@@ -30,9 +30,12 @@ public class CorsConfig {
         CorsConfiguration config = new CorsConfiguration();
         // 只允许前端开发服务器来源，生产环境需改为实际域名
         config.addAllowedOrigin("http://localhost:5173");
+        config.addAllowedOriginPattern("http://*.frp.one:*");
+        config.addAllowedOriginPattern("https://*.frp.one:*");
         // 只允许必要的请求头
         config.addAllowedHeader("Content-Type");
         config.addAllowedHeader("X-Session-Token");
+        config.addAllowedHeader("X-Admin-Token");
         // 只允许必要的 HTTP 方法
         config.addAllowedMethod("GET");
         config.addAllowedMethod("POST");

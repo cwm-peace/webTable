@@ -89,7 +89,8 @@ public class FormServiceImpl implements FormService {
     @Override
     public Map<String, Object> getStatus(String sessionToken) {
         String sessionKey = SESSION_KEY_PREFIX + sessionToken;
-        Long submissionId = (Long) redisUtil.get(sessionKey);
+        Number submissionIdNum = (Number) redisUtil.get(sessionKey);
+        Long submissionId = submissionIdNum != null ? submissionIdNum.longValue() : null;
 
         Submission submission;
         if (submissionId != null) {
@@ -122,11 +123,12 @@ public class FormServiceImpl implements FormService {
     @Override
     public ApiResponse<Void> completeSubmission(String sessionToken) {
         String sessionKey = SESSION_KEY_PREFIX + sessionToken;
-        Long submissionId = (Long) redisUtil.get(sessionKey);
+        Number submissionIdNum = (Number) redisUtil.get(sessionKey);
 
-        if (submissionId == null) {
+        if (submissionIdNum == null) {
             return ApiResponse.error("会话已过期，请重新填写");
         }
+        Long submissionId = submissionIdNum.longValue();
 
         Submission submission = submissionMapper.selectById(submissionId);
         if (submission == null) {

@@ -76,7 +76,7 @@ export const useFormStore = defineStore('form', () => {
         }
       }
 
-      if (!submissionId.value) {
+      if (!submissionId.value || submissionId.value === 'null') {
         const res = await createSubmission()
         sessionToken.value = res.data.sessionToken
         submissionId.value = res.data.submissionId
@@ -100,7 +100,7 @@ export const useFormStore = defineStore('form', () => {
    * 所有数据存储在 store 中，组件通过 store 读取和修改。
    */
   async function loadAllData() {
-    if (!submissionId.value) return
+    if (!submissionId.value || submissionId.value === 'null') return
 
     try {
       // 加载基础信息

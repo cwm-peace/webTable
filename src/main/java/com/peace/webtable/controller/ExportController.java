@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.ByteArrayOutputStream;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -51,19 +52,13 @@ public class ExportController {
         // 生成带时间戳的文件名
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
         String filename = "webtable_export_" + timestamp + ".xlsx";
-        // 对文件名进行 URL 编码，兼容中文浏览器（UTF-8 始终支持，不会抛异常）
-        String encodedFilename;
-        try {
-            encodedFilename = URLEncoder.encode(filename, "UTF-8");
-        } catch (java.io.UnsupportedEncodingException e) {
-            encodedFilename = filename;
-        }
+        String encodedFilename = URLEncoder.encode(filename, StandardCharsets.UTF_8);
 
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                 .header(HttpHeaders.CONTENT_DISPOSITION,
-                        "attachment; filename=\"" + encodedFilename + "\"")
+                        "attachment; filename=\"" + filename + "\"; filename*=UTF-8''" + encodedFilename)
                 .body(bytes);
     }
 }
