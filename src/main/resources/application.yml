@@ -1,0 +1,46 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: webTable
+
+  # 数据源配置
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/webtable?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: root
+    password: adminadmin
+    hikari:
+      maximum-pool-size: 50
+      minimum-idle: 10
+      connection-timeout: 30000
+
+  # Redis 配置（无密码）
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+
+  # 文件上传限制（照片最大 10MB）
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+
+# MyBatis-Plus 配置
+mybatis-plus:
+  configuration:
+    # 驼峰命名映射
+    map-underscore-to-camel-case: true
+    # SQL 日志输出
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      # 主键自增
+      id-type: auto
+
+# 管理员配置
+admin:
+  # 管理员查看系统的登录密码
+  password: admin123

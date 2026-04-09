@@ -1,0 +1,406 @@
+2026-04-09 11:58:34.723 [restartedMain] INFO  c.peace.webtable.WebTableApplication - Starting WebTableApplication using Java 21.0.10 with PID 47565 (/Users/cwm/IdeaProjects/webTable/target/classes started by cwm in /Users/cwm/IdeaProjects/webTable)
+2026-04-09 11:58:34.729 [restartedMain] INFO  c.peace.webtable.WebTableApplication - No active profile set, falling back to 1 default profile: "default"
+2026-04-09 11:58:34.796 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-04-09 11:58:34.797 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-04-09 11:58:35.684 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-04-09 11:58:35.690 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-04-09 11:58:35.738 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 20 ms. Found 0 Redis repository interfaces.
+2026-04-09 11:58:36.735 [restartedMain] INFO  o.s.boot.tomcat.TomcatWebServer - Tomcat initialized with port 8081 (http)
+2026-04-09 11:58:36.754 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8081"]
+2026-04-09 11:58:36.757 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-04-09 11:58:36.757 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-04-09 11:58:36.811 [restartedMain] INFO  o.s.b.w.c.s.WebApplicationContextInitializer - Root WebApplicationContext: initialization completed in 2012 ms
+2026-04-09 11:58:36.957 [restartedMain] INFO  o.a.catalina.core.StandardService - Stopping service [Tomcat]
+2026-04-09 11:58:36.977 [restartedMain] INFO  o.s.b.a.l.ConditionEvaluationReportLogger - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-04-09 12:00:00.392 [restartedMain] INFO  c.peace.webtable.WebTableApplication - Starting WebTableApplication using Java 21.0.10 with PID 47736 (/Users/cwm/IdeaProjects/webTable/target/classes started by cwm in /Users/cwm/IdeaProjects/webTable)
+2026-04-09 12:00:00.395 [restartedMain] INFO  c.peace.webtable.WebTableApplication - No active profile set, falling back to 1 default profile: "default"
+2026-04-09 12:00:00.461 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-04-09 12:00:00.462 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-04-09 12:00:01.381 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-04-09 12:00:01.386 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-04-09 12:00:01.447 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 34 ms. Found 0 Redis repository interfaces.
+2026-04-09 12:00:02.715 [restartedMain] INFO  o.s.boot.tomcat.TomcatWebServer - Tomcat initialized with port 8081 (http)
+2026-04-09 12:00:02.741 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8081"]
+2026-04-09 12:00:02.744 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-04-09 12:00:02.745 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-04-09 12:00:02.818 [restartedMain] INFO  o.s.b.w.c.s.WebApplicationContextInitializer - Root WebApplicationContext: initialization completed in 2354 ms
+2026-04-09 12:00:02.991 [restartedMain] INFO  o.a.catalina.core.StandardService - Stopping service [Tomcat]
+2026-04-09 12:00:03.011 [restartedMain] INFO  o.s.b.a.l.ConditionEvaluationReportLogger - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-04-09 13:46:18.796 [restartedMain] INFO  c.peace.webtable.WebTableApplication - Starting WebTableApplication using Java 21.0.10 with PID 54895 (/Users/cwm/IdeaProjects/webTable/${project.build.directory}/classes started by cwm in /Users/cwm/IdeaProjects/webTable)
+2026-04-09 13:46:18.800 [restartedMain] INFO  c.peace.webtable.WebTableApplication - No active profile set, falling back to 1 default profile: "default"
+2026-04-09 13:46:18.901 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-04-09 13:46:18.902 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-04-09 13:46:19.896 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-04-09 13:46:19.900 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-04-09 13:46:19.967 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 33 ms. Found 0 Redis repository interfaces.
+2026-04-09 13:46:21.274 [restartedMain] INFO  o.s.boot.tomcat.TomcatWebServer - Tomcat initialized with port 8081 (http)
+2026-04-09 13:46:21.299 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8081"]
+2026-04-09 13:46:21.302 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-04-09 13:46:21.302 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-04-09 13:46:21.378 [restartedMain] INFO  o.s.b.w.c.s.WebApplicationContextInitializer - Root WebApplicationContext: initialization completed in 2475 ms
+2026-04-09 13:46:21.558 [restartedMain] INFO  o.a.catalina.core.StandardService - Stopping service [Tomcat]
+2026-04-09 13:46:21.582 [restartedMain] INFO  o.s.b.a.l.ConditionEvaluationReportLogger - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-04-09 13:46:58.497 [restartedMain] INFO  c.peace.webtable.WebTableApplication - Starting WebTableApplication using Java 21.0.10 with PID 54971 (/Users/cwm/IdeaProjects/webTable/${project.build.directory}/classes started by cwm in /Users/cwm/IdeaProjects/webTable)
+2026-04-09 13:46:58.502 [restartedMain] INFO  c.peace.webtable.WebTableApplication - No active profile set, falling back to 1 default profile: "default"
+2026-04-09 13:46:58.579 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-04-09 13:46:58.580 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-04-09 13:46:59.678 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-04-09 13:46:59.685 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-04-09 13:46:59.750 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 33 ms. Found 0 Redis repository interfaces.
+2026-04-09 13:47:00.866 [restartedMain] INFO  o.s.boot.tomcat.TomcatWebServer - Tomcat initialized with port 8081 (http)
+2026-04-09 13:47:00.892 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8081"]
+2026-04-09 13:47:00.894 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-04-09 13:47:00.894 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-04-09 13:47:00.968 [restartedMain] INFO  o.s.b.w.c.s.WebApplicationContextInitializer - Root WebApplicationContext: initialization completed in 2388 ms
+2026-04-09 13:47:01.157 [restartedMain] INFO  o.a.catalina.core.StandardService - Stopping service [Tomcat]
+2026-04-09 13:47:01.186 [restartedMain] INFO  o.s.b.a.l.ConditionEvaluationReportLogger - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-04-09 13:47:38.453 [restartedMain] INFO  c.peace.webtable.WebTableApplication - Starting WebTableApplication using Java 21.0.10 with PID 55070 (/Users/cwm/IdeaProjects/webTable/${project.build.directory}/classes started by cwm in /Users/cwm/IdeaProjects/webTable)
+2026-04-09 13:47:38.457 [restartedMain] INFO  c.peace.webtable.WebTableApplication - No active profile set, falling back to 1 default profile: "default"
+2026-04-09 13:47:38.524 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-04-09 13:47:38.525 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-04-09 13:47:39.557 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-04-09 13:47:39.561 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-04-09 13:47:39.629 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 35 ms. Found 0 Redis repository interfaces.
+2026-04-09 13:47:40.764 [restartedMain] INFO  o.s.boot.tomcat.TomcatWebServer - Tomcat initialized with port 8081 (http)
+2026-04-09 13:47:40.785 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8081"]
+2026-04-09 13:47:40.792 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-04-09 13:47:40.793 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-04-09 13:47:40.877 [restartedMain] INFO  o.s.b.w.c.s.WebApplicationContextInitializer - Root WebApplicationContext: initialization completed in 2352 ms
+2026-04-09 13:47:41.080 [restartedMain] INFO  o.a.catalina.core.StandardService - Stopping service [Tomcat]
+2026-04-09 13:47:41.105 [restartedMain] INFO  o.s.b.a.l.ConditionEvaluationReportLogger - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-04-09 13:49:42.007 [restartedMain] INFO  c.peace.webtable.WebTableApplication - Starting WebTableApplication using Java 21.0.10 with PID 55465 (/Users/cwm/IdeaProjects/webTable/${project.build.directory}/classes started by cwm in /Users/cwm/IdeaProjects/webTable)
+2026-04-09 13:49:42.012 [restartedMain] INFO  c.peace.webtable.WebTableApplication - No active profile set, falling back to 1 default profile: "default"
+2026-04-09 13:49:42.117 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-04-09 13:49:42.118 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-04-09 13:49:43.433 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-04-09 13:49:43.439 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-04-09 13:49:43.518 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 41 ms. Found 0 Redis repository interfaces.
+2026-04-09 13:49:45.114 [restartedMain] INFO  o.s.boot.tomcat.TomcatWebServer - Tomcat initialized with port 8081 (http)
+2026-04-09 13:49:45.145 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8081"]
+2026-04-09 13:49:45.151 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-04-09 13:49:45.152 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-04-09 13:49:45.249 [restartedMain] INFO  o.s.b.w.c.s.WebApplicationContextInitializer - Root WebApplicationContext: initialization completed in 3129 ms
+2026-04-09 13:49:45.441 [restartedMain] INFO  o.a.catalina.core.StandardService - Stopping service [Tomcat]
+2026-04-09 13:49:45.465 [restartedMain] INFO  o.s.b.a.l.ConditionEvaluationReportLogger - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-04-09 13:50:08.449 [restartedMain] INFO  c.peace.webtable.WebTableApplication - Starting WebTableApplication using Java 21.0.10 with PID 55536 (/Users/cwm/IdeaProjects/webTable/${project.build.directory}/classes started by cwm in /Users/cwm/IdeaProjects/webTable)
+2026-04-09 13:50:08.454 [restartedMain] INFO  c.peace.webtable.WebTableApplication - No active profile set, falling back to 1 default profile: "default"
+2026-04-09 13:50:08.543 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-04-09 13:50:08.544 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-04-09 13:50:09.576 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-04-09 13:50:09.580 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-04-09 13:50:09.647 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 40 ms. Found 0 Redis repository interfaces.
+2026-04-09 13:50:10.896 [restartedMain] INFO  o.s.boot.tomcat.TomcatWebServer - Tomcat initialized with port 8081 (http)
+2026-04-09 13:50:10.925 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8081"]
+2026-04-09 13:50:10.931 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-04-09 13:50:10.931 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-04-09 13:50:11.002 [restartedMain] INFO  o.s.b.w.c.s.WebApplicationContextInitializer - Root WebApplicationContext: initialization completed in 2458 ms
+2026-04-09 13:50:11.201 [restartedMain] INFO  o.a.catalina.core.StandardService - Stopping service [Tomcat]
+2026-04-09 13:50:11.226 [restartedMain] INFO  o.s.b.a.l.ConditionEvaluationReportLogger - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-04-09 13:50:58.311 [restartedMain] INFO  c.peace.webtable.WebTableApplication - Starting WebTableApplication using Java 21.0.10 with PID 55645 (/Users/cwm/IdeaProjects/webTable/target/classes started by cwm in /Users/cwm/IdeaProjects/webTable)
+2026-04-09 13:50:58.313 [restartedMain] INFO  c.peace.webtable.WebTableApplication - No active profile set, falling back to 1 default profile: "default"
+2026-04-09 13:50:58.372 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-04-09 13:50:58.373 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-04-09 13:50:59.271 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-04-09 13:50:59.276 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-04-09 13:50:59.326 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 22 ms. Found 0 Redis repository interfaces.
+2026-04-09 13:51:00.474 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8081 (http)
+2026-04-09 13:51:00.494 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8081"]
+2026-04-09 13:51:00.497 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-04-09 13:51:00.497 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.53]
+2026-04-09 13:51:00.553 [restartedMain] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-04-09 13:51:00.553 [restartedMain] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2180 ms
+2026-04-09 13:51:00.856 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-04-09 13:51:01.166 [restartedMain] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@1f99c64b
+2026-04-09 13:51:01.170 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-04-09 13:51:02.758 [restartedMain] INFO  o.s.b.d.a.OptionalLiveReloadServer - LiveReload server is running on port 35729
+2026-04-09 13:51:02.782 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8081"]
+2026-04-09 13:51:02.807 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8081 (http) with context path '/'
+2026-04-09 13:51:02.819 [restartedMain] INFO  c.peace.webtable.WebTableApplication - Started WebTableApplication in 5.461 seconds (process running for 7.342)
+2026-04-09 13:52:15.915 [http-nio-8081-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-04-09 13:52:15.916 [http-nio-8081-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-04-09 13:52:15.923 [http-nio-8081-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 6 ms
+2026-04-09 13:52:16.181 [http-nio-8081-exec-1] INFO  c.p.w.controller.FormController - 收到创建提交请求
+2026-04-09 13:52:18.110 [http-nio-8081-exec-1] INFO  c.p.w.service.impl.FormServiceImpl - 创建新提交记录：submissionId=1, sessionToken=7c42cda70f59462f94dd2fd4cc5ad225
+2026-04-09 13:52:18.302 [http-nio-8081-exec-2] INFO  c.p.w.controller.FormController - 读取第1步数据：submissionId=1
+2026-04-09 13:52:28.435 [http-nio-8081-exec-4] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=1, category=nude
+2026-04-09 13:52:28.435 [http-nio-8081-exec-5] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=1, category=dick
+2026-04-09 13:52:28.435 [http-nio-8081-exec-6] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=1, category=other
+2026-04-09 13:52:28.435 [http-nio-8081-exec-3] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=1, category=selfie
+2026-04-09 13:52:33.614 [http-nio-8081-exec-7] INFO  c.p.w.controller.FormController - 读取第3步左侧数据：submissionId=1
+2026-04-09 13:52:33.614 [http-nio-8081-exec-8] INFO  c.p.w.controller.FormController - 读取第3步右侧数据：submissionId=1
+2026-04-09 13:52:33.682 [http-nio-8081-exec-9] INFO  c.p.w.controller.FormController - 获取左侧栏模板数据
+2026-04-09 13:52:33.799 [http-nio-8081-exec-10] INFO  c.p.w.controller.FormController - 获取右侧栏模板数据
+2026-04-09 13:53:04.559 [http-nio-8081-exec-1] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=1, category=selfie
+2026-04-09 13:53:04.559 [http-nio-8081-exec-2] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=1, category=nude
+2026-04-09 13:53:04.559 [http-nio-8081-exec-5] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=1, category=other
+2026-04-09 13:53:04.559 [http-nio-8081-exec-6] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=1, category=dick
+2026-04-09 13:53:16.868 [http-nio-8081-exec-4] INFO  c.p.w.controller.FormController - 读取第1步数据：submissionId=1
+2026-04-09 13:53:37.779 [http-nio-8081-exec-3] INFO  c.p.w.controller.FormController - 保存第1步数据：submissionId=1
+2026-04-09 13:54:57.877 [SpringApplicationShutdownHook] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-04-09 13:54:57.917 [tomcat-shutdown] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-04-09 13:54:57.950 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-04-09 13:54:57.960 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-04-09 14:05:10.750 [restartedMain] INFO  c.peace.webtable.WebTableApplication - Starting WebTableApplication using Java 21.0.10 with PID 57371 (/Users/cwm/IdeaProjects/webTable/target/classes started by cwm in /Users/cwm/IdeaProjects/webTable)
+2026-04-09 14:05:10.756 [restartedMain] INFO  c.peace.webtable.WebTableApplication - No active profile set, falling back to 1 default profile: "default"
+2026-04-09 14:05:10.874 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-04-09 14:05:10.875 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-04-09 14:05:12.097 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-04-09 14:05:12.103 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-04-09 14:05:12.172 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 30 ms. Found 0 Redis repository interfaces.
+2026-04-09 14:05:13.478 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8081 (http)
+2026-04-09 14:05:13.495 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8081"]
+2026-04-09 14:05:13.498 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-04-09 14:05:13.498 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.53]
+2026-04-09 14:05:13.549 [restartedMain] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-04-09 14:05:13.549 [restartedMain] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2674 ms
+2026-04-09 14:05:13.868 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-04-09 14:05:14.166 [restartedMain] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@746c045c
+2026-04-09 14:05:14.169 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-04-09 14:05:15.984 [restartedMain] INFO  o.s.b.d.a.OptionalLiveReloadServer - LiveReload server is running on port 35729
+2026-04-09 14:05:16.022 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8081"]
+2026-04-09 14:05:16.057 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8081 (http) with context path '/'
+2026-04-09 14:05:16.076 [restartedMain] INFO  c.peace.webtable.WebTableApplication - Started WebTableApplication in 6.504 seconds (process running for 7.963)
+2026-04-09 14:05:25.617 [http-nio-8081-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-04-09 14:05:25.618 [http-nio-8081-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-04-09 14:05:25.620 [http-nio-8081-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 2 ms
+2026-04-09 14:05:25.757 [http-nio-8081-exec-1] INFO  c.p.w.controller.FormController - 收到创建提交请求
+2026-04-09 14:05:25.757 [http-nio-8081-exec-2] INFO  c.p.w.controller.FormController - 收到创建提交请求
+2026-04-09 14:05:27.236 [http-nio-8081-exec-2] INFO  c.p.w.service.impl.FormServiceImpl - 创建新提交记录：submissionId=3, sessionToken=893f758c89aa431395b1dff50d5f31dd
+2026-04-09 14:05:27.237 [http-nio-8081-exec-1] INFO  c.p.w.service.impl.FormServiceImpl - 创建新提交记录：submissionId=2, sessionToken=7ee76618fe0a40cb873a7fedd3e433ac
+2026-04-09 14:05:27.427 [http-nio-8081-exec-3] INFO  c.p.w.controller.FormController - 读取第1步数据：submissionId=2
+2026-04-09 14:05:27.431 [http-nio-8081-exec-4] INFO  c.p.w.controller.FormController - 读取第1步数据：submissionId=3
+2026-04-09 14:05:36.899 [http-nio-8081-exec-8] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=2, category=other
+2026-04-09 14:05:36.899 [http-nio-8081-exec-5] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=2, category=selfie
+2026-04-09 14:05:36.899 [http-nio-8081-exec-6] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=2, category=nude
+2026-04-09 14:05:36.899 [http-nio-8081-exec-7] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=2, category=dick
+2026-04-09 14:05:48.474 [http-nio-8081-exec-9] INFO  c.p.w.controller.PhotoController - 收到照片上传请求：submissionId=2, category=selfie, fileName=微信图片_20260306140235_89.jpg
+2026-04-09 14:05:48.615 [http-nio-8081-exec-9] INFO  c.p.w.service.impl.PhotoServiceImpl - 照片上传成功：submissionId=2, category=selfie, fileName=微信图片_20260306140235_89.jpg, size=894KB
+2026-04-09 14:05:48.628 [http-nio-8081-exec-10] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=2, category=selfie
+2026-04-09 14:05:48.675 [http-nio-8081-exec-2] INFO  c.p.w.controller.PhotoController - 收到照片下载请求：photoId=1
+2026-04-09 14:05:56.301 [http-nio-8081-exec-1] INFO  c.p.w.controller.PhotoController - 收到照片上传请求：submissionId=2, category=selfie, fileName=8footdino_on_scratch-atom-20328_512.gif
+2026-04-09 14:05:56.370 [http-nio-8081-exec-1] INFO  c.p.w.service.impl.PhotoServiceImpl - 照片上传成功：submissionId=2, category=selfie, fileName=8footdino_on_scratch-atom-20328_512.gif, size=443KB
+2026-04-09 14:05:56.390 [http-nio-8081-exec-3] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=2, category=selfie
+2026-04-09 14:05:56.424 [http-nio-8081-exec-4] INFO  c.p.w.controller.PhotoController - 收到照片下载请求：photoId=2
+2026-04-09 14:06:01.592 [http-nio-8081-exec-8] INFO  c.p.w.controller.FormController - 读取第3步左侧数据：submissionId=2
+2026-04-09 14:06:01.592 [http-nio-8081-exec-5] INFO  c.p.w.controller.FormController - 读取第3步右侧数据：submissionId=2
+2026-04-09 14:06:01.636 [http-nio-8081-exec-7] INFO  c.p.w.controller.FormController - 获取左侧栏模板数据
+2026-04-09 14:06:01.752 [http-nio-8081-exec-6] INFO  c.p.w.controller.FormController - 获取右侧栏模板数据
+2026-04-09 14:06:14.211 [http-nio-8081-exec-9] INFO  c.p.w.controller.ExportController - 收到 Excel 导出请求
+2026-04-09 14:06:14.212 [http-nio-8081-exec-9] INFO  c.p.w.service.impl.ExportServiceImpl - 开始导出 Excel 数据
+2026-04-09 14:07:20.466 [SpringApplicationShutdownHook] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-04-09 14:07:20.496 [tomcat-shutdown] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-04-09 14:07:20.531 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-04-09 14:07:20.546 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-04-09 14:09:51.517 [restartedMain] INFO  c.peace.webtable.WebTableApplication - Starting WebTableApplication using Java 21.0.10 with PID 58025 (/Users/cwm/IdeaProjects/webTable/target/classes started by cwm in /Users/cwm/IdeaProjects/webTable)
+2026-04-09 14:09:51.522 [restartedMain] INFO  c.peace.webtable.WebTableApplication - No active profile set, falling back to 1 default profile: "default"
+2026-04-09 14:09:51.649 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-04-09 14:09:51.650 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-04-09 14:09:52.648 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-04-09 14:09:52.652 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-04-09 14:09:52.693 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 20 ms. Found 0 Redis repository interfaces.
+2026-04-09 14:09:54.328 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8081 (http)
+2026-04-09 14:09:54.379 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8081"]
+2026-04-09 14:09:54.384 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-04-09 14:09:54.385 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.53]
+2026-04-09 14:09:54.655 [restartedMain] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-04-09 14:09:54.656 [restartedMain] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 3005 ms
+2026-04-09 14:09:55.343 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-04-09 14:09:55.678 [restartedMain] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@1d65aa47
+2026-04-09 14:09:55.681 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-04-09 14:09:57.568 [restartedMain] INFO  o.s.b.d.a.OptionalLiveReloadServer - LiveReload server is running on port 35729
+2026-04-09 14:09:57.602 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8081"]
+2026-04-09 14:09:57.633 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8081 (http) with context path '/'
+2026-04-09 14:09:57.652 [restartedMain] INFO  c.peace.webtable.WebTableApplication - Started WebTableApplication in 8.048 seconds (process running for 9.585)
+2026-04-09 14:09:59.270 [http-nio-8081-exec-2] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-04-09 14:09:59.270 [http-nio-8081-exec-2] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-04-09 14:09:59.271 [http-nio-8081-exec-2] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
+2026-04-09 14:10:01.664 [http-nio-8081-exec-5] INFO  c.p.w.controller.ExportController - 收到 Excel 导出请求
+2026-04-09 14:10:01.664 [http-nio-8081-exec-5] INFO  c.p.w.service.impl.ExportServiceImpl - 开始导出 Excel 数据
+2026-04-09 14:10:06.056 [http-nio-8081-exec-5] INFO  c.p.w.service.impl.ExportServiceImpl - Excel 导出完成：提交数=0
+2026-04-09 14:13:34.390 [http-nio-8081-exec-10] INFO  c.p.w.controller.FormController - 收到创建提交请求
+2026-04-09 14:13:35.438 [http-nio-8081-exec-10] INFO  c.p.w.service.impl.FormServiceImpl - 创建新提交记录：submissionId=4, sessionToken=08ac88f7d89e49e8a5f6d32a0c701769
+2026-04-09 14:13:35.497 [http-nio-8081-exec-3] INFO  c.p.w.controller.FormController - 读取第1步数据：submissionId=4
+2026-04-09 14:13:38.341 [http-nio-8081-exec-4] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=4, category=dick
+2026-04-09 14:13:38.342 [http-nio-8081-exec-2] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=4, category=selfie
+2026-04-09 14:13:38.342 [http-nio-8081-exec-1] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=4, category=nude
+2026-04-09 14:13:38.342 [http-nio-8081-exec-5] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=4, category=other
+2026-04-09 14:13:39.250 [http-nio-8081-exec-9] INFO  c.p.w.controller.FormController - 读取第3步左侧数据：submissionId=4
+2026-04-09 14:13:39.264 [http-nio-8081-exec-8] INFO  c.p.w.controller.FormController - 读取第3步右侧数据：submissionId=4
+2026-04-09 14:13:39.312 [http-nio-8081-exec-6] INFO  c.p.w.controller.FormController - 获取左侧栏模板数据
+2026-04-09 14:13:39.486 [http-nio-8081-exec-7] INFO  c.p.w.controller.FormController - 获取右侧栏模板数据
+2026-04-09 14:13:47.280 [http-nio-8081-exec-3] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=4, category=nude
+2026-04-09 14:13:47.280 [http-nio-8081-exec-10] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=4, category=selfie
+2026-04-09 14:13:47.280 [http-nio-8081-exec-2] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=4, category=dick
+2026-04-09 14:13:47.280 [http-nio-8081-exec-4] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=4, category=other
+2026-04-09 14:13:48.072 [http-nio-8081-exec-1] INFO  c.p.w.controller.FormController - 读取第1步数据：submissionId=4
+2026-04-09 14:14:36.628 [http-nio-8081-exec-5] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=4, category=selfie
+2026-04-09 14:14:36.628 [http-nio-8081-exec-8] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=4, category=nude
+2026-04-09 14:14:36.628 [http-nio-8081-exec-9] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=4, category=dick
+2026-04-09 14:14:36.629 [http-nio-8081-exec-6] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=4, category=other
+2026-04-09 14:14:46.833 [http-nio-8081-exec-7] INFO  c.p.w.controller.PhotoController - 收到照片上传请求：submissionId=4, category=selfie, fileName=兰亭序.jpg
+2026-04-09 14:14:47.101 [http-nio-8081-exec-7] INFO  c.p.w.service.impl.PhotoServiceImpl - 照片上传成功：submissionId=4, category=selfie, fileName=兰亭序.jpg, size=1715KB
+2026-04-09 14:14:47.117 [http-nio-8081-exec-4] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=4, category=selfie
+2026-04-09 14:14:47.179 [http-nio-8081-exec-10] INFO  c.p.w.controller.PhotoController - 收到照片下载请求：photoId=3
+2026-04-09 14:14:54.186 [http-nio-8081-exec-2] INFO  c.p.w.controller.PhotoController - 收到照片上传请求：submissionId=4, category=nude, fileName=微信图片_20260306140235_89.jpg
+2026-04-09 14:14:54.329 [http-nio-8081-exec-2] INFO  c.p.w.service.impl.PhotoServiceImpl - 照片上传成功：submissionId=4, category=nude, fileName=微信图片_20260306140235_89.jpg, size=894KB
+2026-04-09 14:14:54.349 [http-nio-8081-exec-3] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=4, category=nude
+2026-04-09 14:14:54.369 [http-nio-8081-exec-1] INFO  c.p.w.controller.PhotoController - 收到照片下载请求：photoId=4
+2026-04-09 14:15:00.604 [http-nio-8081-exec-5] INFO  c.p.w.controller.PhotoController - 收到照片上传请求：submissionId=4, category=dick, fileName=兰亭序.png
+2026-04-09 14:15:01.178 [http-nio-8081-exec-5] INFO  c.p.w.service.impl.PhotoServiceImpl - 照片上传成功：submissionId=4, category=dick, fileName=兰亭序.png, size=4375KB
+2026-04-09 14:15:01.214 [http-nio-8081-exec-8] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=4, category=dick
+2026-04-09 14:15:01.230 [http-nio-8081-exec-6] INFO  c.p.w.controller.PhotoController - 收到照片下载请求：photoId=5
+2026-04-09 14:15:06.411 [http-nio-8081-exec-9] INFO  c.p.w.controller.PhotoController - 收到照片上传请求：submissionId=4, category=other, fileName=幕后玩家.png
+2026-04-09 14:15:06.466 [http-nio-8081-exec-9] INFO  c.p.w.service.impl.PhotoServiceImpl - 照片上传成功：submissionId=4, category=other, fileName=幕后玩家.png, size=339KB
+2026-04-09 14:15:06.499 [http-nio-8081-exec-7] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=4, category=other
+2026-04-09 14:15:06.519 [http-nio-8081-exec-4] INFO  c.p.w.controller.PhotoController - 收到照片下载请求：photoId=6
+2026-04-09 14:15:08.820 [http-nio-8081-exec-10] INFO  c.p.w.controller.FormController - 读取第3步左侧数据：submissionId=4
+2026-04-09 14:15:08.820 [http-nio-8081-exec-2] INFO  c.p.w.controller.FormController - 读取第3步右侧数据：submissionId=4
+2026-04-09 14:15:08.982 [http-nio-8081-exec-3] INFO  c.p.w.controller.FormController - 获取左侧栏模板数据
+2026-04-09 14:15:09.095 [http-nio-8081-exec-1] INFO  c.p.w.controller.FormController - 获取右侧栏模板数据
+2026-04-09 14:15:25.049 [http-nio-8081-exec-8] INFO  c.p.w.controller.FormController - 保存第3步右侧数据：submissionId=4, 行数=60
+2026-04-09 14:15:25.049 [http-nio-8081-exec-5] INFO  c.p.w.controller.FormController - 保存第3步左侧数据：submissionId=4, 行数=65
+2026-04-09 14:15:25.303 [http-nio-8081-exec-8] INFO  c.p.w.service.impl.FormServiceImpl - 保存第3步右侧数据：submissionId=4, 行数=60
+2026-04-09 14:15:25.318 [http-nio-8081-exec-5] INFO  c.p.w.service.impl.FormServiceImpl - 保存第3步左侧数据：submissionId=4, 行数=65
+2026-04-09 14:15:38.078 [http-nio-8081-exec-6] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=4, category=selfie
+2026-04-09 14:15:38.078 [http-nio-8081-exec-7] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=4, category=dick
+2026-04-09 14:15:38.078 [http-nio-8081-exec-9] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=4, category=nude
+2026-04-09 14:15:38.082 [http-nio-8081-exec-4] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=4, category=other
+2026-04-09 14:15:38.120 [http-nio-8081-exec-2] INFO  c.p.w.controller.PhotoController - 收到照片下载请求：photoId=5
+2026-04-09 14:15:38.121 [http-nio-8081-exec-10] INFO  c.p.w.controller.PhotoController - 收到照片下载请求：photoId=4
+2026-04-09 14:15:38.124 [http-nio-8081-exec-3] INFO  c.p.w.controller.PhotoController - 收到照片下载请求：photoId=3
+2026-04-09 14:15:38.127 [http-nio-8081-exec-1] INFO  c.p.w.controller.PhotoController - 收到照片下载请求：photoId=6
+2026-04-09 14:15:39.308 [http-nio-8081-exec-8] INFO  c.p.w.controller.FormController - 读取第1步数据：submissionId=4
+2026-04-09 14:16:53.709 [SpringApplicationShutdownHook] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-04-09 14:16:53.737 [tomcat-shutdown] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-04-09 14:16:53.794 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-04-09 14:16:53.808 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-04-09 14:59:06.731 [restartedMain] INFO  c.peace.webtable.WebTableApplication - Starting WebTableApplication using Java 21.0.10 with PID 63900 (/Users/cwm/IdeaProjects/webTable/target/classes started by cwm in /Users/cwm/IdeaProjects/webTable)
+2026-04-09 14:59:06.734 [restartedMain] INFO  c.peace.webtable.WebTableApplication - No active profile set, falling back to 1 default profile: "default"
+2026-04-09 14:59:06.796 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-04-09 14:59:06.796 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-04-09 14:59:07.837 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-04-09 14:59:07.842 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-04-09 14:59:07.899 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 33 ms. Found 0 Redis repository interfaces.
+2026-04-09 14:59:08.822 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8081 (http)
+2026-04-09 14:59:08.842 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8081"]
+2026-04-09 14:59:08.845 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-04-09 14:59:08.845 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.53]
+2026-04-09 14:59:08.899 [restartedMain] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-04-09 14:59:08.899 [restartedMain] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2102 ms
+2026-04-09 14:59:09.175 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-04-09 14:59:09.403 [restartedMain] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@7a0d438b
+2026-04-09 14:59:09.407 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-04-09 14:59:10.779 [restartedMain] INFO  o.s.b.d.a.OptionalLiveReloadServer - LiveReload server is running on port 35729
+2026-04-09 14:59:10.808 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8081"]
+2026-04-09 14:59:10.843 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8081 (http) with context path '/'
+2026-04-09 14:59:10.858 [restartedMain] INFO  c.peace.webtable.WebTableApplication - Started WebTableApplication in 4.995 seconds (process running for 6.392)
+2026-04-09 14:59:23.449 [http-nio-8081-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-04-09 14:59:23.450 [http-nio-8081-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-04-09 14:59:23.453 [http-nio-8081-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 2 ms
+2026-04-09 14:59:23.567 [http-nio-8081-exec-1] INFO  c.p.w.controller.FormController - 收到创建提交请求
+2026-04-09 14:59:25.001 [http-nio-8081-exec-1] INFO  c.p.w.service.impl.FormServiceImpl - 创建新提交记录：submissionId=5, sessionToken=438f***
+2026-04-09 14:59:25.113 [http-nio-8081-exec-2] INFO  c.p.w.controller.FormController - 读取第1步数据：submissionId=5
+2026-04-09 14:59:25.236 [http-nio-8081-exec-3] INFO  c.p.w.controller.FormController - 读取第3步左侧数据：submissionId=5
+2026-04-09 14:59:25.271 [http-nio-8081-exec-4] INFO  c.p.w.controller.FormController - 获取左侧栏模板数据
+2026-04-09 14:59:25.312 [http-nio-8081-exec-5] INFO  c.p.w.controller.FormController - 读取第3步右侧数据：submissionId=5
+2026-04-09 14:59:25.341 [http-nio-8081-exec-6] INFO  c.p.w.controller.FormController - 获取右侧栏模板数据
+2026-04-09 14:59:44.742 [http-nio-8081-exec-9] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=5, category=other
+2026-04-09 14:59:44.742 [http-nio-8081-exec-7] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=5, category=selfie
+2026-04-09 14:59:44.742 [http-nio-8081-exec-8] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=5, category=nude
+2026-04-09 14:59:44.742 [http-nio-8081-exec-10] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=5, category=dick
+2026-04-09 15:00:41.686 [http-nio-8081-exec-1] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=5, category=selfie
+2026-04-09 15:00:41.686 [http-nio-8081-exec-2] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=5, category=nude
+2026-04-09 15:00:41.688 [http-nio-8081-exec-4] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=5, category=other
+2026-04-09 15:00:41.688 [http-nio-8081-exec-3] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=5, category=dick
+2026-04-09 15:00:49.342 [http-nio-8081-exec-5] INFO  c.p.w.controller.PhotoController - 收到照片上传请求：submissionId=5, category=selfie, fileName=微信图片_20260306140235_89.jpg
+2026-04-09 15:00:49.485 [http-nio-8081-exec-5] INFO  c.p.w.service.impl.PhotoServiceImpl - 照片上传成功：submissionId=5, category=selfie, fileName=微信图片_20260306140235_89.jpg, size=894KB
+2026-04-09 15:00:49.495 [http-nio-8081-exec-6] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=5, category=selfie
+2026-04-09 15:00:49.533 [http-nio-8081-exec-10] INFO  c.p.w.controller.PhotoController - 收到照片下载请求：photoId=7
+2026-04-09 15:00:54.382 [http-nio-8081-exec-9] INFO  c.p.w.controller.PhotoController - 收到照片上传请求：submissionId=5, category=selfie, fileName=8footdino_on_scratch-atom-20328_512.gif
+2026-04-09 15:00:54.484 [http-nio-8081-exec-9] INFO  c.p.w.service.impl.PhotoServiceImpl - 照片上传成功：submissionId=5, category=selfie, fileName=8footdino_on_scratch-atom-20328_512.gif, size=443KB
+2026-04-09 15:00:54.495 [http-nio-8081-exec-7] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=5, category=selfie
+2026-04-09 15:00:54.510 [http-nio-8081-exec-8] INFO  c.p.w.controller.PhotoController - 收到照片下载请求：photoId=8
+2026-04-09 15:01:55.518 [http-nio-8081-exec-3] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=5, category=selfie
+2026-04-09 15:01:55.519 [http-nio-8081-exec-1] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=5, category=other
+2026-04-09 15:01:55.519 [http-nio-8081-exec-4] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=5, category=dick
+2026-04-09 15:01:55.519 [http-nio-8081-exec-2] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=5, category=nude
+2026-04-09 15:02:25.578 [SpringApplicationShutdownHook] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-04-09 15:02:25.640 [tomcat-shutdown] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-04-09 15:02:25.670 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-04-09 15:02:25.681 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-04-09 15:43:59.036 [restartedMain] INFO  c.peace.webtable.WebTableApplication - Starting WebTableApplication using Java 21.0.10 with PID 68607 (/Users/cwm/IdeaProjects/webTable/target/classes started by cwm in /Users/cwm/IdeaProjects/webTable)
+2026-04-09 15:43:59.038 [restartedMain] INFO  c.peace.webtable.WebTableApplication - No active profile set, falling back to 1 default profile: "default"
+2026-04-09 15:43:59.135 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-04-09 15:43:59.135 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-04-09 15:44:00.644 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-04-09 15:44:00.652 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-04-09 15:44:00.733 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 32 ms. Found 0 Redis repository interfaces.
+2026-04-09 15:44:02.039 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8081 (http)
+2026-04-09 15:44:02.082 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8081"]
+2026-04-09 15:44:02.087 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-04-09 15:44:02.088 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.53]
+2026-04-09 15:44:02.159 [restartedMain] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-04-09 15:44:02.159 [restartedMain] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 3023 ms
+2026-04-09 15:44:03.334 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-04-09 15:44:03.944 [restartedMain] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@6ea248c7
+2026-04-09 15:44:03.948 [restartedMain] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-04-09 15:44:06.092 [restartedMain] INFO  o.s.b.d.a.OptionalLiveReloadServer - LiveReload server is running on port 35729
+2026-04-09 15:44:06.139 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8081"]
+2026-04-09 15:44:06.175 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8081 (http) with context path '/'
+2026-04-09 15:44:06.189 [restartedMain] INFO  c.peace.webtable.WebTableApplication - Started WebTableApplication in 8.365 seconds (process running for 10.022)
+2026-04-09 15:44:11.984 [http-nio-8081-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-04-09 15:44:11.985 [http-nio-8081-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-04-09 15:44:11.990 [http-nio-8081-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 4 ms
+2026-04-09 15:44:12.228 [http-nio-8081-exec-1] INFO  c.p.w.controller.AdminController - 收到管理员登录请求
+2026-04-09 15:44:13.274 [http-nio-8081-exec-1] INFO  c.p.w.service.impl.AdminServiceImpl - 管理员登录成功
+2026-04-09 15:45:10.957 [http-nio-8081-exec-2] INFO  c.p.w.controller.AdminController - 收到管理员登录请求
+2026-04-09 15:45:11.023 [http-nio-8081-exec-2] INFO  c.p.w.service.impl.AdminServiceImpl - 管理员登录成功
+2026-04-09 15:45:16.615 [http-nio-8081-exec-3] INFO  c.p.w.controller.AdminController - 收到管理员登录请求
+2026-04-09 15:45:16.627 [http-nio-8081-exec-3] INFO  c.p.w.service.impl.AdminServiceImpl - 管理员登录成功
+2026-04-09 15:45:17.953 [http-nio-8081-exec-4] INFO  c.p.w.controller.AdminController - 收到管理员登录请求
+2026-04-09 15:45:17.973 [http-nio-8081-exec-4] INFO  c.p.w.service.impl.AdminServiceImpl - 管理员登录成功
+2026-04-09 15:45:18.721 [http-nio-8081-exec-5] INFO  c.p.w.controller.AdminController - 收到管理员登录请求
+2026-04-09 15:45:18.723 [http-nio-8081-exec-5] INFO  c.p.w.service.impl.AdminServiceImpl - 管理员登录成功
+2026-04-09 15:45:18.905 [http-nio-8081-exec-6] INFO  c.p.w.controller.AdminController - 收到管理员登录请求
+2026-04-09 15:45:18.924 [http-nio-8081-exec-6] INFO  c.p.w.service.impl.AdminServiceImpl - 管理员登录成功
+2026-04-09 15:45:19.057 [http-nio-8081-exec-7] INFO  c.p.w.controller.AdminController - 收到管理员登录请求
+2026-04-09 15:45:19.073 [http-nio-8081-exec-7] INFO  c.p.w.service.impl.AdminServiceImpl - 管理员登录成功
+2026-04-09 15:45:19.186 [http-nio-8081-exec-8] INFO  c.p.w.controller.AdminController - 收到管理员登录请求
+2026-04-09 15:45:19.189 [http-nio-8081-exec-8] INFO  c.p.w.service.impl.AdminServiceImpl - 管理员登录成功
+2026-04-09 15:45:54.005 [http-nio-8081-exec-9] INFO  c.p.w.controller.AdminController - 收到管理员登录请求
+2026-04-09 15:45:54.022 [http-nio-8081-exec-9] INFO  c.p.w.service.impl.AdminServiceImpl - 管理员登录成功
+2026-04-09 15:49:21.045 [http-nio-8081-exec-10] INFO  c.p.w.controller.AdminController - 收到管理员登录请求
+2026-04-09 15:49:21.055 [http-nio-8081-exec-10] INFO  c.p.w.service.impl.AdminServiceImpl - 管理员登录成功
+2026-04-09 15:49:21.728 [http-nio-8081-exec-1] INFO  c.p.w.controller.AdminController - 获取提交列表
+2026-04-09 15:49:25.827 [http-nio-8081-exec-2] INFO  c.p.w.controller.AdminController - 获取提交列表
+2026-04-09 15:49:31.037 [http-nio-8081-exec-3] INFO  c.p.w.controller.FormController - 收到创建提交请求
+2026-04-09 15:49:31.108 [http-nio-8081-exec-3] INFO  c.p.w.service.impl.FormServiceImpl - 创建新提交记录：submissionId=6, sessionToken=2fdb***
+2026-04-09 15:49:31.181 [http-nio-8081-exec-4] INFO  c.p.w.controller.FormController - 读取第1步数据：submissionId=6
+2026-04-09 15:49:31.236 [http-nio-8081-exec-5] INFO  c.p.w.controller.FormController - 读取第3步左侧数据：submissionId=6
+2026-04-09 15:49:31.298 [http-nio-8081-exec-6] INFO  c.p.w.controller.FormController - 获取左侧栏模板数据
+2026-04-09 15:49:31.384 [http-nio-8081-exec-7] INFO  c.p.w.controller.FormController - 读取第3步右侧数据：submissionId=6
+2026-04-09 15:49:31.411 [http-nio-8081-exec-8] INFO  c.p.w.controller.FormController - 获取右侧栏模板数据
+2026-04-09 15:50:42.509 [http-nio-8081-exec-10] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=6, category=nude
+2026-04-09 15:50:42.509 [http-nio-8081-exec-1] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=6, category=dick
+2026-04-09 15:50:42.509 [http-nio-8081-exec-2] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=6, category=other
+2026-04-09 15:50:42.509 [http-nio-8081-exec-9] INFO  c.p.w.controller.PhotoController - 查询照片列表：submissionId=6, category=selfie
+2026-04-09 16:11:42.388 [http-nio-8081-exec-3] INFO  c.p.w.controller.FormController - 查询提交状态：sessionToken=2fdb***
+2026-04-09 16:13:07.304 [http-nio-8081-exec-4] INFO  c.p.w.controller.FormController - 查询提交状态：sessionToken=2fdb***
+2026-04-09 16:15:18.835 [SpringApplicationShutdownHook] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-04-09 16:15:18.921 [tomcat-shutdown] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-04-09 16:15:19.129 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-04-09 16:15:19.136 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
