@@ -294,8 +294,10 @@ public class AdminServiceImpl implements AdminService {
                             img.scaleAbsolute(maxWidth, img.getHeight() * scale);
                         }
                         img.setAlignment(Element.ALIGN_CENTER);
-                        img.setSpacingAfter(8);
-                        document.add(img);
+                        Paragraph imgParagraph = new Paragraph();
+                        imgParagraph.add(img);
+                        imgParagraph.setSpacingAfter(8);
+                        document.add(imgParagraph);
                     }
                 }
             }

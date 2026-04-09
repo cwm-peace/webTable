@@ -107,16 +107,12 @@ public class AdminController {
 
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
         String filename = "webtable_" + submissionId + "_" + timestamp + ".pdf";
-        String encodedFilename;
-        try {
-            encodedFilename = URLEncoder.encode(filename, "UTF-8");
-        } catch (java.io.UnsupportedEncodingException e) {
-            encodedFilename = filename;
-        }
+        String encodedFilename = URLEncoder.encode(filename, StandardCharsets.UTF_8);
 
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_PDF)
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodedFilename + "\"")
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" + filename + "\"; filename*=UTF-8''" + encodedFilename)
                 .body(bytes);
     }
 }

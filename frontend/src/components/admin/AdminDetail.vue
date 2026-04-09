@@ -190,7 +190,8 @@
  */
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { getSubmissionDetail, exportPdf, getPhotoUrl } from '../../api/admin'
+import { getSubmissionDetail, exportPdf } from '../../api/admin'
+import { getPhotoUrl } from '../../api/photo'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'

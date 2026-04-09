@@ -20,6 +20,7 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    allowedHosts: ['sj.frp.one'],
     proxy: {
       '/api': {
         target: 'http://localhost:8081',

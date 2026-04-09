@@ -40,7 +40,7 @@
           <label v-else class="w-full h-full flex flex-col items-center justify-center cursor-pointer text-muted-foreground">
             <span class="text-2xl font-light">+</span>
             <span class="text-xs mt-1">上传</span>
-            <input type="file" accept="image/*" @change="handleFileSelect" hidden :disabled="uploading" />
+            <input type="file" accept="image/png,image/jpeg,image/gif,image/webp,image/bmp" @change="handleFileSelect" class="hidden" :disabled="uploading" />
           </label>
         </div>
       </div>
@@ -81,6 +81,7 @@ onMounted(async () => {
 })
 
 async function loadPhotos() {
+  if (!store.submissionId) return
   try {
     const res = await listPhotos(store.submissionId, props.category)
     photos.value = res.data || []

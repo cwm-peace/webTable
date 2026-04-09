@@ -20,13 +20,18 @@ export async function exportAll() {
     headers: { 'X-Session-Token': token }
   })
 
-  // 从响应头中提取文件名，或使用默认名称
+  // 从响应头中提取文件名，优先使用 filename* (RFC 5987)
   const contentDisposition = response.headers['content-disposition']
   let filename = 'webtable_export.xlsx'
   if (contentDisposition) {
-    const match = contentDisposition.match(/filename="?(.+)"?/)
-    if (match) {
-      filename = decodeURIComponent(match[1])
+    const starredMatch = contentDisposition.match(/filename\*=UTF-8''(.+)/i)
+    if (starredMatch) {
+      filename = decodeURIComponent(starredMatch[1])
+    } else {
+      const match = contentDisposition.match(/filename="?([^";\s]+)"?/)
+      if (match) {
+        filename = match[1]
+      }
     }
   }
 

@@ -51,13 +51,18 @@ export async function exportPdf(submissionId) {
     headers: { 'X-Admin-Token': token }
   })
 
-  // 从响应头提取文件名
+  // 从响应头提取文件名，优先使用 filename* (RFC 5987)
   const contentDisposition = response.headers['content-disposition']
   let filename = 'webtable_export.pdf'
   if (contentDisposition) {
-    const match = contentDisposition.match(/filename="?(.+)"?/)
-    if (match) {
-      filename = decodeURIComponent(match[1])
+    const starredMatch = contentDisposition.match(/filename\*=UTF-8''(.+)/i)
+    if (starredMatch) {
+      filename = decodeURIComponent(starredMatch[1])
+    } else {
+      const match = contentDisposition.match(/filename="?([^";\s]+)"?/)
+      if (match) {
+        filename = match[1]
+      }
     }
   }
 

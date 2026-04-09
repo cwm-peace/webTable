@@ -53,14 +53,14 @@
       </Card>
 
       <!-- 底部导出和管理入口 -->
-      <div class="flex justify-between items-center mt-4" v-if="!formStore.loading && !formStore.completed">
+<!--      <div class="flex justify-between items-center mt-4" v-if="!formStore.loading && !formStore.completed">
         <router-link to="/admin" class="text-sm text-muted-foreground hover:text-primary transition-colors">
           管理入口
         </router-link>
         <Button variant="ghost" size="sm" @click="handleExport" class="text-muted-foreground">
           导出 Excel
         </Button>
-      </div>
+      </div>-->
     </div>
 
     <!-- 预览弹窗 -->
