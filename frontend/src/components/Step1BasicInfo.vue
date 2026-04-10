@@ -17,7 +17,7 @@
       <p class="text-muted-foreground mt-1">以下部分未知或记不清可不填</p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <!-- 基本身体信息 -->
       <Card v-motion :initial="{ opacity: 0, y: 30 }" :enter="{ opacity: 1, y: 0, transition: { delay: 100 } }">
         <CardHeader>
@@ -58,28 +58,30 @@
       </Card>
 
       <!-- 个人习惯 -->
-      <Card v-motion :initial="{ opacity: 0, y: 30 }" :enter="{ opacity: 1, y: 0, transition: { delay: 400 } }">
+      <Card class="lg:col-span-2" v-motion :initial="{ opacity: 0, y: 30 }" :enter="{ opacity: 1, y: 0, transition: { delay: 400 } }">
         <CardHeader>
           <CardTitle class="text-base">个人习惯</CardTitle>
         </CardHeader>
         <CardContent class="space-y-4">
-          <div v-for="field in habitFields" :key="field.key" class="space-y-1.5">
-            <Label :for="field.key">{{ field.label }}</Label>
-            <Input :id="field.key" v-model="store.basicInfo[field.key]" :placeholder="field.placeholder || '请输入'" />
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div v-for="field in habitFields" :key="field.key" class="space-y-1.5">
+              <Label :for="field.key">{{ field.label }}</Label>
+              <Input :id="field.key" v-model="store.basicInfo[field.key]" :placeholder="field.placeholder || '请输入'" />
+            </div>
           </div>
         </CardContent>
       </Card>
 
       <!-- 其他 -->
-      <Card class="md:col-span-2" v-motion :initial="{ opacity: 0, y: 30 }" :enter="{ opacity: 1, y: 0, transition: { delay: 500 } }">
+      <Card class="md:col-span-2 lg:col-span-3" v-motion :initial="{ opacity: 0, y: 30 }" :enter="{ opacity: 1, y: 0, transition: { delay: 500 } }">
         <CardHeader>
           <CardTitle class="text-base">其他</CardTitle>
         </CardHeader>
         <CardContent>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div v-for="field in otherFields" :key="field.key" class="space-y-1.5">
               <Label :for="field.key">{{ field.label }}</Label>
-              <Textarea v-if="field.key === 'remark'" :id="field.key" v-model="store.basicInfo[field.key]" placeholder="补充说明..." rows="3" />
+              <Textarea v-if="field.key === 'remark' || field.key === 'trainingIntention'" :id="field.key" v-model="store.basicInfo[field.key]" placeholder="补充说明..." rows="3" />
               <Input v-else :id="field.key" v-model="store.basicInfo[field.key]" placeholder="请输入" />
             </div>
           </div>
@@ -147,6 +149,7 @@ const otherFields = [
   { key: 'dailyMaxEjaculation', label: '每日最高射精次数' },
   { key: 'preferredName', label: '喜欢被叫的称呼' },
   { key: 'selfDescription', label: '一句话形容自己' },
-  { key: 'remark', label: '备注' }
+  { key: 'remark', label: '备注' },
+  { key: 'trainingIntention', label: '培养意向' }
 ]
 </script>

@@ -6,7 +6,7 @@
 -->
 <template>
   <div class="min-h-screen bg-background">
-    <div class="max-w-[1100px] mx-auto px-4 sm:px-5 py-6 sm:py-8">
+    <div class="px-4 sm:px-6 lg:px-10 py-6 sm:py-8">
       <!-- 顶部标题 -->
       <header class="text-center mb-6 sm:mb-8"
         v-motion
@@ -26,7 +26,7 @@
       </Card>
 
       <!-- 已完成状态 -->
-      <Card v-else-if="formStore.completed" class="text-center py-12 sm:py-16"
+      <Card v-else-if="formStore.completed" class="text-center py-12 sm:py-16 max-w-xl lg:mx-auto"
         v-motion
         :initial="{ opacity: 0, scale: 0.95 }"
         :enter="{ opacity: 1, scale: 1, transition: { duration: 400 } }"

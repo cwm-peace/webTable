@@ -7,7 +7,7 @@
 -->
 <template>
   <div class="min-h-screen bg-background">
-    <div class="max-w-[1100px] mx-auto px-4 sm:px-5 py-6 sm:py-8">
+    <div class="px-4 sm:px-6 lg:px-10 py-6 sm:py-8">
       <!-- 顶部导航 -->
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
         <div>
@@ -87,8 +87,8 @@
               <div>更新：{{ formatDate(item.updateTime) }}</div>
             </div>
             <div class="flex gap-2">
-              <Button variant="outline" size="sm" class="flex-1" @click="goToDetail(item.id)">查看详情</Button>
-              <Button variant="outline" size="sm" class="flex-1" @click="handleExportPdf(item.id)">导出 PDF</Button>
+              <Button variant="outline" class="flex-1 h-11 text-sm" @click="goToDetail(item.id)">查看详情</Button>
+              <Button variant="outline" class="flex-1 h-11 text-sm" @click="handleExportPdf(item.id)">导出 PDF</Button>
             </div>
           </CardContent>
         </Card>

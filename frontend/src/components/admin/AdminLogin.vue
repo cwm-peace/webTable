@@ -7,7 +7,7 @@
 -->
 <template>
   <div class="min-h-screen bg-background flex items-center justify-center px-4">
-    <Card class="w-full max-w-sm"
+    <Card class="w-full max-w-md"
       v-motion
       :initial="{ opacity: 0, y: 20 }"
       :enter="{ opacity: 1, y: 0, transition: { duration: 400 } }"
@@ -25,11 +25,12 @@
               type="password"
               v-model="password"
               placeholder="请输入密码"
+              class="h-11"
               @keyup.enter="handleLogin"
             />
           </div>
           <p v-if="errorMsg" class="text-sm text-destructive">{{ errorMsg }}</p>
-          <Button class="w-full" @click="handleLogin" :disabled="loading">
+          <Button class="w-full h-11" @click="handleLogin" :disabled="loading">
             {{ loading ? '登录中...' : '登录' }}
           </Button>
         </div>
