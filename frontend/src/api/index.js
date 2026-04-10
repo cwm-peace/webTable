@@ -10,6 +10,19 @@
  */
 import axios from 'axios'
 
+const SESSION_TOKEN_KEY = 'sessionToken'
+
+/**
+ * 获取当前填写会话令牌
+ *
+ * 优先读取 localStorage，兼容旧版 sessionStorage。
+ *
+ * @returns {string} 会话令牌
+ */
+function getSessionToken() {
+  return localStorage.getItem(SESSION_TOKEN_KEY) || sessionStorage.getItem(SESSION_TOKEN_KEY) || ''
+}
+
 // 创建 axios 实例，所有 API 请求通过此实例发送
 const request = axios.create({
   baseURL: '/api',
@@ -19,12 +32,11 @@ const request = axios.create({
 /**
  * 请求拦截器
  *
- * 在每个请求发送前，自动从 sessionStorage 获取会话令牌并添加到请求头。
- * 会话令牌在用户首次访问时生成，存储在浏览器 sessionStorage 中。
+ * 在每个请求发送前，自动从浏览器存储获取会话令牌并添加到请求头。
  */
 request.interceptors.request.use(config => {
   // 填写页面的会话令牌
-  const token = sessionStorage.getItem('sessionToken')
+  const token = getSessionToken()
   if (token) {
     config.headers['X-Session-Token'] = token
   }

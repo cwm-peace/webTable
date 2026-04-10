@@ -64,7 +64,7 @@
     </div>
 
     <!-- 预览弹窗 -->
-    <PreviewDialog v-model:open="showPreview" @saved="handleSaved" />
+    <PreviewDialog v-model:open="showPreview" />
   </div>
 </template>
 
@@ -97,6 +97,4 @@ async function handleExport() {
     console.error('导出失败：', error)
   }
 }
-
-function handleSaved() {}
 </script>

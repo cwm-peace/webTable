@@ -1,12 +1,12 @@
 <!--
   预览弹窗组件
 
-  职责：展示所有填写内容的摘要预览，用户确认后才真正保存。
+  职责：展示所有填写内容的摘要预览，用户确认后才真正提交。
   使用 shadcn-vue Dialog 组件，包含：
   - 基础信息摘要（关键字段）
   - 照片上传统计
   - 自评完成度（进度条）
-  - 底部："返回修改"和"确认保存"按钮
+  - 底部："返回修改"和"确认提交"按钮
 -->
 <template>
   <Dialog v-model:open="dialogOpen">
@@ -14,7 +14,7 @@
       <DialogHeader>
         <DialogTitle>填写预览</DialogTitle>
         <DialogDescription>
-          请确认以下信息无误后，点击"确认保存"提交
+          请确认以下信息无误后，点击"确认提交"完成填写
         </DialogDescription>
       </DialogHeader>
 
@@ -26,9 +26,9 @@
             基础信息
           </h4>
           <div class="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
-            <div v-for="item in basicInfoSummary" :key="item.key" class="flex justify-between">
-              <span class="text-muted-foreground">{{ item.label }}：</span>
-              <span class="font-medium">{{ item.value || '—' }}</span>
+            <div v-for="item in basicInfoSummary" :key="item.key" class="flex justify-between gap-3">
+              <span class="text-muted-foreground shrink-0">{{ item.label }}：</span>
+              <span class="font-medium text-right break-all">{{ item.value || '—' }}</span>
             </div>
           </div>
         </div>
@@ -61,28 +61,28 @@
             <div>
               <div class="flex justify-between text-sm mb-1">
                 <span>左侧栏</span>
-                <span class="text-muted-foreground">{{ leftCompleted }}/65 项</span>
+                <span class="text-muted-foreground">{{ leftCompleted }}/{{ store.leftRows.length }} 项</span>
               </div>
               <div class="h-2 bg-muted rounded-full overflow-hidden">
-                <div class="h-full bg-primary rounded-full transition-all duration-500" :style="{ width: (leftCompleted / 65 * 100) + '%' }"></div>
+                <div class="h-full bg-primary rounded-full transition-all duration-500" :style="{ width: leftProgress + '%' }"></div>
               </div>
             </div>
             <div>
               <div class="flex justify-between text-sm mb-1">
                 <span>右侧栏</span>
-                <span class="text-muted-foreground">{{ rightCompleted }}/60 项</span>
+                <span class="text-muted-foreground">{{ rightCompleted }}/{{ store.rightRows.length }} 项</span>
               </div>
               <div class="h-2 bg-muted rounded-full overflow-hidden">
-                <div class="h-full bg-primary rounded-full transition-all duration-500" :style="{ width: (rightCompleted / 60 * 100) + '%' }"></div>
+                <div class="h-full bg-primary rounded-full transition-all duration-500" :style="{ width: rightProgress + '%' }"></div>
               </div>
             </div>
             <div>
               <div class="flex justify-between text-sm mb-1">
                 <span class="font-medium">总完成度</span>
-                <span class="font-medium">{{ totalCompleted }}/125 项</span>
+                <span class="font-medium">{{ totalCompleted }}/{{ totalCount }} 项</span>
               </div>
               <div class="h-2.5 bg-muted rounded-full overflow-hidden">
-                <div class="h-full bg-emerald-500 rounded-full transition-all duration-500" :style="{ width: (totalCompleted / 125 * 100) + '%' }"></div>
+                <div class="h-full bg-emerald-500 rounded-full transition-all duration-500" :style="{ width: totalProgress + '%' }"></div>
               </div>
             </div>
           </div>
@@ -96,7 +96,7 @@
           :disabled="store.saving"
           class="bg-emerald-600 hover:bg-emerald-700"
         >
-          {{ store.saving ? '保存中...' : '确认保存' }}
+          {{ store.saving ? '提交中...' : '确认提交' }}
         </Button>
       </DialogFooter>
     </DialogContent>
@@ -107,7 +107,7 @@
 /**
  * 预览弹窗组件逻辑
  *
- * 展示填写摘要，计算完成度，确认后调用 store.submitAll() 一次性保存。
+ * 展示填写摘要，计算完成度，确认后调用 store.submitAll() 完成提交。
  */
 import { computed } from 'vue'
 import { useFormStore } from '../stores/form'
@@ -122,7 +122,7 @@ const props = defineProps({
   open: { type: Boolean, default: false }
 })
 
-const emit = defineEmits(['update:open', 'saved'])
+const emit = defineEmits(['update:open'])
 
 const store = useFormStore()
 
@@ -148,31 +148,43 @@ const photoCategories = [
   { key: 'other', label: '其他' }
 ]
 
-// 左侧自评完成数（选择了级别的项）
 const leftCompleted = computed(() =>
   store.leftRows.filter(r => r.level).length
 )
 
-// 右侧自评完成数
 const rightCompleted = computed(() =>
   store.rightRows.filter(r => r.level).length
 )
 
-// 总完成度
 const totalCompleted = computed(() =>
   leftCompleted.value + rightCompleted.value
 )
 
+const totalCount = computed(() =>
+  store.leftRows.length + store.rightRows.length
+)
+
+const leftProgress = computed(() =>
+  store.leftRows.length ? (leftCompleted.value / store.leftRows.length) * 100 : 0
+)
+
+const rightProgress = computed(() =>
+  store.rightRows.length ? (rightCompleted.value / store.rightRows.length) * 100 : 0
+)
+
+const totalProgress = computed(() =>
+  totalCount.value ? (totalCompleted.value / totalCount.value) * 100 : 0
+)
+
 /**
- * 确认保存
+ * 确认提交
  *
- * 调用 store 的 submitAll() 方法，一次性保存所有数据并标记完成。
+ * 调用 store 的 submitAll() 方法，保存所有数据并标记完成。
  */
 async function handleConfirm() {
   const success = await store.submitAll()
   if (success) {
     dialogOpen.value = false
-    emit('saved')
   }
 }
 </script>

@@ -14,7 +14,7 @@ import axios from 'axios'
  * 下载后自动触发浏览器保存文件对话框。
  */
 export async function exportAll() {
-  const token = sessionStorage.getItem('sessionToken')
+  const token = localStorage.getItem('sessionToken') || sessionStorage.getItem('sessionToken') || ''
   const response = await axios.get('/api/export/all', {
     responseType: 'blob',
     headers: { 'X-Session-Token': token }

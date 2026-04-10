@@ -1,10 +1,3 @@
-<!--
-  步骤指示器组件（v3 - Tailwind 版）
-
-  职责：显示当前填写进度，提供步骤间的导航。
-  v3 变更：去掉步骤内保存按钮，第3步底部出现"保存提交"按钮。
-  点击"保存提交"会触发 showPreview 事件，由 App.vue 弹出预览 Dialog。
--->
 <template>
   <div>
     <!-- 步骤条 -->
@@ -60,7 +53,8 @@
       <Button
         v-if="formStore.currentStep > 1"
         variant="outline"
-        @click="formStore.prevStep()"
+        @click="handlePrev"
+        :disabled="formStore.saving"
         class="order-2 sm:order-1"
       >
         ← 上一步
@@ -70,18 +64,20 @@
       <div class="flex gap-3 order-1 sm:order-2">
         <Button
           v-if="formStore.currentStep < 3"
-          @click="formStore.nextStep()"
+          @click="handleNext"
+          :disabled="formStore.saving"
           class="flex-1 sm:flex-none"
         >
-          下一步 →
+          {{ formStore.saving ? '保存中...' : '下一步 →' }}
         </Button>
         <Button
           v-if="formStore.currentStep === 3"
           variant="default"
-          @click="$emit('showPreview')"
+          @click="handlePreview"
+          :disabled="formStore.saving"
           class="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-700"
         >
-          保存提交
+          {{ formStore.saving ? '保存中...' : '保存提交' }}
         </Button>
       </div>
     </div>
@@ -95,7 +91,7 @@
 import { useFormStore } from '../stores/form'
 import { Button } from '@/components/ui/button'
 
-defineEmits(['showPreview'])
+const emit = defineEmits(['showPreview'])
 
 const formStore = useFormStore()
 
@@ -121,9 +117,24 @@ function stepLabelClass(index) {
   return 'text-muted-foreground'
 }
 
-function onStepClick(stepNum) {
+async function handlePrev() {
+  await formStore.prevStep()
+}
+
+async function handleNext() {
+  await formStore.nextStep()
+}
+
+async function handlePreview() {
+  const ready = await formStore.preparePreview()
+  if (ready) {
+    emit('showPreview')
+  }
+}
+
+async function onStepClick(stepNum) {
   if (stepNum <= formStore.currentStep) {
-    formStore.goToStep(stepNum)
+    await formStore.goToStep(stepNum)
   }
 }
 </script>

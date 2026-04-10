@@ -2,8 +2,7 @@
   第3步：接受程度自评组件（v3 - Tailwind 版）
 
   职责：展示和编辑范本中接受程度自评 Sheet 的左右双栏数据。
-  数据绑定到 Pinia store，去掉保存按钮。
-  保留 vxe-table（因为编辑功能复杂），外层用 Tailwind Card 包裹。
+  数据绑定到 Pinia store，改为按类型分组的卡片式表单，提升手机端连续填写体验。
 -->
 <template>
   <div>
@@ -42,42 +41,43 @@
           <CardTitle class="text-base">左侧栏</CardTitle>
           <CardDescription>性奴、狗奴、玩偶奴、家奴等</CardDescription>
         </CardHeader>
-        <CardContent>
-          <vxe-table
-            :data="store.leftRows"
-            border
-            show-overflow
-            :row-config="{ height: 44 }"
-            max-height="500"
-            :scroll-y="{ enabled: true }"
-            class="w-full"
-          >
-            <vxe-column field="typeName" title="类型" width="110">
-              <template #default="{ row, rowIndex }">
-                <span class="font-bold text-primary text-sm" v-if="isTypeGroupStart(store.leftRows, rowIndex)">
-                  {{ row.typeName }}
-                </span>
-              </template>
-            </vxe-column>
-            <vxe-column field="itemName" title="项目" min-width="140" />
-            <vxe-column field="level" title="级别" width="180">
-              <template #default="{ row }">
-                <select v-model="row.level" class="w-full h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
-                  <option value="">请选择</option>
-                  <option value="A">A - 超级喜欢</option>
-                  <option value="B">B - 喜欢</option>
-                  <option value="C">C - 不喜欢但接受</option>
-                  <option value="D">D - 强迫才接受</option>
-                  <option value="E">E - 绝对不接受</option>
-                </select>
-              </template>
-            </vxe-column>
-            <vxe-column field="remark" title="备注" min-width="150">
-              <template #default="{ row }">
-                <input v-model="row.remark" class="w-full h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring" placeholder="可选填" />
-              </template>
-            </vxe-column>
-          </vxe-table>
+        <CardContent class="space-y-5">
+          <div v-for="group in leftGroups" :key="'left-' + group.typeName" class="space-y-3">
+            <div class="sticky top-0 z-10 -mx-1 px-1 py-1 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+              <h3 class="text-sm font-semibold text-primary">{{ group.typeName }}</h3>
+            </div>
+            <div class="space-y-3">
+              <div
+                v-for="row in group.items"
+                :key="rowKey(row, 'left')"
+                class="rounded-lg border bg-card p-4 shadow-sm"
+              >
+                <div class="space-y-3">
+                  <div>
+                    <div class="text-sm font-medium leading-6">{{ row.itemName }}</div>
+                  </div>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="space-y-1.5">
+                      <Label>接受级别</Label>
+                      <select
+                        v-model="row.level"
+                        class="w-full h-10 rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                      >
+                        <option value="">请选择</option>
+                        <option v-for="option in levelOptions" :key="option.value" :value="option.value">
+                          {{ option.label }}
+                        </option>
+                      </select>
+                    </div>
+                    <div class="space-y-1.5">
+                      <Label>备注</Label>
+                      <Input v-model="row.remark" placeholder="可选填" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </CardContent>
       </Card>
 
@@ -87,42 +87,43 @@
           <CardTitle class="text-base">右侧栏</CardTitle>
           <CardDescription>刑奴、脚厕奴、野奴暴露奴、兽奴等</CardDescription>
         </CardHeader>
-        <CardContent>
-          <vxe-table
-            :data="store.rightRows"
-            border
-            show-overflow
-            :row-config="{ height: 44 }"
-            max-height="500"
-            :scroll-y="{ enabled: true }"
-            class="w-full"
-          >
-            <vxe-column field="typeName" title="类型" width="110">
-              <template #default="{ row, rowIndex }">
-                <span class="font-bold text-primary text-sm" v-if="isTypeGroupStart(store.rightRows, rowIndex)">
-                  {{ row.typeName }}
-                </span>
-              </template>
-            </vxe-column>
-            <vxe-column field="itemName" title="项目" min-width="140" />
-            <vxe-column field="level" title="级别" width="180">
-              <template #default="{ row }">
-                <select v-model="row.level" class="w-full h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
-                  <option value="">请选择</option>
-                  <option value="A">A - 超级喜欢</option>
-                  <option value="B">B - 喜欢</option>
-                  <option value="C">C - 不喜欢但接受</option>
-                  <option value="D">D - 强迫才接受</option>
-                  <option value="E">E - 绝对不接受</option>
-                </select>
-              </template>
-            </vxe-column>
-            <vxe-column field="remark" title="备注" min-width="150">
-              <template #default="{ row }">
-                <input v-model="row.remark" class="w-full h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring" placeholder="可选填" />
-              </template>
-            </vxe-column>
-          </vxe-table>
+        <CardContent class="space-y-5">
+          <div v-for="group in rightGroups" :key="'right-' + group.typeName" class="space-y-3">
+            <div class="sticky top-0 z-10 -mx-1 px-1 py-1 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+              <h3 class="text-sm font-semibold text-primary">{{ group.typeName }}</h3>
+            </div>
+            <div class="space-y-3">
+              <div
+                v-for="row in group.items"
+                :key="rowKey(row, 'right')"
+                class="rounded-lg border bg-card p-4 shadow-sm"
+              >
+                <div class="space-y-3">
+                  <div>
+                    <div class="text-sm font-medium leading-6">{{ row.itemName }}</div>
+                  </div>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="space-y-1.5">
+                      <Label>接受级别</Label>
+                      <select
+                        v-model="row.level"
+                        class="w-full h-10 rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                      >
+                        <option value="">请选择</option>
+                        <option v-for="option in levelOptions" :key="option.value" :value="option.value">
+                          {{ option.label }}
+                        </option>
+                      </select>
+                    </div>
+                    <div class="space-y-1.5">
+                      <Label>备注</Label>
+                      <Input v-model="row.remark" placeholder="可选填" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>
@@ -134,16 +135,48 @@
  * 第3步：接受程度自评组件逻辑（v3）
  *
  * 数据直接从 Pinia store 读取和修改，不再独立管理。
- * 去掉了保存按钮。
+ * 改为按类型分组的卡片式布局，减少移动端横向滚动和内层滚动。
  */
+import { computed } from 'vue'
 import { useFormStore } from '../stores/form'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
 const store = useFormStore()
 
-function isTypeGroupStart(rows, idx) {
-  if (idx === 0) return true
-  return rows[idx].typeName !== rows[idx - 1].typeName
+const levelOptions = [
+  { value: 'A', label: 'A - 超级喜欢' },
+  { value: 'B', label: 'B - 喜欢' },
+  { value: 'C', label: 'C - 不喜欢但接受' },
+  { value: 'D', label: 'D - 强迫才接受' },
+  { value: 'E', label: 'E - 绝对不接受' }
+]
+
+/**
+ * 按 typeName 对行数据分组。
+ *
+ * @param {Array} rows 原始行数据
+ * @returns {Array} 分组结果
+ */
+function groupRows(rows) {
+  const groups = []
+  for (const row of rows) {
+    const lastGroup = groups[groups.length - 1]
+    if (!lastGroup || lastGroup.typeName !== row.typeName) {
+      groups.push({ typeName: row.typeName, items: [row] })
+    } else {
+      lastGroup.items.push(row)
+    }
+  }
+  return groups
+}
+
+const leftGroups = computed(() => groupRows(store.leftRows))
+const rightGroups = computed(() => groupRows(store.rightRows))
+
+function rowKey(row, side) {
+  return `${side}-${row.rowOrder ?? row.itemName}`
 }
 </script>

@@ -81,13 +81,18 @@ public class FormController {
      *
      * 返回当前提交的基础信息记录（一人一条）。
      *
+     * @param sessionToken 会话令牌
      * @param submissionId 提交记录ID
      * @return 基础信息对象
      */
     @GetMapping("/step1/{submissionId}")
-    public ApiResponse<PersonalInfo> getStep1(@PathVariable Long submissionId) {
+    public ApiResponse<PersonalInfo> getStep1(@RequestHeader("X-Session-Token") String sessionToken,
+                                              @PathVariable Long submissionId) {
         log.info("读取第1步数据：submissionId={}", submissionId);
-        PersonalInfo data = formService.getStep1(submissionId);
+        PersonalInfo data = formService.getStep1(sessionToken, submissionId);
+        if (data == null) {
+            return ApiResponse.error(403, "当前草稿无权访问或已失效");
+        }
         return ApiResponse.ok(data);
     }
 
@@ -96,15 +101,17 @@ public class FormController {
      *
      * 如果已有记录则更新，否则新建。一人一条记录。
      *
+     * @param sessionToken 会话令牌
      * @param submissionId 提交记录ID
      * @param info         基础信息数据
      * @return 操作结果
      */
     @PutMapping("/step1/{submissionId}")
-    public ApiResponse<Void> saveStep1(@PathVariable Long submissionId,
+    public ApiResponse<Void> saveStep1(@RequestHeader("X-Session-Token") String sessionToken,
+                                       @PathVariable Long submissionId,
                                        @RequestBody PersonalInfo info) {
         log.info("保存第1步数据：submissionId={}", submissionId);
-        return formService.saveStep1(submissionId, info);
+        return formService.saveStep1(sessionToken, submissionId, info);
     }
 
     // ==================== 第3步：接受程度自评 ====================
@@ -112,57 +119,71 @@ public class FormController {
     /**
      * 读取左侧栏自评数据
      *
+     * @param sessionToken 会话令牌
      * @param submissionId 提交记录ID
      * @return 左侧栏自评列表
      */
     @GetMapping("/step3/left/{submissionId}")
-    public ApiResponse<List<AssessmentLeft>> getStep3Left(@PathVariable Long submissionId) {
+    public ApiResponse<List<AssessmentLeft>> getStep3Left(@RequestHeader("X-Session-Token") String sessionToken,
+                                                          @PathVariable Long submissionId) {
         log.info("读取第3步左侧数据：submissionId={}", submissionId);
-        List<AssessmentLeft> data = formService.getStep3Left(submissionId);
+        List<AssessmentLeft> data = formService.getStep3Left(sessionToken, submissionId);
+        if (data == null) {
+            return ApiResponse.error(403, "当前草稿无权访问或已失效");
+        }
         return ApiResponse.ok(data);
     }
 
     /**
      * 保存左侧栏自评数据
      *
+     * @param sessionToken 会话令牌
      * @param submissionId 提交记录ID
      * @param rows         左侧栏行数据
      * @return 操作结果
      */
     @PutMapping("/step3/left/{submissionId}")
-    public ApiResponse<Void> saveStep3Left(@PathVariable Long submissionId,
+    public ApiResponse<Void> saveStep3Left(@RequestHeader("X-Session-Token") String sessionToken,
+                                           @PathVariable Long submissionId,
                                            @RequestBody List<AssessmentLeft> rows) {
         log.info("保存第3步左侧数据：submissionId={}, 行数={}", submissionId,
                 rows != null ? rows.size() : 0);
-        return formService.saveStep3Left(submissionId, rows);
+        return formService.saveStep3Left(sessionToken, submissionId, rows);
     }
 
     /**
      * 读取右侧栏自评数据
      *
+     * @param sessionToken 会话令牌
      * @param submissionId 提交记录ID
      * @return 右侧栏自评列表
      */
     @GetMapping("/step3/right/{submissionId}")
-    public ApiResponse<List<AssessmentRight>> getStep3Right(@PathVariable Long submissionId) {
+    public ApiResponse<List<AssessmentRight>> getStep3Right(@RequestHeader("X-Session-Token") String sessionToken,
+                                                            @PathVariable Long submissionId) {
         log.info("读取第3步右侧数据：submissionId={}", submissionId);
-        List<AssessmentRight> data = formService.getStep3Right(submissionId);
+        List<AssessmentRight> data = formService.getStep3Right(sessionToken, submissionId);
+        if (data == null) {
+            return ApiResponse.error(403, "当前草稿无权访问或已失效");
+        }
         return ApiResponse.ok(data);
     }
 
     /**
      * 保存右侧栏自评数据
      *
+     * @param sessionToken 会话令牌
      * @param submissionId 提交记录ID
      * @param rows         右侧栏行数据
      * @return 操作结果
      */
     @PutMapping("/step3/right/{submissionId}")
-    public ApiResponse<Void> saveStep3Right(@PathVariable Long submissionId,
+    public ApiResponse<Void> saveStep3Right(@RequestHeader("X-Session-Token") String sessionToken,
+                                            @PathVariable Long submissionId,
                                             @RequestBody List<AssessmentRight> rows) {
         log.info("保存第3步右侧数据：submissionId={}, 行数={}", submissionId,
                 rows != null ? rows.size() : 0);
-        return formService.saveStep3Right(submissionId, rows);
+        return formService.saveStep3Right(sessionToken, submissionId, rows);
     }
 
     // ==================== 模板数据 ====================
