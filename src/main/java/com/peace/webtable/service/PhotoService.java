@@ -37,6 +37,14 @@ public interface PhotoService {
     List<Photo> listPhotos(Long submissionId, String category);
 
     /**
+     * 获取照片记录（含完整元信息，用于归属校验）
+     *
+     * @param photoId 照片记录ID
+     * @return 照片记录对象
+     */
+    Photo getPhoto(Long photoId);
+
+    /**
      * 下载照片
      *
      * @param photoId 照片记录ID

@@ -6,6 +6,12 @@
 
 ## [Unreleased]
 
+### Changed
+- 填写端草稿恢复改为优先复用已有会话，前端会话令牌兼容 localStorage + sessionStorage，降低刷新后误建 submission 的概率
+- 第1步与第3步改为切步即保存，预览前先保存当前步骤，最终提交后清理本地会话和 Redis 草稿缓存
+- 第3步接受程度自评从双 vxe-table 重构为按类型分组的卡片式表单，减少移动端横向滚动和内层滚动
+- 后端步骤接口增加 sessionToken 与 submissionId 归属校验，completeSubmission 支持 Redis miss 后回源数据库
+
 ### Added
 - **管理员查看系统**
   - AdminConfig + AdminService + AdminServiceImpl + AdminController

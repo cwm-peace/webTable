@@ -155,6 +155,13 @@ frontend/src/
 - [x] 手机端适配
 - [ ] 联调测试
 
+## 8.1 当前实施变更
+
+- 第3步改为按 `typeName` 分组的卡片式表单，去掉 `vxe-table` 内层滚动，提升手机端连续填写体验
+- 草稿恢复改为优先复用已存在会话，前端 token 持久化到 localStorage + sessionStorage，切步时分步保存
+- 后端 `completeSubmission()`、步骤读写接口支持 Redis miss 后回源数据库，并校验 `sessionToken -> submissionId` 归属关系
+- 最终提交后清理本地 token 与 Redis 草稿缓存，避免继续复用旧草稿
+
 ## 9. 验证方式
 
 - `./mvnw clean compile` 后端编译通过

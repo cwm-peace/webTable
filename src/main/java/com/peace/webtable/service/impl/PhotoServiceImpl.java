@@ -95,6 +95,14 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     /**
+     * 获取照片记录（含完整元信息，用于归属校验）
+     */
+    @Override
+    public Photo getPhoto(Long photoId) {
+        return photoMapper.selectById(photoId);
+    }
+
+    /**
      * 下载照片：返回完整的二进制数据
      */
     @Override
