@@ -25,7 +25,7 @@
           <!-- 已上传：显示缩略图 -->
           <template v-if="photos[slot - 1]">
             <img
-              :src="getPhotoUrl(photos[slot - 1].id)"
+              :src="blobUrls[photos[slot - 1].id]"
               :alt="photos[slot - 1].photoName"
               class="w-full h-full object-cover"
             />
@@ -59,9 +59,11 @@
  * 照片上传组件逻辑（v3）
  *
  * 固定 4 个槽位，上传后即时展示缩略图。
+ * 下载接口需要 X-Session-Token，img 标签无法携带自定义 header，
+ * 因此用 fetch 获取 Blob 后转为 object URL 供 img 使用。
  */
-import { ref, onMounted } from 'vue'
-import { uploadPhoto, listPhotos, deletePhoto, getPhotoUrl } from '../api/photo'
+import { ref, reactive, watch, onUnmounted } from 'vue'
+import { uploadPhoto, listPhotos, deletePhoto } from '../api/photo'
 import { useFormStore } from '../stores/form'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -75,9 +77,26 @@ const props = defineProps({
 const store = useFormStore()
 const photos = ref([])
 const uploading = ref(false)
+// photoId -> blob object URL，避免重复 fetch
+const blobUrls = reactive({})
 
-onMounted(async () => {
-  await loadPhotos()
+// 等 sessionToken 和 submissionId 都就绪后再加载照片
+// initForm 是异步的，onMounted 时两者可能还是空值
+// 同时监听两者：token 先就绪时 submissionId 可能还为空，反之亦然
+watch(
+  [() => store.sessionToken, () => store.submissionId],
+  ([token, submissionId]) => {
+    if (token && submissionId) loadPhotos()
+  },
+  { immediate: true }
+)
+
+onUnmounted(() => {
+  // 释放所有 blob URL，防止内存泄漏
+  for (const [id, url] of Object.entries(blobUrls)) {
+    if (url) URL.revokeObjectURL(url)
+    blobUrls[id] = null
+  }
 })
 
 async function loadPhotos() {
@@ -86,8 +105,42 @@ async function loadPhotos() {
     const res = await listPhotos(store.submissionId, props.category)
     photos.value = res.data || []
     store.updatePhotoCount(props.category, photos.value.length)
+    // 为新加载的照片预取 blob URL
+    for (const photo of photos.value) {
+      if (!blobUrls[photo.id]) {
+        fetchBlobUrl(photo.id)
+      }
+    }
   } catch (error) {
     console.error('加载照片列表失败：', error)
+  }
+}
+
+/**
+ * 用 fetch 携带鉴权 header 下载照片，转为 blob URL 供 img 使用。
+ * 直接从 localStorage 读取 token，与 axios 拦截器保持一致，
+ * 避免 store 响应式值在异步时序下读到空值。
+ *
+ * @param {number} photoId
+ */
+async function fetchBlobUrl(photoId) {
+  try {
+    const headers = {}
+    // 与 axios 拦截器保持一致：直接读 localStorage/sessionStorage
+    const sessionToken = (() => {
+      try { return localStorage.getItem('sessionToken') || sessionStorage.getItem('sessionToken') || '' } catch { return '' }
+    })()
+    if (sessionToken) headers['X-Session-Token'] = sessionToken
+
+    const res = await fetch(`/api/photo/download/${photoId}`, { headers })
+    if (!res.ok) {
+      console.error('照片下载失败：photoId=', photoId, 'status=', res.status, 'token=', sessionToken ? '已设置' : '为空')
+      return
+    }
+    const blob = await res.blob()
+    blobUrls[photoId] = URL.createObjectURL(blob)
+  } catch (error) {
+    console.error('加载照片预览失败：photoId=', photoId, error)
   }
 }
 
@@ -116,6 +169,11 @@ async function handleFileSelect(event) {
 async function handleDelete(photoId) {
   try {
     await deletePhoto(photoId)
+    // 释放对应的 blob URL（赋 null 而非 delete，保持 Vue reactive 响应性）
+    if (blobUrls[photoId]) {
+      URL.revokeObjectURL(blobUrls[photoId])
+      blobUrls[photoId] = null
+    }
     await loadPhotos()
   } catch (error) {
     console.error('删除照片失败：', error)

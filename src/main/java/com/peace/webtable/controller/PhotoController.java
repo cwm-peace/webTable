@@ -2,6 +2,7 @@ package com.peace.webtable.controller;
 
 import com.peace.webtable.dto.ApiResponse;
 import com.peace.webtable.entity.Photo;
+import com.peace.webtable.service.AdminService;
 import com.peace.webtable.service.FormService;
 import com.peace.webtable.service.PhotoService;
 import lombok.extern.slf4j.Slf4j;
@@ -29,10 +30,12 @@ public class PhotoController {
 
     private final PhotoService photoService;
     private final FormService formService;
+    private final AdminService adminService;
 
-    public PhotoController(PhotoService photoService, FormService formService) {
+    public PhotoController(PhotoService photoService, FormService formService, AdminService adminService) {
         this.photoService = photoService;
         this.formService = formService;
+        this.adminService = adminService;
     }
 
     /**
@@ -80,18 +83,32 @@ public class PhotoController {
     /**
      * 下载照片
      *
-     * @param sessionToken 会话令牌
+     * 填写端携带 X-Session-Token，管理端携带 X-Admin-Token，两者满足其一即可。
+     *
+     * @param sessionToken 填写端会话令牌（可选）
+     * @param adminToken   管理端 token（可选）
      * @param photoId       照片记录ID
      * @return 照片的二进制响应
      */
     @GetMapping("/download/{photoId}")
-    public ResponseEntity<byte[]> downloadPhoto(@RequestHeader("X-Session-Token") String sessionToken,
-                                                @PathVariable Long photoId) {
+    public ResponseEntity<byte[]> downloadPhoto(
+            @RequestHeader(value = "X-Session-Token", required = false) String sessionToken,
+            @RequestHeader(value = "X-Admin-Token", required = false) String adminToken,
+            @PathVariable Long photoId) {
+
         Photo photo = photoService.getPhoto(photoId);
         if (photo == null) {
             return ResponseEntity.notFound().build();
         }
-        if (!formService.validateSession(sessionToken, photo.getSubmissionId())) {
+
+        // 管理端鉴权
+        boolean isAdmin = adminToken != null && !adminToken.isEmpty()
+                && adminService.validateToken(adminToken);
+        // 填写端鉴权
+        boolean isOwner = sessionToken != null && !sessionToken.isEmpty()
+                && formService.validateSession(sessionToken, photo.getSubmissionId());
+
+        if (!isAdmin && !isOwner) {
             return ResponseEntity.status(403).build();
         }
 

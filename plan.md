@@ -152,12 +152,16 @@ frontend/src/
 - [x] 安全加固
 - [x] 管理员系统（登录+列表+详情+PDF导出）
 - [x] vue-router 路由配置
-- [x] 手机端适配
+- [x] 手机端适配 + PC 端宽屏差异化布局
 - [ ] 联调测试
 
 ## 8.1 当前实施变更
 
-- 第3步改为按 `typeName` 分组的卡片式表单，去掉 `vxe-table` 内层滚动，提升手机端连续填写体验
+### 手机端适配与 PC 端宽屏布局
+- 所有页面容器：`max-w-[1100px]` → `px-4 sm:px-6 lg:px-10` 全宽
+- PC 端（lg: ≥1024px）：Step1 3列网格，Step2 4列网格，Step3 左右栏并排，AdminDetail 信息 4列/照片 6列
+- 手机端（<768px）：`style.css` 全局补丁，input/button 最小高度 44px
+- 步骤标签：`text-xs sm:text-sm` 防小屏溢出；导航按钮 `h-11 sm:h-9`
 - 草稿恢复改为优先复用已存在会话，前端 token 持久化到 localStorage + sessionStorage，切步时分步保存
 - 后端 `completeSubmission()`、步骤读写接口支持 Redis miss 后回源数据库，并校验 `sessionToken -> submissionId` 归属关系
 - 最终提交后清理本地 token 与 Redis 草稿缓存，避免继续复用旧草稿

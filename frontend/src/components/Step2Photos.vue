@@ -15,7 +15,7 @@
       <p class="text-muted-foreground mt-1">每个类别最多上传 4 张照片</p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       <PhotoUploader
         v-for="(cat, index) in categories"
         :key="cat.key"

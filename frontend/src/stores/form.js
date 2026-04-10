@@ -60,11 +60,16 @@ export const useFormStore = defineStore('form', () => {
    * 从浏览器存储读取会话令牌
    *
    * 优先使用 localStorage，兼容旧版 sessionStorage。
+   * try-catch 兼容隐私模式下 Storage 被禁用的情况。
    *
    * @returns {string} 会话令牌
    */
   function getStoredSessionToken() {
-    return localStorage.getItem(SESSION_TOKEN_KEY) || sessionStorage.getItem(SESSION_TOKEN_KEY) || ''
+    try {
+      return localStorage.getItem(SESSION_TOKEN_KEY) || sessionStorage.getItem(SESSION_TOKEN_KEY) || ''
+    } catch {
+      return ''
+    }
   }
 
   /**
@@ -77,8 +82,12 @@ export const useFormStore = defineStore('form', () => {
   function persistSessionToken(token) {
     sessionToken.value = token || ''
     if (!token) return
-    localStorage.setItem(SESSION_TOKEN_KEY, token)
-    sessionStorage.setItem(SESSION_TOKEN_KEY, token)
+    try {
+      localStorage.setItem(SESSION_TOKEN_KEY, token)
+      sessionStorage.setItem(SESSION_TOKEN_KEY, token)
+    } catch {
+      // 隐私模式下 Storage 被禁用，静默忽略
+    }
   }
 
   /**
@@ -86,8 +95,12 @@ export const useFormStore = defineStore('form', () => {
    */
   function clearSessionToken() {
     sessionToken.value = ''
-    localStorage.removeItem(SESSION_TOKEN_KEY)
-    sessionStorage.removeItem(SESSION_TOKEN_KEY)
+    try {
+      localStorage.removeItem(SESSION_TOKEN_KEY)
+      sessionStorage.removeItem(SESSION_TOKEN_KEY)
+    } catch {
+      // 忽略
+    }
   }
 
   /**

@@ -16,11 +16,16 @@ const SESSION_TOKEN_KEY = 'sessionToken'
  * 获取当前填写会话令牌
  *
  * 优先读取 localStorage，兼容旧版 sessionStorage。
+ * 使用 try-catch 兼容隐私模式（Safari/Firefox）下 Storage 被禁用的情况。
  *
  * @returns {string} 会话令牌
  */
 function getSessionToken() {
-  return localStorage.getItem(SESSION_TOKEN_KEY) || sessionStorage.getItem(SESSION_TOKEN_KEY) || ''
+  try {
+    return localStorage.getItem(SESSION_TOKEN_KEY) || sessionStorage.getItem(SESSION_TOKEN_KEY) || ''
+  } catch {
+    return ''
+  }
 }
 
 // 创建 axios 实例，所有 API 请求通过此实例发送

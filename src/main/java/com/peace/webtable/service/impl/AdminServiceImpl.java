@@ -234,7 +234,8 @@ public class AdminServiceImpl implements AdminService {
                     {"侍主人数", safeStr(info.getMasterCount())},
                     {"喜欢被叫的称呼", safeStr(info.getPreferredName())},
                     {"一句话形容自己", safeStr(info.getSelfDescription())},
-                    {"备注", safeStr(info.getRemark())}
+                    {"备注", safeStr(info.getRemark())},
+                    {"培养意向", safeStr(info.getTrainingIntention())}
                 };
 
                 PdfPTable infoTable = new PdfPTable(2);
@@ -324,29 +325,44 @@ public class AdminServiceImpl implements AdminService {
                 levelNote.setSpacingAfter(8);
                 document.add(levelNote);
 
-                // 合并左右自评为一个表格
-                PdfPTable table = new PdfPTable(4);
+                // 合并左右自评，按 typeName 分组
+                List<Object[]> allRows = new ArrayList<>();
+                for (AssessmentLeft r : leftList) allRows.add(new Object[]{r.getTypeName(), r.getItemName(), r.getLevel(), r.getRemark()});
+                for (AssessmentRight r : rightList) allRows.add(new Object[]{r.getTypeName(), r.getItemName(), r.getLevel(), r.getRemark()});
+
+                // 按 typeName 保持顺序分组（LinkedHashMap 保持插入顺序）
+                Map<String, List<Object[]>> grouped = new LinkedHashMap<>();
+                for (Object[] row : allRows) {
+                    String type = (String) row[0];
+                    grouped.computeIfAbsent(type, k -> new ArrayList<>()).add(row);
+                }
+
+                PdfPTable table = new PdfPTable(3);
                 table.setWidthPercentage(100);
-                table.setWidths(new float[]{2, 3, 1, 3});
+                table.setWidths(new float[]{3, 1, 3});
 
                 // 表头
-                String[] headers = {"类型", "项目", "级别", "备注"};
-                for (String h : headers) {
+                for (String h : new String[]{"项目", "级别", "备注"}) {
                     PdfPCell cell = new PdfPCell(new Phrase(h, tableHeaderFont));
                     cell.setBackgroundColor(new Color(79, 140, 255));
-                    // cell.setTextColor(Color.WHITE);
                     cell.setPadding(6);
                     cell.setHorizontalAlignment(Element.ALIGN_CENTER);
                     table.addCell(cell);
                 }
 
-                // 左侧数据
-                for (AssessmentLeft row : leftList) {
-                    addAssessmentRow(table, row.getTypeName(), row.getItemName(), row.getLevel(), row.getRemark(), tableCellFont);
-                }
-                // 右侧数据
-                for (AssessmentRight row : rightList) {
-                    addAssessmentRow(table, row.getTypeName(), row.getItemName(), row.getLevel(), row.getRemark(), tableCellFont);
+                // 按分组输出：每组前加一行分组标题（跨3列）
+                for (Map.Entry<String, List<Object[]>> entry : grouped.entrySet()) {
+                    // 分组标题行
+                    PdfPCell groupCell = new PdfPCell(new Phrase(entry.getKey(), labelFont));
+                    groupCell.setColspan(3);
+                    groupCell.setBackgroundColor(new Color(235, 240, 255));
+                    groupCell.setPadding(5);
+                    table.addCell(groupCell);
+
+                    // 数据行
+                    for (Object[] row : entry.getValue()) {
+                        addAssessmentRow(table, (String) row[1], (String) row[2], (String) row[3], tableCellFont);
+                    }
                 }
 
                 document.add(table);
@@ -364,31 +380,26 @@ public class AdminServiceImpl implements AdminService {
     }
 
     /**
-     * 添加自评表格行
+     * 添加自评表格行（3列：项目、级别、备注）
      */
-    private void addAssessmentRow(PdfPTable table, String typeName, String itemName, String level, String remark, Font font) {
-        PdfPCell c1 = new PdfPCell(new Phrase(safeStr(typeName), font));
+    private void addAssessmentRow(PdfPTable table, String itemName, String level, String remark, Font font) {
+        PdfPCell c1 = new PdfPCell(new Phrase(safeStr(itemName), font));
         c1.setPadding(5);
         table.addCell(c1);
 
-        PdfPCell c2 = new PdfPCell(new Phrase(safeStr(itemName), font));
+        PdfPCell c2 = new PdfPCell(new Phrase(safeStr(level), font));
         c2.setPadding(5);
+        c2.setHorizontalAlignment(Element.ALIGN_CENTER);
+        if ("A".equals(level)) c2.setBackgroundColor(new Color(220, 255, 220));
+        else if ("B".equals(level)) c2.setBackgroundColor(new Color(220, 235, 255));
+        else if ("C".equals(level)) c2.setBackgroundColor(new Color(255, 245, 220));
+        else if ("D".equals(level)) c2.setBackgroundColor(new Color(255, 230, 230));
+        else if ("E".equals(level)) c2.setBackgroundColor(new Color(240, 240, 240));
         table.addCell(c2);
 
-        PdfPCell c3 = new PdfPCell(new Phrase(safeStr(level), font));
+        PdfPCell c3 = new PdfPCell(new Phrase(safeStr(remark), font));
         c3.setPadding(5);
-        c3.setHorizontalAlignment(Element.ALIGN_CENTER);
-        // 根据级别设置背景色
-        if ("A".equals(level)) c3.setBackgroundColor(new Color(220, 255, 220));
-        else if ("B".equals(level)) c3.setBackgroundColor(new Color(220, 235, 255));
-        else if ("C".equals(level)) c3.setBackgroundColor(new Color(255, 245, 220));
-        else if ("D".equals(level)) c3.setBackgroundColor(new Color(255, 230, 230));
-        else if ("E".equals(level)) c3.setBackgroundColor(new Color(240, 240, 240));
         table.addCell(c3);
-
-        PdfPCell c4 = new PdfPCell(new Phrase(safeStr(remark), font));
-        c4.setPadding(5);
-        table.addCell(c4);
     }
 
     /**

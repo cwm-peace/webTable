@@ -11,6 +11,8 @@
 - 第1步与第3步改为切步即保存，预览前先保存当前步骤，最终提交后清理本地会话和 Redis 草稿缓存
 - 第3步接受程度自评从双 vxe-table 重构为按类型分组的卡片式表单，减少移动端横向滚动和内层滚动
 - 后端步骤接口增加 sessionToken 与 submissionId 归属校验，completeSubmission 支持 Redis miss 后回源数据库
+- **PC/手机端差异化布局**：所有页面去掉 `max-w-[1100px]` 居中限制，改为 `lg:px-10` 全宽布局；PC 端（≥1024px）多列网格充分利用宽屏；手机端（<768px）全局输入框/按钮最��高度 44px 减少误触；Step3 左右栏在 PC 端并排显示
+- 新增"培养意向"字段：`personal_info` 表新增 `training_intention TEXT` 列（位于 `remark` 之后），前端填写页"其他"卡片同步新增 Textarea，管理员详情页和 PDF 导出同步展示
 
 ### Added
 - **管理员查看系统**

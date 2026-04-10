@@ -53,6 +53,7 @@ CREATE TABLE IF NOT EXISTS personal_info (
     preferred_name VARCHAR(100) COMMENT '喜欢被叫的称呼',
     self_description VARCHAR(500) COMMENT '一句话形容自己',
     remark TEXT COMMENT '备注',
+    training_intention TEXT COMMENT '培养意向',
     create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     update_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     INDEX idx_submission_id (submission_id)

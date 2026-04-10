@@ -118,6 +118,9 @@ public class PersonalInfo {
     /** 备注 */
     private String remark;
 
+    /** 培养意向 */
+    private String trainingIntention;
+
     /** 创建时间 */
     private LocalDateTime createTime;
 

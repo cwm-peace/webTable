@@ -19,7 +19,7 @@
 
         <!-- 步骤标签 -->
         <div
-          class="mt-2 text-sm font-medium transition-colors duration-300"
+          class="mt-2 text-xs sm:text-sm font-medium transition-colors duration-300"
           :class="stepLabelClass(index)"
         >
           {{ step.label }}
@@ -55,7 +55,7 @@
         variant="outline"
         @click="handlePrev"
         :disabled="formStore.saving"
-        class="order-2 sm:order-1"
+        class="order-2 sm:order-1 h-11 sm:h-9"
       >
         ← 上一步
       </Button>
@@ -66,7 +66,7 @@
           v-if="formStore.currentStep < 3"
           @click="handleNext"
           :disabled="formStore.saving"
-          class="flex-1 sm:flex-none"
+          class="flex-1 sm:flex-none h-11 sm:h-9"
         >
           {{ formStore.saving ? '保存中...' : '下一步 →' }}
         </Button>
@@ -75,7 +75,7 @@
           variant="default"
           @click="handlePreview"
           :disabled="formStore.saving"
-          class="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-700"
+          class="flex-1 sm:flex-none h-11 sm:h-9 bg-emerald-600 hover:bg-emerald-700"
         >
           {{ formStore.saving ? '保存中...' : '保存提交' }}
         </Button>
