@@ -175,26 +175,33 @@ export const useFormStore = defineStore('form', () => {
   /**
    * 加载所有已有数据或模板
    *
-   * 如果用户之前填写过则加载已有数据，否则加载预设模板。
-   * 所有数据存储在 store 中，组件通过 store 读取和修改。
+   * 使用 Promise.allSettled 确保各步骤数据独立加载，互不影响。
+   * 任一步骤失败不会导致其他步骤数据丢失。
    */
   async function loadAllData() {
     if (!hasSubmission()) return
 
-    try {
-      const [step1Res, leftRes, rightRes] = await Promise.all([
-        getStep1(submissionId.value),
-        getStep3Left(submissionId.value),
-        getStep3Right(submissionId.value)
-      ])
+    const [step1Result, leftResult, rightResult] = await Promise.allSettled([
+      getStep1(submissionId.value),
+      getStep3Left(submissionId.value),
+      getStep3Right(submissionId.value)
+    ])
 
-      if (step1Res.data) {
-        Object.assign(basicInfo, step1Res.data)
+    // 第1步：基础信息（独立容错）
+    if (step1Result.status === 'fulfilled' && step1Result.value.data) {
+      Object.assign(basicInfo, step1Result.value.data)
+    } else if (step1Result.status === 'rejected') {
+      console.error('加载第1步数据失败：', step1Result.reason)
+    }
+
+    // 第3步左侧：优先加载已有数据，无数据时加载模板
+    if (leftResult.status === 'fulfilled' && leftResult.value.data && leftResult.value.data.length > 0) {
+      leftRows.value = leftResult.value.data
+    } else {
+      if (leftResult.status === 'rejected') {
+        console.error('加载第3步左侧数据失败：', leftResult.reason)
       }
-
-      if (leftRes.data && leftRes.data.length > 0) {
-        leftRows.value = leftRes.data
-      } else {
+      try {
         const templateRes = await getLeftTemplate()
         leftRows.value = (templateRes.data || []).map(t => ({
           typeName: t.typeName,
@@ -203,11 +210,19 @@ export const useFormStore = defineStore('form', () => {
           remark: '',
           rowOrder: t.rowOrder
         }))
+      } catch (error) {
+        console.error('加载左侧模板失败：', error)
       }
+    }
 
-      if (rightRes.data && rightRes.data.length > 0) {
-        rightRows.value = rightRes.data
-      } else {
+    // 第3步右侧：同上逻辑
+    if (rightResult.status === 'fulfilled' && rightResult.value.data && rightResult.value.data.length > 0) {
+      rightRows.value = rightResult.value.data
+    } else {
+      if (rightResult.status === 'rejected') {
+        console.error('加载第3步右侧数据失败：', rightResult.reason)
+      }
+      try {
         const templateRes = await getRightTemplate()
         rightRows.value = (templateRes.data || []).map(t => ({
           typeName: t.typeName,
@@ -216,9 +231,9 @@ export const useFormStore = defineStore('form', () => {
           remark: '',
           rowOrder: t.rowOrder
         }))
+      } catch (error) {
+        console.error('加载右侧模板失败：', error)
       }
-    } catch (error) {
-      console.error('加载数据失败：', error)
     }
   }
 

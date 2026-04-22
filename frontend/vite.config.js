@@ -24,8 +24,9 @@ export default defineConfig({
     target: ['es2015', 'chrome87', 'safari14', 'edge88', 'firefox88']
   },
   server: {
+    host: '127.0.0.1',
     port: 5173,
-    allowedHosts: ['sj.frp.one'],
+    allowedHosts: ['sj.frp.one','vip.lsj-2.frp.one','jp-2.frp.one'],
     proxy: {
       '/api': {
         target: 'http://localhost:8081',

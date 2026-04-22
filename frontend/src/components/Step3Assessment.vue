@@ -45,15 +45,15 @@
           <div v-for="row in group.items" :key="rowKey(row, 'left')"
             class="grid grid-cols-[1fr_auto_auto] items-center gap-2 py-1.5"
           >
-            <span class="text-sm truncate">{{ row.itemName }}</span>
+            <TruncatedText :text="row.itemName" class="text-sm" />
             <select
               v-model="row.level"
-              class="h-8 w-32 rounded-md border border-input bg-transparent px-2 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              class="h-8 w-[6.5rem] sm:w-32 rounded-md border border-input bg-transparent px-2 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
             >
               <option value="">—</option>
               <option v-for="opt in levelOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
             </select>
-            <Input v-model="row.remark" placeholder="备注" class="h-8 w-28 text-sm" />
+            <Input v-model="row.remark" placeholder="备注" class="h-8 w-[5rem] sm:w-28 text-sm" />
           </div>
         </div>
       </div>
@@ -68,15 +68,15 @@
           <div v-for="row in group.items" :key="rowKey(row, 'right')"
             class="grid grid-cols-[1fr_auto_auto] items-center gap-2 py-1.5"
           >
-            <span class="text-sm truncate">{{ row.itemName }}</span>
+            <TruncatedText :text="row.itemName" class="text-sm" />
             <select
               v-model="row.level"
-              class="h-8 w-32 rounded-md border border-input bg-transparent px-2 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              class="h-8 w-[6.5rem] sm:w-32 rounded-md border border-input bg-transparent px-2 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
             >
               <option value="">—</option>
               <option v-for="opt in levelOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
             </select>
-            <Input v-model="row.remark" placeholder="备注" class="h-8 w-28 text-sm" />
+            <Input v-model="row.remark" placeholder="备注" class="h-8 w-[5rem] sm:w-28 text-sm" />
           </div>
         </div>
       </div>
@@ -95,6 +95,7 @@ import { computed } from 'vue'
 import { useFormStore } from '../stores/form'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
+import TruncatedText from './TruncatedText.vue'
 
 const store = useFormStore()
 

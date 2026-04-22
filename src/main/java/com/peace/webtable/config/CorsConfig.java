@@ -32,6 +32,8 @@ public class CorsConfig {
         config.addAllowedOrigin("http://localhost:5173");
         config.addAllowedOriginPattern("http://*.frp.one:*");
         config.addAllowedOriginPattern("https://*.frp.one:*");
+        // config.addAllowedOriginPattern("http://*.lsj-2.frp.one:*");
+        // config.addAllowedOriginPattern("https://*.lsj-2.frp.one:*");
         // 只允许必要的请求头
         config.addAllowedHeader("Content-Type");
         config.addAllowedHeader("X-Session-Token");
