@@ -14,7 +14,6 @@ CREATE TABLE IF NOT EXISTS submissions (
     completed TINYINT(1) NOT NULL DEFAULT 0 COMMENT '是否已完成：0-未完成 1-已完成',
     create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     update_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    INDEX idx_session_token (session_token),
     INDEX idx_completed (completed)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='提交主表';
 

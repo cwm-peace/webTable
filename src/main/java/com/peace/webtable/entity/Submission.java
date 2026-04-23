@@ -30,11 +30,6 @@ public class Submission {
     /** 是否已完成：0-未完成 1-已完成 */
     private Boolean completed;
 
-    // ===== 以下字段已废弃：照片功能迁移到独立的 photos 表 =====
-    // private byte[] photo;
-    // private String photoName;
-    // private String photoType;
-
     /** 创建时间 */
     private LocalDateTime createTime;
 

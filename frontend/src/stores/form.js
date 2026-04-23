@@ -33,7 +33,7 @@ export const useFormStore = defineStore('form', () => {
     sexFrequency: '', masturbationFrequency: '', masturbationTool: '',
     analInsertableSize: '', urethraInsertableSize: '', dogAge: '',
     meetingCount: '', masterCount: '', semenVolume: '',
-    dailyMaxEjaculation: '', preferredName: '', selfDescription: '', remark: ''
+    dailyMaxEjaculation: '', preferredName: '', selfDescription: '', trainingIntention: '', remark: ''
   })
 
   // ===== 第3步：左侧自评数据 =====

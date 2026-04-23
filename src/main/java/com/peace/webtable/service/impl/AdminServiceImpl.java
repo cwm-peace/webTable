@@ -18,6 +18,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * 管理员业务服务实现类
@@ -183,8 +184,8 @@ public class AdminServiceImpl implements AdminService {
             PdfWriter.getInstance(document, bos);
             document.open();
 
-            // 使用系统字体支持中文
-            BaseFont baseFont = BaseFont.createFont("STSong-Light", "UniGB-UCS2-H", BaseFont.NOT_EMBEDDED);
+            // 根据操作系统选择合适的 Unicode 中文字体
+            BaseFont baseFont = createCjkBaseFont();
             Font titleFont = new Font(baseFont, 18, Font.BOLD);
             Font sectionFont = new Font(baseFont, 14, Font.BOLD);
             Font labelFont = new Font(baseFont, 10, Font.BOLD);
@@ -261,7 +262,6 @@ public class AdminServiceImpl implements AdminService {
             List<Photo> photos = photoMapper.selectList(
                     new QueryWrapper<Photo>()
                             .eq("submission_id", submissionId)
-                            .orderByAsc("photo_category")
                             .orderByAsc("photo_order"));
 
             if (!photos.isEmpty()) {
@@ -270,26 +270,35 @@ public class AdminServiceImpl implements AdminService {
                 section2.setSpacingAfter(10);
                 document.add(section2);
 
-                String currentCategory = "";
+                // 固定类别顺序（业务顺序，非字母序）
+                List<String> categoryOrder = List.of("selfie", "nude", "dick", "other");
                 Map<String, String> categoryNames = Map.of(
                         "selfie", "自拍", "nude", "裸照", "dick", "狗屌", "other", "其他");
 
-                for (Photo photo : photos) {
-                    // 类别标题
-                    if (!photo.getPhotoCategory().equals(currentCategory)) {
-                        currentCategory = photo.getPhotoCategory();
-                        String catName = categoryNames.getOrDefault(currentCategory, currentCategory);
-                        Paragraph catTitle = new Paragraph("【" + catName + "】", labelFont);
-                        catTitle.setSpacingBefore(8);
-                        catTitle.setSpacingAfter(5);
-                        document.add(catTitle);
-                    }
+                // 按类别分组
+                Map<String, List<Photo>> grouped = photos.stream()
+                        .collect(Collectors.groupingBy(Photo::getPhotoCategory, LinkedHashMap::new, Collectors.toList()));
 
-                    // 照片：一行一张大图
-                    if (photo.getPhotoData() != null && photo.getPhotoData().length > 0) {
+                // 按固定顺序输出
+                float maxWidth = document.getPageSize().getWidth() - document.leftMargin() - document.rightMargin();
+
+                for (String cat : categoryOrder) {
+                    List<Photo> group = grouped.get(cat);
+                    if (group == null || group.isEmpty()) continue;
+
+                    // 类别标题
+                    String catName = categoryNames.getOrDefault(cat, cat);
+                    Paragraph catTitle = new Paragraph("【" + catName + "】", labelFont);
+                    catTitle.setSpacingBefore(8);
+                    catTitle.setSpacingAfter(5);
+                    document.add(catTitle);
+
+                    // 照片
+                    for (Photo photo : group) {
+                        if (photo.getPhotoData() == null || photo.getPhotoData().length == 0) continue;
+
                         Image img = Image.getInstance(photo.getPhotoData());
-                        // 缩放图片以适应页面宽度
-                        float maxWidth = document.getPageSize().getWidth() - document.leftMargin() - document.rightMargin();
+                        // 按页面宽度等比缩放
                         if (img.getWidth() > maxWidth) {
                             float scale = maxWidth / img.getWidth();
                             img.scaleAbsolute(maxWidth, img.getHeight() * scale);
@@ -403,9 +412,53 @@ public class AdminServiceImpl implements AdminService {
     }
 
     /**
-     * 安全字符串转换
+     * 根据操作系统选择合适的 Unicode CJK 字体
+     *
+     * STSong-Light 仅支持 GB2312，遇到 Unicode 字符会 ArrayIndexOutOfBoundsException。
+     * 按系统选择对应的 Unicode 字体，每个系统提供主备两个选项。
+     */
+    private BaseFont createCjkBaseFont() {
+        String os = System.getProperty("os.name", "").toLowerCase();
+        String[] candidates;
+        if (os.contains("mac")) {
+            candidates = new String[]{"STHeiti", "PingFang SC", "Hiragino Sans GB"};
+        } else if (os.contains("linux")) {
+            candidates = new String[]{"WenQuanYi Micro Hei", "Noto Sans CJK SC", "Droid Sans Fallback"};
+        } else {
+            // Windows
+            candidates = new String[]{"SimSun", "Microsoft YaHei", "KaiTi"};
+        }
+        for (String name : candidates) {
+            try {
+                return BaseFont.createFont(name, "UniGB-UCS2-H", BaseFont.NOT_EMBEDDED);
+            } catch (Exception ignored) {
+                // 字体不存在，尝试下一个
+            }
+        }
+        // 兜底：所有候选都失败时回退 STSong-Light（可能再次报错，但至少有明确日志）
+        log.warn("未找到可用的 Unicode CJK 字体，回退到 STSong-Light");
+        try {
+            return BaseFont.createFont("STSong-Light", "UniGB-UCS2-H", BaseFont.NOT_EMBEDDED);
+        } catch (Exception e) {
+            throw new RuntimeException("无法加载任何中文字体", e);
+        }
+    }
+
+    /**
+     * 安全字符串转换，null 返回空字符串，并过滤 OpenPDF 无法处理的 Unicode 增补平面字符（emoji 等）
      */
     private String safeStr(String s) {
-        return s != null ? s : "";
+        if (s == null) return "";
+        // OpenPDF CJKFont 宽度表仅 16 位（65536），SMP 字符（U+10000+）会越界
+        StringBuilder sb = new StringBuilder(s.length());
+        for (int i = 0; i < s.length(); i++) {
+            int cp = s.codePointAt(i);
+            if (cp <= 0xFFFF) {
+                sb.appendCodePoint(cp);
+            }
+            // SMP 字符（cp > 0xFFFF）直接跳过
+            if (Character.isSupplementaryCodePoint(cp)) i++; // 跳过 surrogate pair 的第二个 char
+        }
+        return sb.toString();
     }
 }

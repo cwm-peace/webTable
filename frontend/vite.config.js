@@ -19,14 +19,13 @@ export default defineConfig({
     }
   },
   build: {
-    // 目标浏览器：Safari 14+、Chrome 87+、Edge 88+、Firefox 88+
-    // 覆盖：macOS Safari、iOS Safari 14+、Chrome/Edge 现代版本、鸿蒙（Chromium 内核）
-    target: ['es2015', 'chrome87', 'safari14', 'edge88', 'firefox88']
+    // 覆盖所有现代浏览器（Chrome 87+、Safari 14+、Edge 88+、Firefox 88+、鸿蒙 Chromium 内核）
+    target: 'chrome87'
   },
   server: {
-    host: '127.0.0.1',
+    host: '0.0.0.0',
     port: 5173,
-    allowedHosts: ['sj.frp.one','vip.lsj-2.frp.one','jp-2.frp.one'],
+    allowedHosts: true,
     proxy: {
       '/api': {
         target: 'http://localhost:8081',

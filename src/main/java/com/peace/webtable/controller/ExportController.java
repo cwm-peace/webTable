@@ -1,11 +1,13 @@
 package com.peace.webtable.controller;
 
+import com.peace.webtable.service.AdminService;
 import com.peace.webtable.service.ExportService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,9 +31,11 @@ import java.time.format.DateTimeFormatter;
 public class ExportController {
 
     private final ExportService exportService;
+    private final AdminService adminService;
 
-    public ExportController(ExportService exportService) {
+    public ExportController(ExportService exportService, AdminService adminService) {
         this.exportService = exportService;
+        this.adminService = adminService;
     }
 
     /**
@@ -43,7 +47,11 @@ public class ExportController {
      * @return Excel 文件的二进制响应
      */
     @GetMapping("/all")
-    public ResponseEntity<byte[]> exportAll() {
+    public ResponseEntity<byte[]> exportAll(@RequestHeader(value = "X-Admin-Token", required = false) String adminToken) {
+        if (adminService == null || !adminService.validateToken(adminToken)) {
+            log.warn("Excel 导出请求被拒绝：未提供有效管理员 token");
+            return ResponseEntity.status(401).build();
+        }
         log.info("收到 Excel 导出请求");
 
         ByteArrayOutputStream bos = exportService.exportAllToExcel();

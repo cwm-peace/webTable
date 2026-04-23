@@ -45,22 +45,13 @@
       <Card v-else>
         <CardContent class="pt-4 sm:pt-6">
           <StepWizard @showPreview="showPreview = true">
-            <Step1BasicInfo v-if="formStore.currentStep === 1" />
-            <Step2Photos v-else-if="formStore.currentStep === 2" />
-            <Step3Assessment v-else-if="formStore.currentStep === 3" />
+            <Step1BasicInfo v-if="formStore.currentStep === 1" :key="1" />
+            <Step2Photos v-else-if="formStore.currentStep === 2" :key="2" />
+            <Step3Assessment v-else-if="formStore.currentStep === 3" :key="3" />
           </StepWizard>
         </CardContent>
       </Card>
 
-      <!-- 底部导出和管理入口 -->
-<!--      <div class="flex justify-between items-center mt-4" v-if="!formStore.loading && !formStore.completed">
-        <router-link to="/admin" class="text-sm text-muted-foreground hover:text-primary transition-colors">
-          管理入口
-        </router-link>
-        <Button variant="ghost" size="sm" @click="handleExport" class="text-muted-foreground">
-          导出 Excel
-        </Button>
-      </div>-->
     </div>
 
     <!-- 预览弹窗 -->
