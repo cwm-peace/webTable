@@ -412,12 +412,22 @@ public class AdminServiceImpl implements AdminService {
     }
 
     /**
-     * 根据操作系统选择合适的 Unicode CJK 字体
+     * 创建支持 Emoji 的 BaseFont
      *
-     * STSong-Light 仅支持 GB2312，遇到 Unicode 字符会 ArrayIndexOutOfBoundsException。
-     * 按系统选择对应的 Unicode 字体，每个系统提供主备两个选项。
+     * 优先加载内嵌的 NotoEmoji-Regular.ttf（支持 SMP U+10000+ 字符），
+     * 同时按操作系统选择 CJK 字体作为 fallback。
+     * 如果 NotoEmoji 加载失败，回退到纯 CJK 字体（emoji 会丢失）。
      */
     private BaseFont createCjkBaseFont() {
+        // 1. 尝试加载内嵌 NotoEmoji TTF（支持完整 Unicode + emoji）
+        try {
+            return BaseFont.createFont(
+                    "fonts/NotoEmoji-Regular.ttf", "Identity-H", BaseFont.EMBEDDED);
+        } catch (Exception e) {
+            log.warn("NotoEmoji 字体加载失败，回退到系统 CJK 字体：{}", e.getMessage());
+        }
+
+        // 2. 回退：按操作系统选择 CJK 字体
         String os = System.getProperty("os.name", "").toLowerCase();
         String[] candidates;
         if (os.contains("mac")) {
@@ -425,18 +435,15 @@ public class AdminServiceImpl implements AdminService {
         } else if (os.contains("linux")) {
             candidates = new String[]{"WenQuanYi Micro Hei", "Noto Sans CJK SC", "Droid Sans Fallback"};
         } else {
-            // Windows
             candidates = new String[]{"SimSun", "Microsoft YaHei", "KaiTi"};
         }
         for (String name : candidates) {
             try {
                 return BaseFont.createFont(name, "UniGB-UCS2-H", BaseFont.NOT_EMBEDDED);
             } catch (Exception ignored) {
-                // 字体不存在，尝试下一个
             }
         }
-        // 兜底：所有候选都失败时回退 STSong-Light（可能再次报错，但至少有明确日志）
-        log.warn("未找到可用的 Unicode CJK 字体，回退到 STSong-Light");
+        log.warn("未找到 Unicode CJK 字体，回退 STSong-Light");
         try {
             return BaseFont.createFont("STSong-Light", "UniGB-UCS2-H", BaseFont.NOT_EMBEDDED);
         } catch (Exception e) {
@@ -445,19 +452,29 @@ public class AdminServiceImpl implements AdminService {
     }
 
     /**
-     * 安全字符串转换，null 返回空字符串，并过滤 OpenPDF 无法处理的 Unicode 增补平面字符（emoji 等）
+     * 安全字符串转换，null 返回空字符串
+     *
+     * 过滤 Unicode 增补平面字符（U+10000+，如 emoji），
+     * 因为 OpenPDF CJKFont 宽度表仅 16 位，SMP 字符会触发 ArrayIndexOutOfBoundsException。
      */
     private String safeStr(String s) {
         if (s == null) return "";
-        // OpenPDF CJKFont 宽度表仅 16 位（65536），SMP 字符（U+10000+）会越界
+        boolean hasSmp = false;
+        for (int i = 0; i < s.length(); i++) {
+            if (Character.isHighSurrogate(s.charAt(i))) {
+                hasSmp = true;
+                break;
+            }
+        }
+        if (!hasSmp) return s;
         StringBuilder sb = new StringBuilder(s.length());
         for (int i = 0; i < s.length(); i++) {
-            int cp = s.codePointAt(i);
-            if (cp <= 0xFFFF) {
-                sb.appendCodePoint(cp);
+            char c = s.charAt(i);
+            if (Character.isHighSurrogate(c)) {
+                i++; // 跳过整个 surrogate pair
+            } else {
+                sb.append(c);
             }
-            // SMP 字符（cp > 0xFFFF）直接跳过
-            if (Character.isSupplementaryCodePoint(cp)) i++; // 跳过 surrogate pair 的第二个 char
         }
         return sb.toString();
     }
