@@ -18,25 +18,20 @@ public class CorsConfig {
     /**
      * 创建 CORS 过滤器
      *
-     * 安全配置：
-     * - 只允许前端开发服务器来源（localhost:5173）
-     * - 只允许必要的 HTTP 方法
-     * - 只允许必要的请求头
+     * 允许任意来源访问（内网穿透场景下域名不固定，无法穷举）。
+     * 通过 addAllowedOriginPattern("**") 匹配所有来源，
+     * 配合 allowCredentials(true) 使用 Origin 反射模式。
      *
      * @return CorsFilter 实例
      */
     @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
-        // 只允许前端开发服务器来源，生产环境需改为实际域名
-        config.addAllowedOrigin("http://localhost:5173");
-        config.addAllowedOriginPattern("http://*.frp.one:*");
-        config.addAllowedOriginPattern("https://*.frp.one:*");
-        // 只允许必要的请求头
-        config.addAllowedHeader("Content-Type");
-        config.addAllowedHeader("X-Session-Token");
-        config.addAllowedHeader("X-Admin-Token");
-        // 只允许必要的 HTTP 方法
+        // 允许任意来源（内网穿透域名不固定）
+        config.addAllowedOriginPattern("**");
+        // 允许所有请求头
+        config.addAllowedHeader("*");
+        // 允许必要的 HTTP 方法
         config.addAllowedMethod("GET");
         config.addAllowedMethod("POST");
         config.addAllowedMethod("PUT");

@@ -12,8 +12,8 @@ spring:
     username: root
     password: root
     hikari:
-      maximum-pool-size: 50
-      minimum-idle: 10
+      maximum-pool-size: 10
+      minimum-idle: 5
       connection-timeout: 30000
 
   # Redis 配置（无密码）
@@ -22,7 +22,7 @@ spring:
       host: 127.0.0.1
       port: 6379
 
-  # 文件上传限制（照片最大 10MB）
+  # 文件上传限制（照片最大 50MB）
   servlet:
     multipart:
       max-file-size: 50MB
@@ -33,8 +33,8 @@ mybatis-plus:
   configuration:
     # 驼峰命名映射
     map-underscore-to-camel-case: true
-    # SQL 日志输出
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    # SQL 日志输出（生产环境关闭，需要调试时取消注释）
+    # log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   global-config:
     db-config:
       # 主键自增

@@ -34,8 +34,12 @@ public class FormServiceImpl implements FormService {
     private static final String SESSION_KEY_PREFIX = "wt:session:";
     /** Redis 步骤数据 key 前缀 */
     private static final String STEP_KEY_PREFIX = "wt:step:";
+    /** Redis 模板数据 key 前缀 */
+    private static final String TEMPLATE_KEY_PREFIX = "wt:template:";
     /** 会话过期时间：2 小时 */
     private static final long SESSION_TTL_HOURS = 2;
+    /** 模板缓存过期时间：24 小时（模板数据不变） */
+    private static final long TEMPLATE_TTL_HOURS = 24;
 
     private final SubmissionMapper submissionMapper;
     private final PersonalInfoMapper personalInfoMapper;
@@ -307,21 +311,37 @@ public class FormServiceImpl implements FormService {
     /**
      * 获取左侧栏评估项目模板
      *
-     * 从预设模板表查询所有左侧栏评估项目，按排序号排列。
+     * 模板数据不变，首次查询后缓存到 Redis，后续读缓存避免重复查库。
      */
+    @SuppressWarnings("unchecked")
     @Override
     public List<AssessmentLeftTemplate> getLeftTemplate() {
-        return assessmentLeftTemplateMapper.selectList(
+        String key = TEMPLATE_KEY_PREFIX + "left";
+        Object cached = redisUtil.get(key);
+        if (cached instanceof List) {
+            return (List<AssessmentLeftTemplate>) cached;
+        }
+        List<AssessmentLeftTemplate> list = assessmentLeftTemplateMapper.selectList(
                 new QueryWrapper<AssessmentLeftTemplate>().orderByAsc("row_order"));
+        redisUtil.set(key, list, TEMPLATE_TTL_HOURS, TimeUnit.HOURS);
+        return list;
     }
 
     /**
      * 获取右侧栏评估项目模板
      */
+    @SuppressWarnings("unchecked")
     @Override
     public List<AssessmentRightTemplate> getRightTemplate() {
-        return assessmentRightTemplateMapper.selectList(
+        String key = TEMPLATE_KEY_PREFIX + "right";
+        Object cached = redisUtil.get(key);
+        if (cached instanceof List) {
+            return (List<AssessmentRightTemplate>) cached;
+        }
+        List<AssessmentRightTemplate> list = assessmentRightTemplateMapper.selectList(
                 new QueryWrapper<AssessmentRightTemplate>().orderByAsc("row_order"));
+        redisUtil.set(key, list, TEMPLATE_TTL_HOURS, TimeUnit.HOURS);
+        return list;
     }
 
     // ==================== 内部方法 ====================
@@ -383,15 +403,16 @@ public class FormServiceImpl implements FormService {
     /**
      * 更新提交记录的当前步骤
      *
-     * 只在目标步骤大于等于当前步骤时更新（用户前进或保存同一步骤时）。
+     * 使用单条 UPDATE 语句，WHERE 条件 current_step < step 避免回退步骤。
+     * 比 SELECT + UPDATEById 两次查询更高效。
      */
     private void updateCurrentStep(Long submissionId, int step) {
-        Submission submission = submissionMapper.selectById(submissionId);
-        if (submission != null && submission.getCurrentStep() < step) {
-            submission.setCurrentStep(step);
-            submission.setUpdateTime(LocalDateTime.now());
-            submissionMapper.updateById(submission);
-        }
+        submissionMapper.update(null,
+                new com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper<Submission>()
+                        .eq("id", submissionId)
+                        .lt("current_step", step)
+                        .set("current_step", step)
+                        .set("update_time", LocalDateTime.now()));
     }
 
     /**

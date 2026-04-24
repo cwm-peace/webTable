@@ -1,5 +1,6 @@
 package com.peace.webtable.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.peace.webtable.entity.*;
 import com.peace.webtable.mapper.*;
 import com.peace.webtable.service.ExportService;
@@ -13,6 +14,8 @@ import org.springframework.stereotype.Service;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Excel 导出服务实现类
@@ -44,23 +47,45 @@ public class ExportServiceImpl implements ExportService {
 
     /**
      * 导出所有已完成提交的数据为 Excel
+     *
+     * 使用批量查询避免 N+1 问题：先查出所有 submission，
+     * 再用 IN 批量查出基础信息和自评数据，内存中按 submissionId 分组。
      */
     @Override
     public ByteArrayOutputStream exportAllToExcel() {
         log.info("开始导出 Excel 数据");
 
-        // 使用流式工作簿，避免大数据量导出时 OOM
-        // 内存中保留 100 行，超出部分写入临时文件
         SXSSFWorkbook workbook = new SXSSFWorkbook(100);
 
         try {
+            // 1. 一次查出所有已完成的 submission
             List<Submission> submissions = submissionMapper.selectList(
-                    new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<Submission>()
-                            .eq("completed", true));
+                    new QueryWrapper<Submission>().eq("completed", true));
 
-            // 生成三个 Sheet
-            writePersonalInfoSheet(workbook, submissions);
-            writeAssessmentSheet(workbook, submissions);
+            if (submissions.isEmpty()) {
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                workbook.write(bos);
+                return bos;
+            }
+
+            List<Long> ids = submissions.stream().map(Submission::getId).collect(Collectors.toList());
+
+            // 2. 批量查询基础信息和自评数据（4 次查询代替 3N+1 次）
+            Map<Long, PersonalInfo> infoMap = personalInfoMapper.selectList(
+                    new QueryWrapper<PersonalInfo>().in("submission_id", ids))
+                    .stream().collect(Collectors.toMap(PersonalInfo::getSubmissionId, p -> p));
+
+            Map<Long, List<AssessmentLeft>> leftMap = assessmentLeftMapper.selectList(
+                    new QueryWrapper<AssessmentLeft>().in("submission_id", ids).orderByAsc("row_order"))
+                    .stream().collect(Collectors.groupingBy(AssessmentLeft::getSubmissionId));
+
+            Map<Long, List<AssessmentRight>> rightMap = assessmentRightMapper.selectList(
+                    new QueryWrapper<AssessmentRight>().in("submission_id", ids).orderByAsc("row_order"))
+                    .stream().collect(Collectors.groupingBy(AssessmentRight::getSubmissionId));
+
+            // 3. 生成 Sheet
+            writePersonalInfoSheet(workbook, submissions, infoMap);
+            writeAssessmentSheet(workbook, submissions, leftMap, rightMap);
 
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             workbook.write(bos);
@@ -80,11 +105,13 @@ public class ExportServiceImpl implements ExportService {
      * 写入基础信息 Sheet
      *
      * 表头对应范本文件中的所有基础字段。
+     *
+     * @param infoMap 批量查询结果，key 为 submissionId
      */
-    private void writePersonalInfoSheet(Workbook workbook, List<Submission> submissions) {
+    private void writePersonalInfoSheet(Workbook workbook, List<Submission> submissions,
+                                        Map<Long, PersonalInfo> infoMap) {
         Sheet sheet = workbook.createSheet("基础信息");
 
-        // 表头：对应范本中 B 列的字段名
         Row header = sheet.createRow(0);
         String[] headers = {
                 "提交ID", "名字", "身高cm", "体重kg", "学历", "职业", "鞋码EU",
@@ -92,7 +119,8 @@ public class ExportServiceImpl implements ExportService {
                 "第一次自慰年龄", "破处年龄", "是否单身", "是否绿过伴侣", "是否被伴侣绿过",
                 "最长带锁时间", "做爱频率", "自慰频率", "自慰工具",
                 "菊穴可完全插入尺寸", "尿道可完全插入尺寸", "犬龄", "约调次数", "侍主人数",
-                "精液量ml", "每日最高射精次数", "喜欢被叫的称呼", "一句话形容自己", "备注"
+                "精液量ml", "每日最高射精次数", "喜欢被叫的称呼", "一句话形容自己",
+                "培养意向", "备注"
         };
         for (int i = 0; i < headers.length; i++) {
             header.createCell(i).setCellValue(headers[i]);
@@ -100,10 +128,7 @@ public class ExportServiceImpl implements ExportService {
 
         int rowNum = 1;
         for (Submission submission : submissions) {
-            PersonalInfo info = personalInfoMapper.selectOne(
-                    new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<PersonalInfo>()
-                            .eq("submission_id", submission.getId()));
-
+            PersonalInfo info = infoMap.get(submission.getId());
             if (info != null) {
                 Row row = sheet.createRow(rowNum++);
                 int col = 0;
@@ -138,6 +163,7 @@ public class ExportServiceImpl implements ExportService {
                 row.createCell(col++).setCellValue(safeStr(info.getDailyMaxEjaculation()));
                 row.createCell(col++).setCellValue(safeStr(info.getPreferredName()));
                 row.createCell(col++).setCellValue(safeStr(info.getSelfDescription()));
+                row.createCell(col++).setCellValue(safeStr(info.getTrainingIntention()));
                 row.createCell(col).setCellValue(safeStr(info.getRemark()));
             }
         }
@@ -147,8 +173,13 @@ public class ExportServiceImpl implements ExportService {
      * 写入接受程度自评 Sheet
      *
      * 合并左右两侧栏数据，表头：提交ID | 左侧类型 | 左侧项目 | 左侧级别 | 左侧备注 | 右侧类型 | 右侧项目 | 右侧级别 | 右侧备注
+     *
+     * @param leftMap  左侧自评数据，key 为 submissionId
+     * @param rightMap 右侧自评数据，key 为 submissionId
      */
-    private void writeAssessmentSheet(Workbook workbook, List<Submission> submissions) {
+    private void writeAssessmentSheet(Workbook workbook, List<Submission> submissions,
+                                      Map<Long, List<AssessmentLeft>> leftMap,
+                                      Map<Long, List<AssessmentRight>> rightMap) {
         Sheet sheet = workbook.createSheet("接受程度自评");
 
         Row header = sheet.createRow(0);
@@ -162,15 +193,8 @@ public class ExportServiceImpl implements ExportService {
 
         int rowNum = 1;
         for (Submission submission : submissions) {
-            List<AssessmentLeft> leftList = assessmentLeftMapper.selectList(
-                    new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<AssessmentLeft>()
-                            .eq("submission_id", submission.getId())
-                            .orderByAsc("row_order"));
-
-            List<AssessmentRight> rightList = assessmentRightMapper.selectList(
-                    new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<AssessmentRight>()
-                            .eq("submission_id", submission.getId())
-                            .orderByAsc("row_order"));
+            List<AssessmentLeft> leftList = leftMap.getOrDefault(submission.getId(), List.of());
+            List<AssessmentRight> rightList = rightMap.getOrDefault(submission.getId(), List.of());
 
             // 按最大行数遍历，左右对齐
             int maxRows = Math.max(leftList.size(), rightList.size());

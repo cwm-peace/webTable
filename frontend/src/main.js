@@ -2,7 +2,7 @@
  * Vue 应用入口文件
  *
  * 职责：创建 Vue 应用实例，注册全局依赖。
- * 包括 Pinia 状态管理、Vue Router 路由、Motion 动画、VxeTable 表格。
+ * 包括 Pinia 状态管理、Vue Router 路由、Motion 动画。
  */
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
