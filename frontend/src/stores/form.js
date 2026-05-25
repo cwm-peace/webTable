@@ -7,7 +7,7 @@
  * 兜底策略：表单数据自动缓存到 localStorage，刷新或网络异常时可恢复已填内容。
  */
 import { defineStore } from 'pinia'
-import { ref, reactive } from 'vue'
+import { ref, reactive, watch } from 'vue'
 import {
   createSubmission, getStatus, completeSubmission,
   getStep1, saveStep1 as apiSaveStep1,
@@ -24,8 +24,12 @@ export const useFormStore = defineStore('form', () => {
   const submissionId = ref(null)
   const sessionToken = ref('')
   const completed = ref(false)
-  const loading = ref(false)
+  const loading = ref(true)
   const saving = ref(false)
+  /** 自动保存状态：idle | saving | saved | error */
+  const autoSaveStatus = ref('idle')
+  /** 最后一次成功保存到服务器的时间戳 */
+  const lastSavedAt = ref(null)
 
   // ===== 第1步：基础信息表单数据 =====
   const basicInfo = reactive({
@@ -112,6 +116,8 @@ export const useFormStore = defineStore('form', () => {
   let autoSaveTimer = null
   /** 自动保存间隔（毫秒） */
   const AUTO_SAVE_INTERVAL = 15000
+  /** Vue watcher 停止函数列表 */
+  let stopWatchers = null
 
   /**
    * 将当前表单数据快照到 localStorage
@@ -183,10 +189,42 @@ export const useFormStore = defineStore('form', () => {
   }
 
   /**
+   * 立即保存到服务器（由组件 blur 事件触发）
+   *
+   * 保存前先写入 localStorage 作为兜底。
+   * 防止重复请求：如果正在保存中则跳过。
+   */
+  async function saveToServer() {
+    if (!hasSubmission() || saving.value) return
+
+    saveDraftToLocal()
+    autoSaveStatus.value = 'saving'
+    try {
+      if (currentStep.value === 1) {
+        await persistStep1()
+      } else if (currentStep.value === 3) {
+        await persistStep3()
+      }
+      autoSaveStatus.value = 'saved'
+      lastSavedAt.value = Date.now()
+      setTimeout(() => {
+        if (autoSaveStatus.value === 'saved') autoSaveStatus.value = 'idle'
+      }, 3000)
+    } catch (error) {
+      console.error('保存失败：', error)
+      autoSaveStatus.value = 'error'
+      setTimeout(() => {
+        if (autoSaveStatus.value === 'error') autoSaveStatus.value = 'idle'
+      }, 5000)
+    }
+  }
+
+  /**
    * 启动自动缓存定时器
    *
    * 每 15 秒将表单数据快照到 localStorage，
    * 同时监听页面可见性变化和 beforeunload 事件，确保数据不丢失。
+   * 启动表单数据变更监听，停止输入 5 秒后自动保存到服务器。
    */
   function startAutoSave() {
     stopAutoSave()
@@ -203,6 +241,13 @@ export const useFormStore = defineStore('form', () => {
     window.addEventListener('beforeunload', handleBeforeUnload)
     document.addEventListener('visibilitychange', handleVisibilityChange)
 
+    // 监听表单数据变更，仅缓存到 localStorage（服务器保存由 blur 事件触发）
+    stopWatchers = [
+      watch(basicInfo, saveDraftToLocal, { deep: true }),
+      watch(leftRows, saveDraftToLocal, { deep: true }),
+      watch(rightRows, saveDraftToLocal, { deep: true })
+    ]
+
     // 将清理函数挂到 timer 上，方便 stopAutoSave 统一清理
     autoSaveTimer._cleanup = () => {
       window.removeEventListener('beforeunload', handleBeforeUnload)
@@ -218,6 +263,10 @@ export const useFormStore = defineStore('form', () => {
       clearInterval(autoSaveTimer)
       autoSaveTimer._cleanup?.()
       autoSaveTimer = null
+    }
+    if (stopWatchers) {
+      stopWatchers.forEach(stop => stop())
+      stopWatchers = null
     }
   }
 
@@ -311,6 +360,34 @@ export const useFormStore = defineStore('form', () => {
   }
 
   /**
+   * 以模板为基准，叠加用户已填写的数据
+   *
+   * 模板提供完整的项目列表（typeName, itemName, rowOrder），
+   * 用户数据提供已填写的 level 和 remark。
+   * 按 itemName 匹配，匹配不上的保留模板默认值（空）。
+   *
+   * @param {Array} template 模板数据
+   * @param {Array} userData 用户已填写的数据
+   * @returns {Array} 合并后的数据
+   */
+  function mergeWithTemplate(template, userData) {
+    const userMap = new Map()
+    for (const item of userData) {
+      userMap.set(item.itemName, item)
+    }
+    return template.map(t => {
+      const saved = userMap.get(t.itemName)
+      return {
+        typeName: t.typeName,
+        itemName: t.itemName,
+        level: saved?.level || '',
+        remark: saved?.remark || '',
+        rowOrder: t.rowOrder
+      }
+    })
+  }
+
+  /**
    * 加载所有已有数据或模板
    *
    * 使用 Promise.allSettled 确保各步骤数据独立加载，互不影响。
@@ -320,10 +397,12 @@ export const useFormStore = defineStore('form', () => {
   async function loadAllData() {
     if (!hasSubmission()) return
 
-    const [step1Result, leftResult, rightResult] = await Promise.allSettled([
+    const [step1Result, leftUserResult, rightUserResult, leftTemplateResult, rightTemplateResult] = await Promise.allSettled([
       getStep1(submissionId.value),
       getStep3Left(submissionId.value),
-      getStep3Right(submissionId.value)
+      getStep3Right(submissionId.value),
+      getLeftTemplate(),
+      getRightTemplate()
     ])
 
     // 第1步：基础信息（独立容错）
@@ -333,47 +412,15 @@ export const useFormStore = defineStore('form', () => {
       console.error('加载第1步数据失败：', step1Result.reason)
     }
 
-    // 第3步左侧：优先加载已有数据，无数据时加载模板
-    if (leftResult.status === 'fulfilled' && leftResult.value.data && leftResult.value.data.length > 0) {
-      leftRows.value = leftResult.value.data
-    } else {
-      if (leftResult.status === 'rejected') {
-        console.error('加载第3步左侧数据失败：', leftResult.reason)
-      }
-      try {
-        const templateRes = await getLeftTemplate()
-        leftRows.value = (templateRes.data || []).map(t => ({
-          typeName: t.typeName,
-          itemName: t.itemName,
-          level: '',
-          remark: '',
-          rowOrder: t.rowOrder
-        }))
-      } catch (error) {
-        console.error('加载左侧模板失败：', error)
-      }
-    }
+    // 第3步左侧：以模板为基准，叠加用户已填写的数据
+    const leftTemplate = leftTemplateResult.status === 'fulfilled' ? (leftTemplateResult.value.data || []) : []
+    const leftUserData = leftUserResult.status === 'fulfilled' && leftUserResult.value.data ? leftUserResult.value.data : []
+    leftRows.value = mergeWithTemplate(leftTemplate, leftUserData)
 
-    // 第3步右侧：同上逻辑
-    if (rightResult.status === 'fulfilled' && rightResult.value.data && rightResult.value.data.length > 0) {
-      rightRows.value = rightResult.value.data
-    } else {
-      if (rightResult.status === 'rejected') {
-        console.error('加载第3步右侧数据失败：', rightResult.reason)
-      }
-      try {
-        const templateRes = await getRightTemplate()
-        rightRows.value = (templateRes.data || []).map(t => ({
-          typeName: t.typeName,
-          itemName: t.itemName,
-          level: '',
-          remark: '',
-          rowOrder: t.rowOrder
-        }))
-      } catch (error) {
-        console.error('加载右侧模板失败：', error)
-      }
-    }
+    // 第3步右侧：以模板为基准，叠加用户已填写的数据
+    const rightTemplate = rightTemplateResult.status === 'fulfilled' ? (rightTemplateResult.value.data || []) : []
+    const rightUserData = rightUserResult.status === 'fulfilled' && rightUserResult.value.data ? rightUserResult.value.data : []
+    rightRows.value = mergeWithTemplate(rightTemplate, rightUserData)
 
     // 服务端数据加载完毕，同步缓存到 localStorage
     saveDraftToLocal()
@@ -554,10 +601,11 @@ export const useFormStore = defineStore('form', () => {
 
   return {
     currentStep, submissionId, sessionToken, completed, loading, saving,
+    autoSaveStatus, lastSavedAt,
     basicInfo, leftRows, rightRows, photoCounts,
     initForm, loadAllData, saveAll, saveCurrentStep,
     saveStep1Draft, saveStep3Draft, preparePreview, submitAll,
-    nextStep, prevStep, goToStep, updatePhotoCount,
+    nextStep, prevStep, goToStep, updatePhotoCount, saveToServer,
     saveDraftToLocal, restoreDraftFromLocal, clearLocalDraft
   }
 })

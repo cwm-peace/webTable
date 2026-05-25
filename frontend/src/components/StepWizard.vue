@@ -50,16 +50,31 @@
 
     <!-- 导航按钮 -->
     <div class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 mt-8 pt-6 border-t">
-      <Button
-        v-if="formStore.currentStep > 1"
-        variant="outline"
-        @click="handlePrev"
-        :disabled="formStore.saving"
-        class="order-2 sm:order-1 h-11 sm:h-9"
-      >
-        ← 上一步
-      </Button>
-      <div v-else class="hidden sm:block"></div>
+      <div class="flex items-center gap-2 order-3 sm:order-1">
+        <Button
+          v-if="formStore.currentStep > 1"
+          variant="outline"
+          @click="handlePrev"
+          :disabled="formStore.saving"
+          class="h-11 sm:h-9"
+        >
+          ← 上一步
+        </Button>
+
+        <!-- 自动保存状态指示 -->
+        <span class="text-xs text-muted-foreground ml-2" v-if="formStore.autoSaveStatus === 'saving'">
+          <span class="inline-block w-1.5 h-1.5 bg-amber-400 rounded-full mr-1 animate-pulse"></span>
+          保存中...
+        </span>
+        <span class="text-xs text-muted-foreground ml-2" v-else-if="formStore.autoSaveStatus === 'saved'">
+          <span class="inline-block w-1.5 h-1.5 bg-emerald-400 rounded-full mr-1"></span>
+          已保存
+        </span>
+        <span class="text-xs text-destructive ml-2" v-else-if="formStore.autoSaveStatus === 'error'">
+          <span class="inline-block w-1.5 h-1.5 bg-destructive rounded-full mr-1"></span>
+          保存失败
+        </span>
+      </div>
 
       <div class="flex gap-3 order-1 sm:order-2">
         <Button

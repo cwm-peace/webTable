@@ -111,16 +111,26 @@ public class AdminServiceImpl implements AdminService {
     }
 
     /**
-     * 获取所有已提交的列表
+     * 获取所有提交的列表
      *
-     * 查询所有已完成的提交记录，按创建时间倒序排列。
+     * 查询所有提交记录（包含未完成），关联查询填写者名字，按创建时间倒序排列。
      */
     @Override
     public ApiResponse<Object> getSubmissionList() {
         List<Submission> submissions = submissionMapper.selectList(
                 new QueryWrapper<Submission>()
-                        .eq("completed", true)
                         .orderByDesc("create_time"));
+
+        // 批量查询所有关联的 personal_info，按 submission_id 索引
+        List<Long> submissionIds = submissions.stream().map(Submission::getId).collect(Collectors.toList());
+        Map<Long, PersonalInfo> infoMap = new HashMap<>();
+        if (!submissionIds.isEmpty()) {
+            List<PersonalInfo> infos = personalInfoMapper.selectList(
+                    new QueryWrapper<PersonalInfo>().in("submission_id", submissionIds));
+            for (PersonalInfo info : infos) {
+                infoMap.put(info.getSubmissionId(), info);
+            }
+        }
 
         // 转换为安全的数据格式（不暴露 session_token）
         List<Map<String, Object>> list = new ArrayList<>();
@@ -131,6 +141,8 @@ public class AdminServiceImpl implements AdminService {
             item.put("completed", s.getCompleted());
             item.put("createTime", s.getCreateTime());
             item.put("updateTime", s.getUpdateTime());
+            PersonalInfo info = infoMap.get(s.getId());
+            item.put("name", info != null ? info.getName() : null);
             list.add(item);
         }
 

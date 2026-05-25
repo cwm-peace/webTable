@@ -4,15 +4,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 /**
  * Redis 配置类
  *
  * 职责：配置 RedisTemplate 的序列化方式。
- * Key 使用 String 序列化，Value 使用 JSON 序列化，
- * 确保 Redis 中存储的数据可读且兼容不同客户端。
+ * Key 使用 String 序列化，Value 使用 Fastjson2 序列化，
+ * 解决 Jackson 无法处理 Java 8 时间类型（LocalDateTime）的问题。
  */
 @Configuration
 public class RedisConfig {
@@ -20,8 +19,8 @@ public class RedisConfig {
     /**
      * 自定义 RedisTemplate Bean
      *
-     * 解决默认 JdkSerializationRedisSerializer 导致的 Redis 数据不可读问题。
-     * Key 用 StringRedisSerializer（可读性强），Value 用 JSON 序列化（支持复杂对象）。
+     * 使用 Fastjson2 替代 Jackson 做 Value 序列化，
+     * 内置支持 LocalDateTime 等 Java 8 时间类型，无需额外模块。
      *
      * @param connectionFactory Redis 连接工厂
      * @return 配置好的 RedisTemplate 实例
@@ -36,10 +35,10 @@ public class RedisConfig {
         template.setKeySerializer(stringSerializer);
         template.setHashKeySerializer(stringSerializer);
 
-        // Value 使用 JSON 序列化，支持存储复杂对象
-        GenericJackson2JsonRedisSerializer jsonSerializer = new GenericJackson2JsonRedisSerializer();
-        template.setValueSerializer(jsonSerializer);
-        template.setHashValueSerializer(jsonSerializer);
+        // Value 使用 Fastjson2 序列化，支持 Java 8 时间类型
+        Fastjson2JsonRedisSerializer<Object> fastjsonSerializer = new Fastjson2JsonRedisSerializer<>();
+        template.setValueSerializer(fastjsonSerializer);
+        template.setHashValueSerializer(fastjsonSerializer);
 
         template.afterPropertiesSet();
         return template;

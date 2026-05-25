@@ -26,7 +26,7 @@
         <CardContent class="space-y-4">
           <div v-for="field in basicFields" :key="field.key" class="space-y-1.5">
             <Label :for="field.key">{{ field.label }}</Label>
-            <Input :id="field.key" v-model="store.basicInfo[field.key]" :placeholder="'请输入' + field.label" />
+            <Input :id="field.key" v-model="store.basicInfo[field.key]" :placeholder="'请输入' + field.label" @blur="store.saveToServer()" />
           </div>
         </CardContent>
       </Card>
@@ -39,7 +39,7 @@
         <CardContent class="space-y-4">
           <div v-for="field in contactFields" :key="field.key" class="space-y-1.5">
             <Label :for="field.key">{{ field.label }}</Label>
-            <Input :id="field.key" v-model="store.basicInfo[field.key]" :placeholder="'请输入' + field.label" />
+            <Input :id="field.key" v-model="store.basicInfo[field.key]" :placeholder="'请输入' + field.label" @blur="store.saveToServer()" />
           </div>
         </CardContent>
       </Card>
@@ -52,7 +52,7 @@
         <CardContent class="space-y-4">
           <div v-for="field in experienceFields" :key="field.key" class="space-y-1.5">
             <Label :for="field.key">{{ field.label }}</Label>
-            <Input :id="field.key" v-model="store.basicInfo[field.key]" :placeholder="'请输入'" />
+            <Input :id="field.key" v-model="store.basicInfo[field.key]" :placeholder="'请输入'" @blur="store.saveToServer()" />
           </div>
         </CardContent>
       </Card>
@@ -66,7 +66,7 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div v-for="field in habitFields" :key="field.key" class="space-y-1.5">
               <Label :for="field.key">{{ field.label }}</Label>
-              <Input :id="field.key" v-model="store.basicInfo[field.key]" :placeholder="field.placeholder || '请输入'" />
+              <Input :id="field.key" v-model="store.basicInfo[field.key]" :placeholder="field.placeholder || '请输入'" @blur="store.saveToServer()" />
             </div>
           </div>
         </CardContent>
@@ -81,8 +81,8 @@
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div v-for="field in otherFields" :key="field.key" class="space-y-1.5">
               <Label :for="field.key">{{ field.label }}</Label>
-              <Textarea v-if="field.key === 'remark' || field.key === 'trainingIntention'" :id="field.key" v-model="store.basicInfo[field.key]" placeholder="补充说明..." rows="3" />
-              <Input v-else :id="field.key" v-model="store.basicInfo[field.key]" placeholder="请输入" />
+              <Textarea v-if="field.key === 'remark' || field.key === 'trainingIntention'" :id="field.key" v-model="store.basicInfo[field.key]" placeholder="补充说明..." rows="3" @blur="store.saveToServer()" />
+              <Input v-else :id="field.key" v-model="store.basicInfo[field.key]" placeholder="请输入" @blur="store.saveToServer()" />
             </div>
           </div>
         </CardContent>

@@ -49,11 +49,12 @@
             <select
               v-model="row.level"
               class="h-8 w-[6.5rem] sm:w-32 rounded-md border border-input bg-transparent px-2 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              @blur="store.saveToServer()"
             >
               <option value="">—</option>
               <option v-for="opt in levelOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
             </select>
-            <Input v-model="row.remark" placeholder="备注" class="h-8 w-[5rem] sm:w-28 text-sm" />
+            <Input v-model="row.remark" placeholder="备注" class="h-8 w-[5rem] sm:w-28 text-sm" @blur="store.saveToServer()" />
           </div>
         </div>
       </div>
@@ -72,11 +73,12 @@
             <select
               v-model="row.level"
               class="h-8 w-[6.5rem] sm:w-32 rounded-md border border-input bg-transparent px-2 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              @blur="store.saveToServer()"
             >
               <option value="">—</option>
               <option v-for="opt in levelOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
             </select>
-            <Input v-model="row.remark" placeholder="备注" class="h-8 w-[5rem] sm:w-28 text-sm" />
+            <Input v-model="row.remark" placeholder="备注" class="h-8 w-[5rem] sm:w-28 text-sm" @blur="store.saveToServer()" />
           </div>
         </div>
       </div>

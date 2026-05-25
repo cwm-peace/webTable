@@ -1,8 +1,7 @@
 package com.peace.webtable.service.impl;
 
+import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.peace.webtable.dto.ApiResponse;
 import com.peace.webtable.entity.*;
 import com.peace.webtable.mapper.*;
@@ -34,12 +33,8 @@ public class FormServiceImpl implements FormService {
     private static final String SESSION_KEY_PREFIX = "wt:session:";
     /** Redis 步骤数据 key 前缀 */
     private static final String STEP_KEY_PREFIX = "wt:step:";
-    /** Redis 模板数据 key 前缀 */
-    private static final String TEMPLATE_KEY_PREFIX = "wt:template:";
     /** 会话过期时间：2 小时 */
     private static final long SESSION_TTL_HOURS = 2;
-    /** 模板缓存过期时间：24 小时（模板数据不变） */
-    private static final long TEMPLATE_TTL_HOURS = 24;
 
     private final SubmissionMapper submissionMapper;
     private final PersonalInfoMapper personalInfoMapper;
@@ -48,7 +43,6 @@ public class FormServiceImpl implements FormService {
     private final AssessmentLeftTemplateMapper assessmentLeftTemplateMapper;
     private final AssessmentRightTemplateMapper assessmentRightTemplateMapper;
     private final RedisUtil redisUtil;
-    private final Gson gson = new Gson();
 
     public FormServiceImpl(SubmissionMapper submissionMapper,
                            PersonalInfoMapper personalInfoMapper,
@@ -123,7 +117,10 @@ public class FormServiceImpl implements FormService {
         submission.setCompleted(true);
         submission.setUpdateTime(LocalDateTime.now());
         submissionMapper.updateById(submission);
+        log.info("提交状态已更新到数据库：submissionId={}, completed=true", submission.getId());
+
         clearDraftCache(submission.getId(), sessionToken);
+        log.info("已清理 Redis 草稿缓存：submissionId={}", submission.getId());
 
         log.info("提交已完成：submissionId={}", submission.getId());
         return ApiResponse.ok();
@@ -143,15 +140,23 @@ public class FormServiceImpl implements FormService {
         String stepKey = STEP_KEY_PREFIX + submissionId + ":1";
 
         Object cached = redisUtil.get(stepKey);
-        if (cached instanceof PersonalInfo info) {
-            return info;
+        if (cached != null) {
+            try {
+                log.info("第1步缓存命中：submissionId={}", submissionId);
+                return toJavaObject(cached, PersonalInfo.class);
+            } catch (Exception e) {
+                log.warn("第1步缓存数据转换失败，回源数据库：submissionId={}, error={}", submissionId, e.getMessage());
+                redisUtil.delete(stepKey);
+            }
         }
 
+        log.info("第1步缓存未命中，回源数据库：submissionId={}", submissionId);
         PersonalInfo info = personalInfoMapper.selectOne(
                 new QueryWrapper<PersonalInfo>().eq("submission_id", submissionId));
 
         if (info != null) {
             redisUtil.set(stepKey, info, SESSION_TTL_HOURS, TimeUnit.HOURS);
+            log.info("第1步数据已缓存到 Redis：submissionId={}", submissionId);
         }
 
         return info;
@@ -174,24 +179,27 @@ public class FormServiceImpl implements FormService {
             info.setId(existing.getId());
             info.setSubmissionId(submissionId);
             personalInfoMapper.updateById(info);
+            log.info("第1步数据已更新到数据库：submissionId={}, id={}", submissionId, existing.getId());
         } else {
             info.setSubmissionId(submissionId);
             personalInfoMapper.insert(info);
+            log.info("第1步数据已写入数据库：submissionId={}, 新记录 id={}", submissionId, info.getId());
         }
 
         String stepKey = STEP_KEY_PREFIX + submissionId + ":1";
         redisUtil.set(stepKey, info, SESSION_TTL_HOURS, TimeUnit.HOURS);
+        log.info("第1步数据已同步到 Redis 缓存：key={}, submissionId={}", stepKey, submissionId);
 
         updateCurrentStep(submissionId, 2);
 
-        log.info("保存第1步数据：submissionId={}", submissionId);
+        log.info("保存第1步数据完成：submissionId={}", submissionId);
         return ApiResponse.ok();
     }
 
     // ==================== 第3步：接受程度自评 ====================
 
     /**
-     * 读取左侧栏自评数据
+     * 读取左侧栏自评数据（直接查数据库）
      */
     @Override
     public List<AssessmentLeft> getStep3Left(String sessionToken, Long submissionId) {
@@ -199,25 +207,16 @@ public class FormServiceImpl implements FormService {
             return null;
         }
 
-        String stepKey = STEP_KEY_PREFIX + submissionId + ":3:left";
-        Object cached = redisUtil.get(stepKey);
-        if (cached != null) {
-            String json = gson.toJson(cached);
-            return gson.fromJson(json,
-                    TypeToken.getParameterized(List.class, AssessmentLeft.class).getType());
-        }
-
         List<AssessmentLeft> list = assessmentLeftMapper.selectList(
                 new QueryWrapper<AssessmentLeft>()
                         .eq("submission_id", submissionId)
                         .orderByAsc("row_order"));
-
-        redisUtil.set(stepKey, list, SESSION_TTL_HOURS, TimeUnit.HOURS);
+        log.info("读取第3步左侧数据：submissionId={}, 行数={}", submissionId, list.size());
         return list;
     }
 
     /**
-     * 保存左侧栏自评数据（全量替换）
+     * 保存左侧栏自评数据（全量替换，直接写数据库）
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -237,19 +236,17 @@ public class FormServiceImpl implements FormService {
                 }
                 assessmentLeftMapper.insert(row);
             }
+            log.info("保存第3步左侧数据到数据库：submissionId={}, 行数={}", submissionId, rows.size());
+        } else {
+            log.info("第3步左侧数据为空，仅清除旧数据：submissionId={}", submissionId);
         }
 
-        String stepKey = STEP_KEY_PREFIX + submissionId + ":3:left";
-        redisUtil.set(stepKey, rows, SESSION_TTL_HOURS, TimeUnit.HOURS);
-
         updateCurrentStep(submissionId, 3);
-
-        log.info("保存第3步左侧数据：submissionId={}, 行数={}", submissionId, rows != null ? rows.size() : 0);
         return ApiResponse.ok();
     }
 
     /**
-     * 读取右侧栏自评数据
+     * 读取右侧栏自评数据（直接查数据库）
      */
     @Override
     public List<AssessmentRight> getStep3Right(String sessionToken, Long submissionId) {
@@ -257,25 +254,16 @@ public class FormServiceImpl implements FormService {
             return null;
         }
 
-        String stepKey = STEP_KEY_PREFIX + submissionId + ":3:right";
-        Object cached = redisUtil.get(stepKey);
-        if (cached != null) {
-            String json = gson.toJson(cached);
-            return gson.fromJson(json,
-                    TypeToken.getParameterized(List.class, AssessmentRight.class).getType());
-        }
-
         List<AssessmentRight> list = assessmentRightMapper.selectList(
                 new QueryWrapper<AssessmentRight>()
                         .eq("submission_id", submissionId)
                         .orderByAsc("row_order"));
-
-        redisUtil.set(stepKey, list, SESSION_TTL_HOURS, TimeUnit.HOURS);
+        log.info("读取第3步右侧数据：submissionId={}, 行数={}", submissionId, list.size());
         return list;
     }
 
     /**
-     * 保存右侧栏自评数据（全量替换）
+     * 保存右侧栏自评数据（全量替换，直接写数据库）
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -295,52 +283,36 @@ public class FormServiceImpl implements FormService {
                 }
                 assessmentRightMapper.insert(row);
             }
+            log.info("保存第3步右侧数据到数据库：submissionId={}, 行数={}", submissionId, rows.size());
+        } else {
+            log.info("第3步右侧数据为空，仅清除旧数据：submissionId={}", submissionId);
         }
 
-        String stepKey = STEP_KEY_PREFIX + submissionId + ":3:right";
-        redisUtil.set(stepKey, rows, SESSION_TTL_HOURS, TimeUnit.HOURS);
-
         updateCurrentStep(submissionId, 3);
-
-        log.info("保存第3步右侧数据：submissionId={}, 行数={}", submissionId, rows != null ? rows.size() : 0);
         return ApiResponse.ok();
     }
 
     // ==================== 模板数据 ====================
 
     /**
-     * 获取左侧栏评估项目模板
-     *
-     * 模板数据不变，首次查询后缓存到 Redis，后续读缓存避免重复查库。
+     * 获取左侧栏评估项目模板（直接查数据库）
      */
-    @SuppressWarnings("unchecked")
     @Override
     public List<AssessmentLeftTemplate> getLeftTemplate() {
-        String key = TEMPLATE_KEY_PREFIX + "left";
-        Object cached = redisUtil.get(key);
-        if (cached instanceof List) {
-            return (List<AssessmentLeftTemplate>) cached;
-        }
         List<AssessmentLeftTemplate> list = assessmentLeftTemplateMapper.selectList(
                 new QueryWrapper<AssessmentLeftTemplate>().orderByAsc("row_order"));
-        redisUtil.set(key, list, TEMPLATE_TTL_HOURS, TimeUnit.HOURS);
+        log.info("获取左侧栏模板：行数={}", list.size());
         return list;
     }
 
     /**
-     * 获取右侧栏评估项目模板
+     * 获取右侧栏评估项目模板（直接查数据库）
      */
-    @SuppressWarnings("unchecked")
     @Override
     public List<AssessmentRightTemplate> getRightTemplate() {
-        String key = TEMPLATE_KEY_PREFIX + "right";
-        Object cached = redisUtil.get(key);
-        if (cached instanceof List) {
-            return (List<AssessmentRightTemplate>) cached;
-        }
         List<AssessmentRightTemplate> list = assessmentRightTemplateMapper.selectList(
                 new QueryWrapper<AssessmentRightTemplate>().orderByAsc("row_order"));
-        redisUtil.set(key, list, TEMPLATE_TTL_HOURS, TimeUnit.HOURS);
+        log.info("获取右侧栏模板：行数={}", list.size());
         return list;
     }
 
@@ -396,8 +368,6 @@ public class FormServiceImpl implements FormService {
     private void clearDraftCache(Long submissionId, String sessionToken) {
         redisUtil.delete(SESSION_KEY_PREFIX + sessionToken);
         redisUtil.delete(STEP_KEY_PREFIX + submissionId + ":1");
-        redisUtil.delete(STEP_KEY_PREFIX + submissionId + ":3:left");
-        redisUtil.delete(STEP_KEY_PREFIX + submissionId + ":3:right");
     }
 
     /**
@@ -430,5 +400,21 @@ public class FormServiceImpl implements FormService {
      */
     private String maskToken(String sessionToken) {
         return sessionToken.substring(0, Math.min(4, sessionToken.length()));
+    }
+
+    /**
+     * 将 Redis 缓存对象安全转换为目标 Java 类型
+     *
+     * 兼容 Fastjson2 反序列化结果（JSONObject / 原始类型 / 已有类型）。
+     *
+     * @param cached Redis 缓存对象
+     * @param clazz  目标类型
+     * @return 转换后的对象
+     */
+    private <T> T toJavaObject(Object cached, Class<T> clazz) {
+        if (clazz.isInstance(cached)) {
+            return clazz.cast(cached);
+        }
+        return JSON.parseObject(JSON.toJSONString(cached), clazz);
     }
 }
