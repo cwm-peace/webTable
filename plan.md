@@ -155,6 +155,26 @@ frontend/src/
 - [x] 手机端适配 + PC 端宽屏差异化布局
 - [ ] 联调测试
 
+## 8.2 iOS 刷新修复与本地缓存兜底
+
+### 根因分析
+| 根因 | 严重性 | 说明 |
+|---|---|---|
+| iOS 下拉刷新 | HIGH | CSS 未设置 `overscroll-behavior: none`，手指下滑触发原生刷新 |
+| `maximum-scale=5.0` | HIGH | 键盘弹出时 Safari 重新计算视口，导致页面重载 |
+| 表单数据无本地缓存 | HIGH | 刷新后需 4+ API 请求恢复，任一失败数据丢失 |
+| `initForm` 网络错误静默 return | MEDIUM | 非会话错误时表单卡在加载态，无恢复路径 |
+
+### 修复措施
+- `index.html`：`maximum-scale=5.0` → `maximum-scale=1.0`，锁死视口缩放
+- `style.css`：`html, body { overscroll-behavior: none }` 禁止下拉刷新 + `env(safe-area-inset-*)` 安全区域
+- `stores/form.js`：新增本地缓存模块
+  - `saveDraftToLocal()`：序列化表单数据到 `localStorage['wt:formDraft']`
+  - `restoreDraftFromLocal()`：从缓存恢复，支持 submissionId 校验和 24h 过期
+  - `startAutoSave()`：15 秒定时保存 + `visibilitychange` + `beforeunload` 事件监听
+  - `initForm`：网络异常时不再 `return`，改为尝试本地缓存兜底
+  - `submitAll`：提交成功后清理本地缓存并停止自动保存
+
 ## 8.1 当前实施变更
 
 ### 手机端适配与 PC 端宽屏布局

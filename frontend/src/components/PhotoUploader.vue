@@ -149,7 +149,7 @@ async function handleFileSelect(event) {
   if (!file) return
 
   if (photos.value.length >= 4) {
-    alert('每个类别最多上传 4 张照片')
+    alert('每个类别最多上传 4 张照片，请先删除后再上传')
     event.target.value = ''
     return
   }

@@ -43,10 +43,15 @@
           </h4>
           <div class="grid grid-cols-4 gap-3">
             <div v-for="cat in photoCategories" :key="cat.key" class="text-center">
-              <div class="text-2xl font-bold">{{ store.photoCounts[cat.key] }}</div>
+              <div class="text-2xl font-bold" :class="store.photoCounts[cat.key] < 4 ? 'text-destructive' : 'text-emerald-600'">
+                {{ store.photoCounts[cat.key] }}/4
+              </div>
               <div class="text-xs text-muted-foreground">{{ cat.label }}</div>
             </div>
           </div>
+          <p v-if="!photosComplete" class="text-destructive text-xs mt-2">
+            每个类别必须上传满 4 张照片才能提交
+          </p>
         </div>
 
         <Separator />
@@ -93,7 +98,7 @@
         <Button variant="outline" @click="dialogOpen = false">返回修改</Button>
         <Button
           @click="handleConfirm"
-          :disabled="store.saving"
+          :disabled="store.saving || !photosComplete"
           class="bg-emerald-600 hover:bg-emerald-700"
         >
           {{ store.saving ? '提交中...' : '确认提交' }}
@@ -147,6 +152,11 @@ const photoCategories = [
   { key: 'dick', label: '狗屌' },
   { key: 'other', label: '其他' }
 ]
+
+/** 所有 4 个类别都上传满 4 张照片 */
+const photosComplete = computed(() =>
+  photoCategories.every(cat => store.photoCounts[cat.key] >= 4)
+)
 
 const leftCompleted = computed(() =>
   store.leftRows.filter(r => r.level).length

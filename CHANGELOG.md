@@ -6,6 +6,21 @@
 
 ## [Unreleased]
 
+### Fixed
+- **iOS Safari 自动刷新导致表单数据丢失**
+  - viewport `maximum-scale` 从 5.0 改为 1.0，防止键盘弹出时视口缩放触发页面重载
+  - CSS 全局添加 `overscroll-behavior: none`，禁止 iOS 下拉刷新手势触发页面重载
+  - 添加 `env(safe-area-inset-*)` 安全区域适配，解决刘海屏/Dynamic Island 内容遮挡问题
+
+### Added
+- **表单数据本地缓存兜底策略**
+  - 表单数据每 15 秒自动快照到 localStorage（key: `wt:formDraft`）
+  - 页面隐藏（`visibilitychange`）和卸载（`beforeunload`）时立即保存
+  - 刷新后优先从服务端恢复数据，失败时自动从 localStorage 缓存恢复
+  - 网络异常时 `initForm` 不再静默卡死，改为尝试本地缓存兜底
+  - 缓存数据超过 24 小时自动过期清理
+  - 正式提交成功后自动清理本地缓存和停止自动保存
+
 ### Changed
 - 填写端草稿恢复改为优先复用已有会话，前端会话令牌兼容 localStorage + sessionStorage，降低刷新后误建 submission 的概率
 - 第1步与第3步改为切步即保存，预览前先保存当前步骤，最终提交后清理本地会话和 Redis 草稿缓存

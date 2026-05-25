@@ -4,6 +4,7 @@
  * 职责：管理表单填写流程的全局状态和所有表单数据。
  * v3 变更：所有表单数据集中存储在 store 中，不再分散在各组件。
  * 进一步变更：草稿支持分步保存与稳定续填，避免恢复失败时误建新 submission。
+ * 兜底策略：表单数据自动缓存到 localStorage，刷新或网络异常时可恢复已填内容。
  */
 import { defineStore } from 'pinia'
 import { ref, reactive } from 'vue'
@@ -15,6 +16,8 @@ import {
 } from '../api/form'
 
 const SESSION_TOKEN_KEY = 'sessionToken'
+/** 本地表单草稿缓存 key */
+const FORM_DRAFT_KEY = 'wt:formDraft'
 
 export const useFormStore = defineStore('form', () => {
   const currentStep = ref(1)
@@ -103,6 +106,121 @@ export const useFormStore = defineStore('form', () => {
     }
   }
 
+  // ==================== 本地草稿缓存（兜底策略） ====================
+
+  /** 自动保存定时器引用 */
+  let autoSaveTimer = null
+  /** 自动保存间隔（毫秒） */
+  const AUTO_SAVE_INTERVAL = 15000
+
+  /**
+   * 将当前表单数据快照到 localStorage
+   *
+   * 作为刷新/崩溃/网络中断时的兜底恢复手段。
+   * 仅在有有效 submissionId 时缓存，避免无效数据残留。
+   */
+  function saveDraftToLocal() {
+    if (!hasSubmission()) return
+    try {
+      const snapshot = {
+        submissionId: submissionId.value,
+        sessionToken: sessionToken.value,
+        currentStep: currentStep.value,
+        basicInfo: { ...basicInfo },
+        leftRows: JSON.parse(JSON.stringify(leftRows.value)),
+        rightRows: JSON.parse(JSON.stringify(rightRows.value)),
+        photoCounts: { ...photoCounts },
+        savedAt: Date.now()
+      }
+      localStorage.setItem(FORM_DRAFT_KEY, JSON.stringify(snapshot))
+    } catch {
+      // 存储空间不足或隐私模式，静默忽略
+    }
+  }
+
+  /**
+   * 从 localStorage 恢复缓存的表单数据
+   *
+   * @param {string} [expectedSubmissionId] 期望的提交 ID，不匹配则跳过
+   * @returns {boolean} 是否成功恢复
+   */
+  function restoreDraftFromLocal(expectedSubmissionId) {
+    try {
+      const raw = localStorage.getItem(FORM_DRAFT_KEY)
+      if (!raw) return false
+
+      const snapshot = JSON.parse(raw)
+      // 缓存超过 24 小时视为过期
+      if (!snapshot.savedAt || Date.now() - snapshot.savedAt > 24 * 60 * 60 * 1000) {
+        clearLocalDraft()
+        return false
+      }
+      // submissionId 不匹配时跳过（可能是旧草稿）
+      if (expectedSubmissionId && snapshot.submissionId !== expectedSubmissionId) {
+        return false
+      }
+
+      Object.assign(basicInfo, snapshot.basicInfo || {})
+      if (snapshot.leftRows?.length) leftRows.value = snapshot.leftRows
+      if (snapshot.rightRows?.length) rightRows.value = snapshot.rightRows
+      if (snapshot.photoCounts) Object.assign(photoCounts, snapshot.photoCounts)
+      if (snapshot.currentStep) currentStep.value = snapshot.currentStep
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  /**
+   * 清理本地草稿缓存（提交完成后调用）
+   */
+  function clearLocalDraft() {
+    try {
+      localStorage.removeItem(FORM_DRAFT_KEY)
+    } catch {
+      // 忽略
+    }
+  }
+
+  /**
+   * 启动自动缓存定时器
+   *
+   * 每 15 秒将表单数据快照到 localStorage，
+   * 同时监听页面可见性变化和 beforeunload 事件，确保数据不丢失。
+   */
+  function startAutoSave() {
+    stopAutoSave()
+    autoSaveTimer = setInterval(saveDraftToLocal, AUTO_SAVE_INTERVAL)
+
+    // 页面即将卸载时立即保存
+    const handleBeforeUnload = () => saveDraftToLocal()
+    // 页面从后台切回前台时保存（iOS Safari 后台回收的场景）
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        saveDraftToLocal()
+      }
+    }
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+
+    // 将清理函数挂到 timer 上，方便 stopAutoSave 统一清理
+    autoSaveTimer._cleanup = () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
+  }
+
+  /**
+   * 停止自动缓存定时器
+   */
+  function stopAutoSave() {
+    if (autoSaveTimer) {
+      clearInterval(autoSaveTimer)
+      autoSaveTimer._cleanup?.()
+      autoSaveTimer = null
+    }
+  }
+
   /**
    * 创建新的提交记录
    */
@@ -128,6 +246,7 @@ export const useFormStore = defineStore('form', () => {
    * 初始化表单
    *
    * 优先恢复已有草稿；只有在明确没有有效会话时才创建新的 submission。
+   * 兜底策略：服务端数据恢复失败时，从 localStorage 缓存恢复已填内容。
    */
   async function initForm() {
     loading.value = true
@@ -155,20 +274,39 @@ export const useFormStore = defineStore('form', () => {
             submissionId.value = null
             clearSessionToken()
           } else {
-            return
+            // 网络异常：尝试从本地缓存恢复，避免表单卡死
+            const cached = restoreDraftFromLocal()
+            if (cached) {
+              console.info('网络异常，已从本地缓存恢复表单数据')
+            }
+            // 不再 return，让流程继续尝试创建新会话或加载数据
+            shouldCreateSubmission = !hasSubmission()
           }
         }
       }
 
       if (shouldCreateSubmission) {
-        await createNewSubmission()
+        try {
+          await createNewSubmission()
+        } catch (error) {
+          // 创建新会话也失败（网络断开），尝试本地缓存兜底
+          console.error('创建提交记录失败：', error)
+          const cached = restoreDraftFromLocal()
+          if (cached) {
+            console.info('已从本地缓存恢复表单数据，请检查网络后重新提交')
+          }
+        }
       }
 
       await loadAllData()
     } catch (error) {
       console.error('初始化表单失败：', error)
+      // 最终兜底：任何未预期的错误，尝试本地缓存
+      restoreDraftFromLocal()
     } finally {
       loading.value = false
+      // 初始化完成后启动自动缓存
+      startAutoSave()
     }
   }
 
@@ -177,6 +315,7 @@ export const useFormStore = defineStore('form', () => {
    *
    * 使用 Promise.allSettled 确保各步骤数据独立加载，互不影响。
    * 任一步骤失败不会导致其他步骤数据丢失。
+   * 加载成功后自动缓存到 localStorage，作为刷新后的兜底数据源。
    */
   async function loadAllData() {
     if (!hasSubmission()) return
@@ -235,6 +374,9 @@ export const useFormStore = defineStore('form', () => {
         console.error('加载右侧模板失败：', error)
       }
     }
+
+    // 服务端数据加载完毕，同步缓存到 localStorage
+    saveDraftToLocal()
   }
 
   /**
@@ -348,6 +490,7 @@ export const useFormStore = defineStore('form', () => {
    * 提交完成
    *
    * 保存所有数据后，标记提交为已完成。
+   * 清理本地草稿缓存和自动保存定时器。
    */
   async function submitAll() {
     const saveSuccess = await saveAll()
@@ -357,6 +500,8 @@ export const useFormStore = defineStore('form', () => {
       await completeSubmission()
       completed.value = true
       clearSessionToken()
+      stopAutoSave()
+      clearLocalDraft()
       return true
     } catch (error) {
       console.error('完成提交失败：', error)
@@ -412,6 +557,7 @@ export const useFormStore = defineStore('form', () => {
     basicInfo, leftRows, rightRows, photoCounts,
     initForm, loadAllData, saveAll, saveCurrentStep,
     saveStep1Draft, saveStep3Draft, preparePreview, submitAll,
-    nextStep, prevStep, goToStep, updatePhotoCount
+    nextStep, prevStep, goToStep, updatePhotoCount,
+    saveDraftToLocal, restoreDraftFromLocal, clearLocalDraft
   }
 })

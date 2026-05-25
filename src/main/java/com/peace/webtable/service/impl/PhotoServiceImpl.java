@@ -52,11 +52,16 @@ public class PhotoServiceImpl implements PhotoService {
         }
 
         try {
-            // 计算同类别内的下一个排序号
+            // 计算同类别内已有照片数
             Long count = photoMapper.selectCount(
                     new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<Photo>()
                             .eq("submission_id", submissionId)
                             .eq("photo_category", category));
+
+            if (count >= 4) {
+                log.warn("照片数量已达上限：submissionId={}, category={}, count={}", submissionId, category, count);
+                return ApiResponse.error("每个类别最多上传 4 张照片");
+            }
 
             Photo photo = new Photo();
             photo.setSubmissionId(submissionId);
