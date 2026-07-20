@@ -21,7 +21,7 @@ import java.time.format.DateTimeFormatter;
  * Excel 导出控制器
  *
  * 职责：处理 Excel 导出的 HTTP 请求。
- * 将所有已完成提交的数据导出为 .xlsx 文件，包含三个 Sheet。
+ * 将所有已完成提交的数据导出为 .xlsx 文件，包含基础信息和接受程度自评 Sheet。
  *
  * 接口路径：/api/export
  */

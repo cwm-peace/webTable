@@ -2,6 +2,8 @@ package com.peace.webtable.controller;
 
 import com.peace.webtable.dto.ApiResponse;
 import com.peace.webtable.service.AdminService;
+import com.peace.webtable.util.ClientAddressUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -41,13 +43,27 @@ public class AdminController {
      * 验证密码，成功返回 adminToken。
      *
      * @param body 包含 password 的请求体
+     * @param request HTTP 请求，用于获取客户端地址并执行登录限流
      * @return 包含 adminToken 的响应
      */
     @PostMapping("/login")
-    public ApiResponse<Map<String, Object>> login(@RequestBody Map<String, String> body) {
-        String password = body.get("password");
+    public ApiResponse<Map<String, Object>> login(@RequestBody Map<String, String> body,
+                                                  HttpServletRequest request) {
+        String password = body != null ? body.get("password") : null;
         log.info("收到管理员登录请求");
-        return adminService.login(password);
+        return adminService.login(password, ClientAddressUtil.clientAddress(request));
+    }
+
+    /**
+     * 管理员退出登录
+     *
+     * @param adminToken 管理员令牌
+     * @return 操作结果
+     */
+    @PostMapping("/logout")
+    public ApiResponse<Void> logout(@RequestHeader(value = "X-Admin-Token", required = false) String adminToken) {
+        log.info("收到管理员退出登录请求");
+        return adminService.logout(adminToken);
     }
 
     /**
@@ -59,12 +75,15 @@ public class AdminController {
      * @return 提交列表
      */
     @GetMapping("/submissions")
-    public ApiResponse<Object> getSubmissionList(@RequestHeader("X-Admin-Token") String adminToken) {
+    public ApiResponse<Map<String, Object>> getSubmissionList(
+            @RequestHeader("X-Admin-Token") String adminToken,
+            @RequestParam(value = "page", defaultValue = "1") long page,
+            @RequestParam(value = "pageSize", defaultValue = "20") long pageSize) {
         if (!adminService.validateToken(adminToken)) {
             return ApiResponse.error(401, "管理员未登录或 token 已过期");
         }
-        log.info("获取提交列表");
-        return adminService.getSubmissionList();
+        log.info("获取提交列表：page={}, pageSize={}", page, pageSize);
+        return adminService.getSubmissionList(page, pageSize);
     }
 
     /**
@@ -115,4 +134,5 @@ public class AdminController {
                         "attachment; filename=\"" + filename + "\"; filename*=UTF-8''" + encodedFilename)
                 .body(bytes);
     }
+
 }

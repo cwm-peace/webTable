@@ -1,14 +1,16 @@
 package com.peace.webtable.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.peace.webtable.entity.*;
 import com.peace.webtable.mapper.*;
 import com.peace.webtable.service.ExportService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
@@ -21,14 +23,19 @@ import java.util.stream.Collectors;
  * Excel 导出服务实现类
  *
  * 职责：将所有已完成提交的数据导出为 Excel 文件。
- * 导出格式参照范本文件，包含三个 Sheet：
+ * 导出格式参照范本文件，包含两个 Sheet：
  * 1. 基础信息 — 所有提交者的基础信息汇总
  * 2. 接受程度自评 — 左右两侧栏的自评数据汇总
- * 使用 SXSSFWorkbook 流式写入，支持大数据量导出。
+ * 使用分批查询写入工作簿，避免一次性加载所有数据库记录。
  */
 @Slf4j
 @Service
 public class ExportServiceImpl implements ExportService {
+
+    /** 每批导出的提交数，避免一次性加载所有关联数据。 */
+    private static final int EXPORT_BATCH_SIZE = 500;
+    /** Excel 会将这些字符开头的文本解析为公式或命令，需要转义。 */
+    private static final String EXCEL_FORMULA_PREFIXES = "=+-@";
 
     private final SubmissionMapper submissionMapper;
     private final PersonalInfoMapper personalInfoMapper;
@@ -48,29 +55,65 @@ public class ExportServiceImpl implements ExportService {
     /**
      * 导出所有已完成提交的数据为 Excel
      *
-     * 使用批量查询避免 N+1 问题：先查出所有 submission，
-     * 再用 IN 批量查出基础信息和自评数据，内存中按 submissionId 分组。
+     * 使用分批查询避免 N+1 问题和一次性加载全部导出数据。
      */
     @Override
     public ByteArrayOutputStream exportAllToExcel() {
         log.info("开始导出 Excel 数据");
 
-        SXSSFWorkbook workbook = new SXSSFWorkbook(100);
+        Workbook workbook = new XSSFWorkbook();
 
         try {
-            // 1. 一次查出所有已完成的 submission
-            List<Submission> submissions = submissionMapper.selectList(
-                    new QueryWrapper<Submission>().eq("completed", true));
+            long exportedCount = writeExportWorkbook(workbook);
 
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            workbook.write(bos);
+
+            log.info("Excel 导出完成：提交数={}", exportedCount);
+            return bos;
+
+        } catch (IOException e) {
+            log.error("Excel 导出失败", e);
+            throw new RuntimeException("Excel 导出失败", e);
+        } finally {
+            try {
+                workbook.close();
+            } catch (IOException e) {
+                log.warn("Excel 工作簿关闭失败：{}", e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * 将导出数据写入工作簿。
+     *
+     * 该方法承载分页查询和写入逻辑，便于用普通 Workbook 做单元测试。
+     *
+     * @param workbook Excel 工作簿
+     * @return 导出的提交数量
+     */
+    long writeExportWorkbook(Workbook workbook) {
+        Sheet personalInfoSheet = createPersonalInfoSheet(workbook);
+        Sheet assessmentSheet = createAssessmentSheet(workbook);
+        int personalInfoRowNum = 1;
+        int assessmentRowNum = 1;
+        long exportedCount = 0;
+
+        for (long pageNo = 1; ; pageNo++) {
+            Page<Submission> page = submissionMapper.selectPage(
+                    new Page<>(pageNo, EXPORT_BATCH_SIZE, false),
+                    new QueryWrapper<Submission>()
+                            .eq("completed", true)
+                            .select("id")
+                            .orderByAsc("id"));
+            List<Submission> submissions = page.getRecords();
             if (submissions.isEmpty()) {
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                workbook.write(bos);
-                return bos;
+                break;
             }
 
             List<Long> ids = submissions.stream().map(Submission::getId).collect(Collectors.toList());
 
-            // 2. 批量查询基础信息和自评数据（4 次查询代替 3N+1 次）
+            // 批量查询当前批次的关联数据，避免全量导出时把所有自评行同时放进内存。
             Map<Long, PersonalInfo> infoMap = personalInfoMapper.selectList(
                     new QueryWrapper<PersonalInfo>().in("submission_id", ids))
                     .stream().collect(Collectors.toMap(PersonalInfo::getSubmissionId, p -> p));
@@ -83,33 +126,23 @@ public class ExportServiceImpl implements ExportService {
                     new QueryWrapper<AssessmentRight>().in("submission_id", ids).orderByAsc("row_order"))
                     .stream().collect(Collectors.groupingBy(AssessmentRight::getSubmissionId));
 
-            // 3. 生成 Sheet
-            writePersonalInfoSheet(workbook, submissions, infoMap);
-            writeAssessmentSheet(workbook, submissions, leftMap, rightMap);
+            personalInfoRowNum = appendPersonalInfoRows(personalInfoSheet, personalInfoRowNum, submissions, infoMap);
+            assessmentRowNum = appendAssessmentRows(assessmentSheet, assessmentRowNum, submissions, leftMap, rightMap);
+            exportedCount += submissions.size();
 
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            workbook.write(bos);
-
-            log.info("Excel 导出完成：提交数={}", submissions.size());
-            return bos;
-
-        } catch (IOException e) {
-            log.error("Excel 导出失败", e);
-            throw new RuntimeException("Excel 导出失败", e);
-        } finally {
-            workbook.dispose();
+            if (submissions.size() < EXPORT_BATCH_SIZE) {
+                break;
+            }
         }
+        return exportedCount;
     }
 
     /**
-     * 写入基础信息 Sheet
+     * 创建基础信息 Sheet 并写入表头。
      *
      * 表头对应范本文件中的所有基础字段。
-     *
-     * @param infoMap 批量查询结果，key 为 submissionId
      */
-    private void writePersonalInfoSheet(Workbook workbook, List<Submission> submissions,
-                                        Map<Long, PersonalInfo> infoMap) {
+    private Sheet createPersonalInfoSheet(Workbook workbook) {
         Sheet sheet = workbook.createSheet("基础信息");
 
         Row header = sheet.createRow(0);
@@ -125,61 +158,66 @@ public class ExportServiceImpl implements ExportService {
         for (int i = 0; i < headers.length; i++) {
             header.createCell(i).setCellValue(headers[i]);
         }
+        return sheet;
+    }
 
-        int rowNum = 1;
+    /**
+     * 追加基础信息行。
+     *
+     * @param infoMap 批量查询结果，key 为 submissionId
+     * @return 下一行行号
+     */
+    private int appendPersonalInfoRows(Sheet sheet, int rowNum, List<Submission> submissions,
+                                       Map<Long, PersonalInfo> infoMap) {
         for (Submission submission : submissions) {
             PersonalInfo info = infoMap.get(submission.getId());
             if (info != null) {
                 Row row = sheet.createRow(rowNum++);
                 int col = 0;
                 row.createCell(col++).setCellValue(submission.getId());
-                row.createCell(col++).setCellValue(safeStr(info.getName()));
-                row.createCell(col++).setCellValue(safeStr(info.getHeight()));
-                row.createCell(col++).setCellValue(safeStr(info.getWeight()));
-                row.createCell(col++).setCellValue(safeStr(info.getEducation()));
-                row.createCell(col++).setCellValue(safeStr(info.getOccupation()));
-                row.createCell(col++).setCellValue(safeStr(info.getShoeSize()));
-                row.createCell(col++).setCellValue(safeStr(info.getProvince()));
-                row.createCell(col++).setCellValue(safeStr(info.getCity()));
-                row.createCell(col++).setCellValue(safeStr(info.getQq()));
-                row.createCell(col++).setCellValue(safeStr(info.getWechat()));
-                row.createCell(col++).setCellValue(safeStr(info.getWeibo()));
-                row.createCell(col++).setCellValue(safeStr(info.getPhone()));
-                row.createCell(col++).setCellValue(safeStr(info.getFirstMasturbationAge()));
-                row.createCell(col++).setCellValue(safeStr(info.getFirstSexAge()));
-                row.createCell(col++).setCellValue(safeStr(info.getIsSingle()));
-                row.createCell(col++).setCellValue(safeStr(info.getCheatedOnPartner()));
-                row.createCell(col++).setCellValue(safeStr(info.getBeenCheated()));
-                row.createCell(col++).setCellValue(safeStr(info.getLongestLockTime()));
-                row.createCell(col++).setCellValue(safeStr(info.getSexFrequency()));
-                row.createCell(col++).setCellValue(safeStr(info.getMasturbationFrequency()));
-                row.createCell(col++).setCellValue(safeStr(info.getMasturbationTool()));
-                row.createCell(col++).setCellValue(safeStr(info.getAnalInsertableSize()));
-                row.createCell(col++).setCellValue(safeStr(info.getUrethraInsertableSize()));
-                row.createCell(col++).setCellValue(safeStr(info.getDogAge()));
-                row.createCell(col++).setCellValue(safeStr(info.getMeetingCount()));
-                row.createCell(col++).setCellValue(safeStr(info.getMasterCount()));
-                row.createCell(col++).setCellValue(safeStr(info.getSemenVolume()));
-                row.createCell(col++).setCellValue(safeStr(info.getDailyMaxEjaculation()));
-                row.createCell(col++).setCellValue(safeStr(info.getPreferredName()));
-                row.createCell(col++).setCellValue(safeStr(info.getSelfDescription()));
-                row.createCell(col++).setCellValue(safeStr(info.getTrainingIntention()));
-                row.createCell(col).setCellValue(safeStr(info.getRemark()));
+                writeTextCell(row, col++, info.getName());
+                writeTextCell(row, col++, info.getHeight());
+                writeTextCell(row, col++, info.getWeight());
+                writeTextCell(row, col++, info.getEducation());
+                writeTextCell(row, col++, info.getOccupation());
+                writeTextCell(row, col++, info.getShoeSize());
+                writeTextCell(row, col++, info.getProvince());
+                writeTextCell(row, col++, info.getCity());
+                writeTextCell(row, col++, info.getQq());
+                writeTextCell(row, col++, info.getWechat());
+                writeTextCell(row, col++, info.getWeibo());
+                writeTextCell(row, col++, info.getPhone());
+                writeTextCell(row, col++, info.getFirstMasturbationAge());
+                writeTextCell(row, col++, info.getFirstSexAge());
+                writeTextCell(row, col++, info.getIsSingle());
+                writeTextCell(row, col++, info.getCheatedOnPartner());
+                writeTextCell(row, col++, info.getBeenCheated());
+                writeTextCell(row, col++, info.getLongestLockTime());
+                writeTextCell(row, col++, info.getSexFrequency());
+                writeTextCell(row, col++, info.getMasturbationFrequency());
+                writeTextCell(row, col++, info.getMasturbationTool());
+                writeTextCell(row, col++, info.getAnalInsertableSize());
+                writeTextCell(row, col++, info.getUrethraInsertableSize());
+                writeTextCell(row, col++, info.getDogAge());
+                writeTextCell(row, col++, info.getMeetingCount());
+                writeTextCell(row, col++, info.getMasterCount());
+                writeTextCell(row, col++, info.getSemenVolume());
+                writeTextCell(row, col++, info.getDailyMaxEjaculation());
+                writeTextCell(row, col++, info.getPreferredName());
+                writeTextCell(row, col++, info.getSelfDescription());
+                writeTextCell(row, col++, info.getTrainingIntention());
+                writeTextCell(row, col, info.getRemark());
             }
         }
+        return rowNum;
     }
 
     /**
-     * 写入接受程度自评 Sheet
+     * 创建接受程度自评 Sheet 并写入表头。
      *
      * 合并左右两侧栏数据，表头：提交ID | 左侧类型 | 左侧项目 | 左侧级别 | 左侧备注 | 右侧类型 | 右侧项目 | 右侧级别 | 右侧备注
-     *
-     * @param leftMap  左侧自评数据，key 为 submissionId
-     * @param rightMap 右侧自评数据，key 为 submissionId
      */
-    private void writeAssessmentSheet(Workbook workbook, List<Submission> submissions,
-                                      Map<Long, List<AssessmentLeft>> leftMap,
-                                      Map<Long, List<AssessmentRight>> rightMap) {
+    private Sheet createAssessmentSheet(Workbook workbook) {
         Sheet sheet = workbook.createSheet("接受程度自评");
 
         Row header = sheet.createRow(0);
@@ -190,8 +228,19 @@ public class ExportServiceImpl implements ExportService {
         for (int i = 0; i < headers.length; i++) {
             header.createCell(i).setCellValue(headers[i]);
         }
+        return sheet;
+    }
 
-        int rowNum = 1;
+    /**
+     * 追加接受程度自评行。
+     *
+     * @param leftMap  左侧自评数据，key 为 submissionId
+     * @param rightMap 右侧自评数据，key 为 submissionId
+     * @return 下一行行号
+     */
+    private int appendAssessmentRows(Sheet sheet, int rowNum, List<Submission> submissions,
+                                     Map<Long, List<AssessmentLeft>> leftMap,
+                                     Map<Long, List<AssessmentRight>> rightMap) {
         for (Submission submission : submissions) {
             List<AssessmentLeft> leftList = leftMap.getOrDefault(submission.getId(), List.of());
             List<AssessmentRight> rightList = rightMap.getOrDefault(submission.getId(), List.of());
@@ -206,10 +255,10 @@ public class ExportServiceImpl implements ExportService {
                 // 左侧数据
                 if (i < leftList.size()) {
                     AssessmentLeft left = leftList.get(i);
-                    row.createCell(col++).setCellValue(safeStr(left.getTypeName()));
-                    row.createCell(col++).setCellValue(safeStr(left.getItemName()));
-                    row.createCell(col++).setCellValue(safeStr(left.getLevel()));
-                    row.createCell(col++).setCellValue(safeStr(left.getRemark()));
+                    writeTextCell(row, col++, left.getTypeName());
+                    writeTextCell(row, col++, left.getItemName());
+                    writeTextCell(row, col++, left.getLevel());
+                    writeTextCell(row, col++, left.getRemark());
                 } else {
                     col += 4;
                 }
@@ -217,13 +266,34 @@ public class ExportServiceImpl implements ExportService {
                 // 右侧数据
                 if (i < rightList.size()) {
                     AssessmentRight right = rightList.get(i);
-                    row.createCell(col++).setCellValue(safeStr(right.getTypeName()));
-                    row.createCell(col++).setCellValue(safeStr(right.getItemName()));
-                    row.createCell(col++).setCellValue(safeStr(right.getLevel()));
-                    row.createCell(col).setCellValue(safeStr(right.getRemark()));
+                    writeTextCell(row, col++, right.getTypeName());
+                    writeTextCell(row, col++, right.getItemName());
+                    writeTextCell(row, col++, right.getLevel());
+                    writeTextCell(row, col, right.getRemark());
                 }
             }
         }
+        return rowNum;
+    }
+
+    /**
+     * 写入文本单元格，并转义可能被 Excel 解释为公式的用户输入。
+     */
+    private void writeTextCell(Row row, int columnIndex, String value) {
+        Cell cell = row.createCell(columnIndex);
+        cell.setCellValue(escapeExcelFormula(value));
+    }
+
+    /**
+     * 转义 Excel 公式前缀，防止用户输入在管理员打开导出文件时被执行。
+     */
+    private String escapeExcelFormula(String value) {
+        String safeValue = safeStr(value);
+        if (safeValue.isEmpty()) {
+            return safeValue;
+        }
+        char first = safeValue.charAt(0);
+        return EXCEL_FORMULA_PREFIXES.indexOf(first) >= 0 ? "'" + safeValue : safeValue;
     }
 
     /**

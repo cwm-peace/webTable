@@ -1,20 +1,29 @@
 package com.peace.webtable.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.peace.webtable.config.AdminConfig;
 import com.peace.webtable.dto.ApiResponse;
 import com.peace.webtable.entity.*;
 import com.peace.webtable.mapper.*;
 import com.peace.webtable.service.AdminService;
+import com.peace.webtable.util.ClientKeyUtil;
 import com.peace.webtable.util.RedisUtil;
 import com.lowagie.text.*;
 import com.lowagie.text.Font;
 import com.lowagie.text.pdf.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -32,8 +41,22 @@ public class AdminServiceImpl implements AdminService {
 
     /** Redis 管理员 token key 前缀 */
     private static final String ADMIN_TOKEN_PREFIX = "wt:admin:";
+    /** Redis 管理员登录失败次数 key 前缀 */
+    private static final String ADMIN_LOGIN_FAILURE_PREFIX = "wt:admin:login:fail:";
+    /** Redis 管理员登录锁定 key 前缀 */
+    private static final String ADMIN_LOGIN_LOCK_PREFIX = "wt:admin:login:lock:";
     /** 管理员 token 过期时间：24 小时 */
     private static final long ADMIN_TOKEN_TTL_HOURS = 24;
+    /** 管理员 token 随机字节数。 */
+    private static final int ADMIN_TOKEN_BYTES = 32;
+    /** 管理员列表默认页大小。 */
+    private static final long DEFAULT_PAGE_SIZE = 20;
+    /** 管理员列表最大页大小，避免单次请求拖垮数据库和浏览器渲染。 */
+    private static final long MAX_PAGE_SIZE = 100;
+    /** 默认单次 PDF 导出允许读取的照片总字节数：100MB。 */
+    private static final long DEFAULT_PDF_MAX_PHOTO_BYTES = 100L * 1024 * 1024;
+    /** 管理员 token 随机数生成器。 */
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     private final AdminConfig adminConfig;
     private final RedisUtil redisUtil;
@@ -42,6 +65,10 @@ public class AdminServiceImpl implements AdminService {
     private final PhotoMapper photoMapper;
     private final AssessmentLeftMapper assessmentLeftMapper;
     private final AssessmentRightMapper assessmentRightMapper;
+
+    /** 单次 PDF 导出允许嵌入的照片总字节数。 */
+    @Value("${app.export.pdf.max-photo-bytes:104857600}")
+    private long pdfMaxPhotoBytes = DEFAULT_PDF_MAX_PHOTO_BYTES;
 
     public AdminServiceImpl(AdminConfig adminConfig, RedisUtil redisUtil,
                             SubmissionMapper submissionMapper, PersonalInfoMapper personalInfoMapper,
@@ -59,24 +86,50 @@ public class AdminServiceImpl implements AdminService {
     /**
      * 管理员登录验证
      *
-     * 比对输入密码与配置密码，匹配时生成 UUID token 存入 Redis。
+     * 先按客户端维度执行失败次数限流，再使用固定长度摘要做常量时间密码比较。
+     * 匹配时生成高熵随机 token 存入 Redis。
      */
     @Override
-    public ApiResponse<Map<String, Object>> login(String password) {
-        if (password == null || !password.equals(adminConfig.getPassword())) {
-            log.warn("管理员登录失败：密码错误");
-            return ApiResponse.error("密码错误");
+    public ApiResponse<Map<String, Object>> login(String password, String clientIdentifier) {
+        String clientKey = clientKey(clientIdentifier);
+        if (Boolean.TRUE.equals(redisUtil.hasKey(ADMIN_LOGIN_LOCK_PREFIX + clientKey))) {
+            log.warn("管理员登录被限流：clientKey={}", clientKey);
+            return ApiResponse.error(429, "登录失败次数过多，请稍后再试");
         }
 
-        // 生成管理员 token
-        String token = UUID.randomUUID().toString().replace("-", "");
+        if (!passwordMatches(password, adminConfig.getPassword())) {
+            long failures = recordLoginFailure(clientKey);
+            log.warn("管理员登录失败：clientKey={}, failures={}", clientKey, failures);
+            if (failures >= adminConfig.getLoginMaxFailures()) {
+                lockLogin(clientKey);
+                return ApiResponse.error(429, "登录失败次数过多，请稍后再试");
+            }
+            return ApiResponse.error(401, "密码错误");
+        }
+
+        clearLoginFailures(clientKey);
+
+        String token = generateAdminToken();
         String key = ADMIN_TOKEN_PREFIX + token;
         redisUtil.set(key, "admin", ADMIN_TOKEN_TTL_HOURS, TimeUnit.HOURS);
 
-        log.info("管理员登录成功");
+        log.info("管理员登录成功：clientKey={}", clientKey);
         Map<String, Object> result = new HashMap<>();
         result.put("adminToken", token);
         return ApiResponse.ok(result);
+    }
+
+    /**
+     * 管理员退出登录。
+     */
+    @Override
+    public ApiResponse<Void> logout(String adminToken) {
+        if (adminToken == null || adminToken.isBlank()) {
+            return ApiResponse.ok();
+        }
+        redisUtil.delete(ADMIN_TOKEN_PREFIX + adminToken);
+        log.info("管理员退出登录：adminToken={}***", maskToken(adminToken));
+        return ApiResponse.ok();
     }
 
     /**
@@ -91,20 +144,107 @@ public class AdminServiceImpl implements AdminService {
     }
 
     /**
-     * 获取所有已提交的列表
-     *
-     * 查询所有已完成的提交记录，按创建时间倒序排列。
+     * 校验提交记录是否已经最终提交。
      */
     @Override
-    public ApiResponse<Object> getSubmissionList() {
-        List<Submission> submissions = submissionMapper.selectList(
+    public boolean validateCompletedSubmission(Long submissionId) {
+        return findCompletedSubmission(submissionId) != null;
+    }
+
+    /**
+     * 记录一次登录失败，首次失败时设置统计窗口。
+     */
+    private long recordLoginFailure(String clientKey) {
+        String key = ADMIN_LOGIN_FAILURE_PREFIX + clientKey;
+        Long failures = redisUtil.increment(key);
+        long failureCount = failures != null ? failures : 1L;
+        if (failureCount == 1L) {
+            redisUtil.expire(key, adminConfig.getLoginFailureWindowMinutes(), TimeUnit.MINUTES);
+        }
+        return failureCount;
+    }
+
+    /**
+     * 锁定当前客户端的管理员登录入口。
+     */
+    private void lockLogin(String clientKey) {
+        redisUtil.set(ADMIN_LOGIN_LOCK_PREFIX + clientKey, "locked", adminConfig.getLoginLockMinutes(), TimeUnit.MINUTES);
+        redisUtil.expire(ADMIN_LOGIN_FAILURE_PREFIX + clientKey, adminConfig.getLoginLockMinutes(), TimeUnit.MINUTES);
+    }
+
+    /**
+     * 登录成功后清理当前客户端的失败记录。
+     */
+    private void clearLoginFailures(String clientKey) {
+        redisUtil.delete(ADMIN_LOGIN_FAILURE_PREFIX + clientKey);
+        redisUtil.delete(ADMIN_LOGIN_LOCK_PREFIX + clientKey);
+    }
+
+    /**
+     * 使用 SHA-256 固定长度摘要进行常量时间密码比较，避免长度差异带来的时间侧信道。
+     */
+    private boolean passwordMatches(String inputPassword, String expectedPassword) {
+        byte[] inputDigest = sha256Bytes(inputPassword != null ? inputPassword : "");
+        byte[] expectedDigest = sha256Bytes(expectedPassword != null ? expectedPassword : "");
+        return MessageDigest.isEqual(inputDigest, expectedDigest);
+    }
+
+    /**
+     * 生成高熵管理员 token。
+     */
+    private String generateAdminToken() {
+        byte[] tokenBytes = new byte[ADMIN_TOKEN_BYTES];
+        SECURE_RANDOM.nextBytes(tokenBytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(tokenBytes);
+    }
+
+    /**
+     * 将客户端标识哈希后用于 Redis key，避免原始 IP 出现在 Redis key 和日志中。
+     */
+    private String clientKey(String clientIdentifier) {
+        return ClientKeyUtil.hashClientIdentifier(clientIdentifier);
+    }
+
+    /**
+     * SHA-256 摘要。
+     */
+    private byte[] sha256Bytes(String value) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            return digest.digest(value.getBytes(StandardCharsets.UTF_8));
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("SHA-256 算法不可用", e);
+        }
+    }
+
+    /**
+     * 脱敏显示管理员 token。
+     */
+    private String maskToken(String adminToken) {
+        return adminToken.substring(0, Math.min(4, adminToken.length()));
+    }
+
+    /**
+     * 分页获取已提交的列表
+     *
+     * 查询已完成的提交记录，按创建时间倒序排列。返回分页元数据，避免一次性加载大量记录。
+     */
+    @Override
+    public ApiResponse<Map<String, Object>> getSubmissionList(long page, long pageSize) {
+        long safePage = Math.max(1L, page);
+        long safePageSize = pageSize > 0 ? Math.min(pageSize, MAX_PAGE_SIZE) : DEFAULT_PAGE_SIZE;
+
+        Page<Submission> resultPage = submissionMapper.selectPage(
+                Page.of(safePage, safePageSize),
                 new QueryWrapper<Submission>()
                         .eq("completed", true)
-                        .orderByDesc("create_time"));
+                        .select("id", "current_step", "completed", "create_time", "update_time")
+                        .orderByDesc("create_time")
+                        .orderByDesc("id"));
 
         // 转换为安全的数据格式（不暴露 session_token）
         List<Map<String, Object>> list = new ArrayList<>();
-        for (Submission s : submissions) {
+        for (Submission s : resultPage.getRecords()) {
             Map<String, Object> item = new HashMap<>();
             item.put("id", s.getId());
             item.put("currentStep", s.getCurrentStep());
@@ -114,7 +254,13 @@ public class AdminServiceImpl implements AdminService {
             list.add(item);
         }
 
-        return ApiResponse.ok(list);
+        Map<String, Object> data = new HashMap<>();
+        data.put("records", list);
+        data.put("total", resultPage.getTotal());
+        data.put("page", resultPage.getCurrent());
+        data.put("pageSize", resultPage.getSize());
+        data.put("totalPages", resultPage.getPages());
+        return ApiResponse.ok(data);
     }
 
     /**
@@ -126,10 +272,10 @@ public class AdminServiceImpl implements AdminService {
     public ApiResponse<Map<String, Object>> getSubmissionDetail(Long submissionId) {
         Map<String, Object> detail = new HashMap<>();
 
-        // 查询提交记录
-        Submission submission = submissionMapper.selectById(submissionId);
+        // 管理端只能查看最终提交的数据，避免通过 ID 枚举访问仍在填写中的草稿。
+        Submission submission = findCompletedSubmission(submissionId);
         if (submission == null) {
-            return ApiResponse.error("提交记录不存在");
+            return ApiResponse.error(404, "提交记录不存在或尚未完成");
         }
 
         // 查询基础信息
@@ -160,8 +306,35 @@ public class AdminServiceImpl implements AdminService {
                         .orderByAsc("row_order"));
         detail.put("assessmentRight", rightList);
 
-        detail.put("submission", submission);
+        detail.put("submission", safeSubmissionSummary(submission));
         return ApiResponse.ok(detail);
+    }
+
+    /**
+     * 构造提交摘要，避免管理员详情响应暴露填写端 sessionToken。
+     */
+    private Map<String, Object> safeSubmissionSummary(Submission submission) {
+        Map<String, Object> summary = new HashMap<>();
+        summary.put("id", submission.getId());
+        summary.put("currentStep", submission.getCurrentStep());
+        summary.put("completed", submission.getCompleted());
+        summary.put("createTime", submission.getCreateTime());
+        summary.put("updateTime", submission.getUpdateTime());
+        return summary;
+    }
+
+    /**
+     * 查询已完成提交记录。
+     */
+    private Submission findCompletedSubmission(Long submissionId) {
+        if (submissionId == null) {
+            return null;
+        }
+        Submission submission = submissionMapper.selectById(submissionId);
+        if (submission == null || !Boolean.TRUE.equals(submission.getCompleted())) {
+            return null;
+        }
+        return submission;
     }
 
     /**
@@ -176,6 +349,11 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public ByteArrayOutputStream exportPdf(Long submissionId) {
         log.info("开始生成 PDF：submissionId={}", submissionId);
+
+        if (findCompletedSubmission(submissionId) == null) {
+            throw new IllegalArgumentException("提交记录不存在或尚未完成");
+        }
+        validatePdfPhotoBudget(submissionId);
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
@@ -362,7 +540,7 @@ public class AdminServiceImpl implements AdminService {
                 // 按分组输出：每组前加一行分组标题（跨3列）
                 for (Map.Entry<String, List<Object[]>> entry : grouped.entrySet()) {
                     // 分组标题行
-                    PdfPCell groupCell = new PdfPCell(new Phrase(entry.getKey(), labelFont));
+                    PdfPCell groupCell = new PdfPCell(new Phrase(safeStr(entry.getKey()), labelFont));
                     groupCell.setColspan(3);
                     groupCell.setBackgroundColor(new Color(235, 240, 255));
                     groupCell.setPadding(5);
@@ -389,6 +567,25 @@ public class AdminServiceImpl implements AdminService {
     }
 
     /**
+     * 校验单次 PDF 导出照片总量，避免合法上传上限组合后造成导出内存压力。
+     */
+    private void validatePdfPhotoBudget(Long submissionId) {
+        if (pdfMaxPhotoBytes < 1) {
+            throw new IllegalStateException("PDF 照片导出大小限制必须为正数");
+        }
+
+        Long totalPhotoBytes = photoMapper.sumPhotoDataBytesBySubmissionId(submissionId);
+        long safeTotalPhotoBytes = totalPhotoBytes != null ? totalPhotoBytes : 0L;
+        if (safeTotalPhotoBytes > pdfMaxPhotoBytes) {
+            log.warn("PDF 导出照片总量超过限制：submissionId={}, totalBytes={}, maxBytes={}",
+                    submissionId, safeTotalPhotoBytes, pdfMaxPhotoBytes);
+            throw new ResponseStatusException(
+                    HttpStatus.PAYLOAD_TOO_LARGE,
+                    "该提交照片总量超过 PDF 导出上限，请减少照片体积后重试");
+        }
+    }
+
+    /**
      * 添加自评表格行（3列：项目、级别、备注）
      */
     private void addAssessmentRow(PdfPTable table, String itemName, String level, String remark, Font font) {
@@ -412,22 +609,12 @@ public class AdminServiceImpl implements AdminService {
     }
 
     /**
-     * 创建支持 Emoji 的 BaseFont
+     * 创建中文 PDF 字体。
      *
-     * 优先加载内嵌的 NotoEmoji-Regular.ttf（支持 SMP U+10000+ 字符），
-     * 同时按操作系统选择 CJK 字体作为 fallback。
-     * 如果 NotoEmoji 加载失败，回退到纯 CJK 字体（emoji 会丢失）。
+     * OpenPDF 的内置 CJK 字体不能安全处理增补平面字符，调用方会先过滤 emoji 等 SMP 字符。
+     * 这里按操作系统优先选择常见中文字体，最后回退到 OpenPDF 内置的 STSong-Light。
      */
     private BaseFont createCjkBaseFont() {
-        // 1. 尝试加载内嵌 NotoEmoji TTF（支持完整 Unicode + emoji）
-        try {
-            return BaseFont.createFont(
-                    "fonts/NotoEmoji-Regular.ttf", "Identity-H", BaseFont.EMBEDDED);
-        } catch (Exception e) {
-            log.warn("NotoEmoji 字体加载失败，回退到系统 CJK 字体：{}", e.getMessage());
-        }
-
-        // 2. 回退：按操作系统选择 CJK 字体
         String os = System.getProperty("os.name", "").toLowerCase();
         String[] candidates;
         if (os.contains("mac")) {

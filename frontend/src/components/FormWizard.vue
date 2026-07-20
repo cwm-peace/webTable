@@ -37,7 +37,6 @@
           </div>
           <h2 class="text-xl sm:text-2xl font-bold text-emerald-600 mb-2">提交成功</h2>
           <p class="text-muted-foreground mb-6">感谢您的认真填写！</p>
-          <Button variant="outline" @click="handleExport">导出 Excel</Button>
         </CardContent>
       </Card>
 
@@ -65,9 +64,7 @@
  */
 import { ref, onMounted } from 'vue'
 import { useFormStore } from '../stores/form'
-import { exportAll } from '../api/export'
 import { Card, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 import StepWizard from './StepWizard.vue'
 import Step1BasicInfo from './Step1BasicInfo.vue'
 import Step2Photos from './Step2Photos.vue'
@@ -80,12 +77,4 @@ const showPreview = ref(false)
 onMounted(async () => {
   await formStore.initForm()
 })
-
-async function handleExport() {
-  try {
-    await exportAll()
-  } catch (error) {
-    console.error('导出失败：', error)
-  }
-}
 </script>

@@ -11,6 +11,7 @@
  * /admin/detail/:id — 单个提交详情页
  */
 import { createRouter, createWebHistory } from 'vue-router'
+import { hasAdminToken } from '../lib/adminAuth'
 
 const routes = [
   {
@@ -21,16 +22,19 @@ const routes = [
   {
     path: '/admin',
     name: 'AdminLogin',
+    meta: { guestOnly: true },
     component: () => import('../components/admin/AdminLogin.vue')
   },
   {
     path: '/admin/dashboard',
     name: 'AdminDashboard',
+    meta: { requiresAdmin: true },
     component: () => import('../components/admin/AdminDashboard.vue')
   },
   {
     path: '/admin/detail/:id',
     name: 'AdminDetail',
+    meta: { requiresAdmin: true },
     component: () => import('../components/admin/AdminDetail.vue')
   }
 ]
@@ -38,6 +42,17 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes
+})
+
+router.beforeEach((to) => {
+  const loggedIn = hasAdminToken()
+  if (to.meta.requiresAdmin && !loggedIn) {
+    return { name: 'AdminLogin', replace: true }
+  }
+  if (to.meta.guestOnly && loggedIn) {
+    return { name: 'AdminDashboard', replace: true }
+  }
+  return true
 })
 
 export default router

@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS submissions (
     create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     update_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     INDEX idx_session_token (session_token),
-    INDEX idx_completed (completed)
+    INDEX idx_completed_create_id (completed, create_time, id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='提交主表';
 
 -- 第1步：基础信息（一个人一条记录，包含范本中所有基础字段）
@@ -65,11 +65,12 @@ CREATE TABLE IF NOT EXISTS photos (
     submission_id BIGINT NOT NULL COMMENT '关联的提交ID',
     photo_category VARCHAR(50) COMMENT '照片类别：selfie-自拍 nude-裸照 dick-狗屌 other-其他',
     photo_order INT NOT NULL DEFAULT 0 COMMENT '同类别内的排序号',
-    photo_data MEDIUMBLOB COMMENT '照片二进制数据',
+    photo_data LONGBLOB COMMENT '照片二进制数据',
     photo_name VARCHAR(255) COMMENT '照片原始文件名',
     photo_type VARCHAR(100) COMMENT '照片 MIME 类型',
     create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    INDEX idx_submission_id (submission_id)
+    INDEX idx_submission_id (submission_id),
+    UNIQUE KEY uk_submission_category_order (submission_id, photo_category, photo_order)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='附图表（第2步）';
 
 -- 第3步：接受程度自评（左侧栏：性奴/玩偶奴/家奴等）

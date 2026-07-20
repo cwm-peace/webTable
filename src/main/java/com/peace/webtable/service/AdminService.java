@@ -19,9 +19,20 @@ public interface AdminService {
      * 验证密码是否正确，正确时生成 admin token 存入 Redis。
      *
      * @param password 输入的密码
+     * @param clientIdentifier 客户端标识（通常为远端 IP，用于登录限流）
      * @return 包含 adminToken 的响应，密码错误时返回错误信息
      */
-    ApiResponse<Map<String, Object>> login(String password);
+    ApiResponse<Map<String, Object>> login(String password, String clientIdentifier);
+
+    /**
+     * 管理员退出登录
+     *
+     * 删除 Redis 中的管理员 token，使当前 token 立即失效。
+     *
+     * @param adminToken 管理员令牌
+     * @return 操作结果
+     */
+    ApiResponse<Void> logout(String adminToken);
 
     /**
      * 验证管理员 token 是否有效
@@ -32,11 +43,25 @@ public interface AdminService {
     boolean validateToken(String adminToken);
 
     /**
-     * 获取所有已提交的列表
+     * 校验提交记录是否已经最终提交。
      *
-     * @return 提交列表（包含 ID、步骤、完成状态、创建时间等）
+     * 管理端只能查看和下载已完成提交的数据，避免通过猜测 ID 访问仍在填写中的草稿。
+     *
+     * @param submissionId 提交记录ID
+     * @return 是否为已完成提交
      */
-    ApiResponse<Object> getSubmissionList();
+    boolean validateCompletedSubmission(Long submissionId);
+
+    /**
+     * 分页获取已提交列表
+     *
+     * 只返回当前页必要字段，不暴露 session token，避免管理员列表在提交量增长后一次性加载过多数据。
+     *
+     * @param page 当前页码，从 1 开始
+     * @param pageSize 每页数量，服务端会限制最大值
+     * @return 分页提交列表（包含 records、total、page、pageSize、totalPages）
+     */
+    ApiResponse<Map<String, Object>> getSubmissionList(long page, long pageSize);
 
     /**
      * 获取单个提交的完整详情

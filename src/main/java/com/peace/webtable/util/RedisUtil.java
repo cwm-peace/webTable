@@ -62,6 +62,18 @@ public class RedisUtil {
     }
 
     /**
+     * 原子递增 Redis 数值。
+     *
+     * 用于登录失败次数等计数场景，避免并发请求下读写覆盖。
+     *
+     * @param key Redis 键
+     * @return 递增后的值
+     */
+    public Long increment(String key) {
+        return redisTemplate.opsForValue().increment(key);
+    }
+
+    /**
      * 从 Redis 获取值并转换为指定类型
      *
      * 通过 Gson 将 Redis 中的 JSON 字符串反序列化为目标类型。

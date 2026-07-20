@@ -48,6 +48,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { adminLogin } from '../../api/admin'
+import { setAdminToken } from '../../lib/adminAuth'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -72,8 +73,7 @@ async function handleLogin() {
 
   try {
     const res = await adminLogin(password.value)
-    // 保存管理员 token 到 localStorage
-    localStorage.setItem('adminToken', res.data.adminToken)
+    setAdminToken(res.data.adminToken)
     // 跳转到列表页
     router.push('/admin/dashboard')
   } catch (error) {

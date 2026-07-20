@@ -19,7 +19,7 @@ import java.util.List;
  *
  * 职责：处理照片上传、查询、下载和删除的 HTTP 请求。
  * 照片按类别分组（selfie-自拍 nude-裸照 dick-狗屌 other-其他），
- * 每个类别可上传多张照片。
+ * 每个类别最多上传 4 张照片。
  *
  * 接口路径：/api/photo
  */
@@ -101,9 +101,10 @@ public class PhotoController {
             return ResponseEntity.notFound().build();
         }
 
-        // 管理端鉴权
+        // 管理端只能下载已完成提交的照片，避免通过 photoId 访问仍在填写中的草稿。
         boolean isAdmin = adminToken != null && !adminToken.isEmpty()
-                && adminService.validateToken(adminToken);
+                && adminService.validateToken(adminToken)
+                && adminService.validateCompletedSubmission(photo.getSubmissionId());
         // 填写端鉴权
         boolean isOwner = sessionToken != null && !sessionToken.isEmpty()
                 && formService.validateSession(sessionToken, photo.getSubmissionId());
@@ -140,7 +141,7 @@ public class PhotoController {
                                          @PathVariable Long photoId) {
         Photo photo = photoService.getPhoto(photoId);
         if (photo == null) {
-            return ApiResponse.error("照片不存在");
+            return ApiResponse.error(404, "照片不存在");
         }
         if (!formService.validateSession(sessionToken, photo.getSubmissionId())) {
             return ApiResponse.error(403, "当前草稿无权访问或已失效");

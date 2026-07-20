@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
  * 附图实体类（第2步）
  *
  * 对应数据库 photos 表，存储用户上传的照片。
- * 支持多个照片类别（自拍、裸照、狗屌、其他），每个类别可上传多张照片。
- * 照片以 MEDIUMBLOB 二进制形式存储在数据库中，最大 16MB。
+ * 支持多个照片类别（自拍、裸照、狗屌、其他），每个类别最多 4 张。
+ * 照片以 LONGBLOB 二进制形式存储在数据库中，服务层限制单张最大 50MB。
  */
 @Data
 @TableName("photos")
@@ -31,7 +31,7 @@ public class Photo {
     /** 同类别内的排序号 */
     private Integer photoOrder;
 
-    /** 照片二进制数据（MEDIUMBLOB，最大16MB） */
+    /** 照片二进制数据（LONGBLOB，服务层限制最大 50MB） */
     private byte[] photoData;
 
     /** 照片原始文件名 */

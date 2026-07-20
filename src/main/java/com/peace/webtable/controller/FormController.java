@@ -3,6 +3,8 @@ package com.peace.webtable.controller;
 import com.peace.webtable.dto.ApiResponse;
 import com.peace.webtable.entity.*;
 import com.peace.webtable.service.FormService;
+import com.peace.webtable.util.ClientAddressUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,13 +39,13 @@ public class FormController {
     /**
      * 创建新的提交记录
      *
+     * @param request HTTP 请求，用于获取客户端地址并执行创建限流
      * @return 包含 submissionId 和 sessionToken 的响应
      */
     @PostMapping
-    public ApiResponse<Map<String, Object>> createSubmission() {
+    public ApiResponse<Map<String, Object>> createSubmission(HttpServletRequest request) {
         log.info("收到创建提交请求");
-        Map<String, Object> result = formService.createSubmission();
-        return ApiResponse.ok(result);
+        return formService.createSubmission(ClientAddressUtil.clientAddress(request));
     }
 
     /**

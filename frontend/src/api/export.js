@@ -5,45 +5,35 @@
  * 导出所有已完成提交的数据为 .xlsx 文件。
  */
 import axios from 'axios'
+import { getAdminToken, handleAdminUnauthorized } from '../lib/adminAuth'
+import { blobErrorMessage, downloadBlob, filenameFromHeaders } from './download'
 
 /**
  * 导出所有已完成提交的数据为 Excel
  *
  * 使用原生 axios（不走统一拦截器）直接下载文件，
  * 因为响应类型是二进制 blob，需要特殊处理。
+ * 该接口仅供管理员系统使用，必须携带 X-Admin-Token。
  * 下载后自动触发浏览器保存文件对话框。
  */
 export async function exportAll() {
-  const token = localStorage.getItem('sessionToken') || sessionStorage.getItem('sessionToken') || ''
+  const token = getAdminToken()
   const response = await axios.get('/api/export/all', {
     responseType: 'blob',
-    headers: { 'X-Session-Token': token }
+    validateStatus: status => status >= 200 && status < 600,
+    headers: { 'X-Admin-Token': token }
   })
-
-  // 从响应头中提取文件名，优先使用 filename* (RFC 5987)
-  const contentDisposition = response.headers['content-disposition']
-  let filename = 'webtable_export.xlsx'
-  if (contentDisposition) {
-    const starredMatch = contentDisposition.match(/filename\*=UTF-8''(.+)/i)
-    if (starredMatch) {
-      filename = decodeURIComponent(starredMatch[1])
-    } else {
-      const match = contentDisposition.match(/filename="?([^";\s]+)"?/)
-      if (match) {
-        filename = match[1]
-      }
-    }
+  if (response.status === 401) {
+    handleAdminUnauthorized()
+    throw new Error('管理员未登录或 token 已过期')
+  }
+  if (response.status !== 200) {
+    throw new Error(await blobErrorMessage(response, 'Excel 导出失败'))
   }
 
-  // 创建 Blob 对象并触发浏览器下载
-  const blob = new Blob([response.data], {
-    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-  })
-  const url = window.URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = filename
-  link.click()
-  // 释放 URL 对象，避免内存泄漏
-  window.URL.revokeObjectURL(url)
+  downloadBlob(
+    response.data,
+    filenameFromHeaders(response.headers, 'webtable_export.xlsx'),
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  )
 }

@@ -4,11 +4,15 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 .claude
-.mvn
-mvnw
-mvnw.cmd
+.bevel/
 logs/
 *.log
+
+### Frontend build/dependencies ###
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+frontend/*.local
 
 ### STS ###
 .apt_generated

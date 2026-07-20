@@ -22,7 +22,7 @@ public interface FormService {
      *
      * @return 包含 submissionId 和 sessionToken 的 Map
      */
-    Map<String, Object> createSubmission();
+    ApiResponse<Map<String, Object>> createSubmission(String clientIdentifier);
 
     /**
      * 查询提交状态

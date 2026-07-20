@@ -9,6 +9,7 @@
  * - 响应拦截器：统一处理错误信息
  */
 import axios from 'axios'
+import { getAdminToken, handleAdminUnauthorized } from '../lib/adminAuth'
 
 const SESSION_TOKEN_KEY = 'sessionToken'
 
@@ -46,7 +47,7 @@ request.interceptors.request.use(config => {
     config.headers['X-Session-Token'] = token
   }
   // 管理员系统的 token
-  const adminToken = localStorage.getItem('adminToken')
+  const adminToken = getAdminToken()
   if (adminToken) {
     config.headers['X-Admin-Token'] = adminToken
   }
@@ -64,13 +65,21 @@ request.interceptors.response.use(
     const res = response.data
     if (res.code !== 200) {
       console.error('API 错误：', res.message)
+      if (res.code === 401) {
+        handleAdminUnauthorized()
+      }
       return Promise.reject(new Error(res.message))
     }
     return res
   },
   error => {
-    console.error('网络错误：', error.message)
-    return Promise.reject(error)
+    const response = error.response
+    const message = response?.data?.message || error.message || '请求失败'
+    console.error('API 请求失败：', message)
+    if (response?.status === 401 || response?.data?.code === 401) {
+      handleAdminUnauthorized()
+    }
+    return Promise.reject(new Error(message))
   }
 )
 

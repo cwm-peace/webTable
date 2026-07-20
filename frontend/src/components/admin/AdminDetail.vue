@@ -154,6 +154,7 @@
 import { ref, computed, onMounted, onUnmounted, reactive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getSubmissionDetail, exportPdf } from '../../api/admin'
+import { getAdminToken, handleAdminUnauthorized, hasAdminToken } from '../../lib/adminAuth'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -198,11 +199,6 @@ const infoFields = [
 ]
 
 onMounted(async () => {
-  if (!localStorage.getItem('adminToken')) {
-    router.push('/admin')
-    return
-  }
-
   try {
     const res = await getSubmissionDetail(route.params.id)
     detail.value = res.data
@@ -212,8 +208,11 @@ onMounted(async () => {
         fetchBlobUrl(photo.id)
       }
     }
-  } catch {
-    router.push('/admin/dashboard')
+  } catch (error) {
+    console.error('加载提交详情失败：', error)
+    if (hasAdminToken()) {
+      router.push('/admin/dashboard')
+    }
   } finally {
     loading.value = false
   }
@@ -231,11 +230,15 @@ onUnmounted(() => {
  */
 async function fetchBlobUrl(photoId) {
   try {
-    const adminToken = localStorage.getItem('adminToken') || ''
+    const adminToken = getAdminToken()
     if (!adminToken) return
     const res = await fetch(`/api/photo/download/${photoId}`, {
       headers: { 'X-Admin-Token': adminToken }
     })
+    if (res.status === 401 || res.status === 403) {
+      handleAdminUnauthorized()
+      return
+    }
     if (!res.ok) return
     const blob = await res.blob()
     blobUrls[photoId] = URL.createObjectURL(blob)
@@ -268,6 +271,7 @@ async function handleExportPdf() {
     await exportPdf(route.params.id)
   } catch (error) {
     console.error('PDF 导出失败：', error)
+    alert(error.message || 'PDF 导出失败')
   }
 }
 

@@ -1,7 +1,7 @@
 <!--
   管理员列表页
 
-  职责：展示所有已完成提交的列表，提供查看详情和导出 PDF 的入口。
+  职责：展示所有已完成提交的列表，提供查看详情、导出 PDF 和导出 Excel 的入口。
   对应路由：/admin/dashboard
   窄屏下表格改为卡片列表展示。
 -->
@@ -12,10 +12,11 @@
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
         <div>
           <h1 class="text-xl sm:text-2xl font-bold tracking-tight">提交管理</h1>
-          <p class="text-muted-foreground text-sm mt-1">共 {{ submissions.length }} 条提交记录</p>
+          <p class="text-muted-foreground text-sm mt-1">共 {{ pagination.total }} 条提交记录</p>
         </div>
-        <div class="flex gap-2">
-          <Button variant="outline" size="sm" @click="loadSubmissions">刷新</Button>
+        <div class="flex flex-wrap gap-2">
+          <Button variant="outline" size="sm" @click="loadSubmissions()">刷新</Button>
+          <Button variant="outline" size="sm" @click="handleExportExcel">导出 Excel</Button>
           <Button variant="ghost" size="sm" @click="handleLogout" class="text-muted-foreground">退出登录</Button>
         </div>
       </div>
@@ -31,7 +32,7 @@
       </Card>
 
       <!-- 桌面端：表格展示（md 以上显示） -->
-      <Card class="hidden md:block">
+      <Card v-else class="hidden md:block">
         <CardContent class="p-0">
           <table class="w-full">
             <thead>
@@ -68,7 +69,7 @@
       </Card>
 
       <!-- 移动端：卡片列表（md 以下显示） -->
-      <div class="md:hidden space-y-3">
+      <div v-if="!loading && submissions.length > 0" class="md:hidden space-y-3">
         <Card v-for="item in submissions" :key="item.id"
           v-motion
           :initial="{ opacity: 0, y: 10 }"
@@ -93,6 +94,28 @@
           </CardContent>
         </Card>
       </div>
+
+      <!-- 分页控制 -->
+      <div v-if="!loading && pagination.total > 0" class="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-sm">
+        <div class="text-muted-foreground">
+          第 {{ pagination.page }} / {{ pagination.totalPages }} 页，每页
+          <select
+            v-model.number="pagination.pageSize"
+            class="mx-1 h-9 rounded-md border border-input bg-background px-2 text-sm"
+            @change="changePageSize"
+          >
+            <option :value="10">10</option>
+            <option :value="20">20</option>
+            <option :value="50">50</option>
+            <option :value="100">100</option>
+          </select>
+          条
+        </div>
+        <div class="grid grid-cols-2 gap-2 sm:flex sm:justify-end">
+          <Button variant="outline" size="sm" :disabled="pagination.page <= 1" @click="changePage(pagination.page - 1)">上一页</Button>
+          <Button variant="outline" size="sm" :disabled="pagination.page >= pagination.totalPages" @click="changePage(pagination.page + 1)">下一页</Button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -106,7 +129,9 @@
  */
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { getSubmissionList, exportPdf } from '../../api/admin'
+import { getSubmissionList, exportPdf, adminLogout } from '../../api/admin'
+import { exportAll } from '../../api/export'
+import { clearAdminToken } from '../../lib/adminAuth'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -114,31 +139,52 @@ import { Badge } from '@/components/ui/badge'
 const router = useRouter()
 const submissions = ref([])
 const loading = ref(true)
+const pagination = ref({
+  page: 1,
+  pageSize: 20,
+  total: 0,
+  totalPages: 1
+})
 
 onMounted(async () => {
-  // 检查是否已登录
-  if (!localStorage.getItem('adminToken')) {
-    router.push('/admin')
-    return
-  }
   await loadSubmissions()
 })
 
 /**
  * 加载提交列表
  */
-async function loadSubmissions() {
+async function loadSubmissions(page = pagination.value.page) {
   loading.value = true
   try {
-    const res = await getSubmissionList()
-    submissions.value = res.data || []
-  } catch {
-    // token 可能过期，跳转到登录页
-    localStorage.removeItem('adminToken')
-    router.push('/admin')
+    const res = await getSubmissionList(page, pagination.value.pageSize)
+    const data = res.data || {}
+    submissions.value = data.records || []
+    pagination.value = {
+      page: data.page || page,
+      pageSize: data.pageSize || pagination.value.pageSize,
+      total: data.total || 0,
+      totalPages: Math.max(data.totalPages || 1, 1)
+    }
+  } catch (error) {
+    console.error('加载提交列表失败：', error)
   } finally {
     loading.value = false
   }
+}
+
+/**
+ * 切换页码
+ */
+async function changePage(page) {
+  const nextPage = Math.min(Math.max(page, 1), pagination.value.totalPages)
+  await loadSubmissions(nextPage)
+}
+
+/**
+ * 切换每页数量后回到第一页
+ */
+async function changePageSize() {
+  await loadSubmissions(1)
 }
 
 /**
@@ -156,15 +202,34 @@ async function handleExportPdf(id) {
     await exportPdf(id)
   } catch (error) {
     console.error('PDF 导出失败：', error)
+    alert(error.message || 'PDF 导出失败')
+  }
+}
+
+/**
+ * 导出所有已完成提交为 Excel
+ */
+async function handleExportExcel() {
+  try {
+    await exportAll()
+  } catch (error) {
+    console.error('Excel 导出失败：', error)
+    alert(error.message || 'Excel 导出失败')
   }
 }
 
 /**
  * 退出登录
  */
-function handleLogout() {
-  localStorage.removeItem('adminToken')
-  router.push('/admin')
+async function handleLogout() {
+  try {
+    await adminLogout()
+  } catch (error) {
+    console.error('退出登录请求失败：', error)
+  } finally {
+    clearAdminToken()
+    router.replace('/admin')
+  }
 }
 
 /**

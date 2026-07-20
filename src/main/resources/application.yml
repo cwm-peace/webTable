@@ -8,9 +8,9 @@ spring:
   # 数据源配置
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/webtable?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
-    username: root
-    password: adminadmin
+    url: ${WEBTABLE_DB_URL:jdbc:mysql://localhost:3306/webtable?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true}
+    username: ${WEBTABLE_DB_USERNAME:root}
+    password: ${WEBTABLE_DB_PASSWORD:adminadmin}
     hikari:
       maximum-pool-size: 10
       minimum-idle: 5
@@ -42,5 +42,33 @@ mybatis-plus:
 
 # 管理员配置
 admin:
-  # 管理员查看系统的登录密码
-  password: admin123
+  # 管理员查看系统的登录密码。必须通过环境变量配置强密码，禁止使用默认弱密码上线。
+  password: ${WEBTABLE_ADMIN_PASSWORD:adminadminadmin}
+  login:
+    # 单个客户端在统计窗口内允许的失败次数，超过后临时锁定该客户端。
+    max-failures: ${WEBTABLE_ADMIN_LOGIN_MAX_FAILURES:5}
+    # 登录失败次数统计窗口，单位分钟。
+    failure-window-minutes: ${WEBTABLE_ADMIN_LOGIN_FAILURE_WINDOW_MINUTES:15}
+    # 达到失败上限后的锁定时长，单位分钟。
+    lock-minutes: ${WEBTABLE_ADMIN_LOGIN_LOCK_MINUTES:15}
+
+# 应用安全配置
+app:
+  request:
+    # 非 multipart API 请求体最大字节数，防止恶意超大 JSON 在进入控制器前消耗内存和线程。
+    max-json-body-bytes: ${WEBTABLE_MAX_JSON_BODY_BYTES:1048576}
+  export:
+    pdf:
+      # 单次 PDF 导出允许嵌入的照片总字节数，避免多个大图组合导致导出内存压力。
+      max-photo-bytes: ${WEBTABLE_PDF_MAX_PHOTO_BYTES:104857600}
+  cors:
+    # 允许访问 API 的前端来源。部署到局域网、域名或内网穿透时显式追加来源，避免默认全网放开。
+    allowed-origin-patterns: http://localhost:5173,http://127.0.0.1:5173
+  submission:
+    create-rate-limit:
+      # 公开创建草稿入口限流，防止脚本刷出大量空 submission。
+      enabled: ${WEBTABLE_SUBMISSION_CREATE_RATE_LIMIT_ENABLED:true}
+      # 单个客户端在统计窗口内最多创建草稿次数。
+      max-requests: ${WEBTABLE_SUBMISSION_CREATE_RATE_LIMIT_MAX_REQUESTS:20}
+      # 统计窗口，单位分钟。
+      window-minutes: ${WEBTABLE_SUBMISSION_CREATE_RATE_LIMIT_WINDOW_MINUTES:10}

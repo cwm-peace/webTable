@@ -2,11 +2,13 @@
  * 管理员 API 模块
  *
  * 职责：封装管理员系统的所有 HTTP 接口。
- * 包括登录、提交列表查询、详情查询、PDF 导出。
+ * 包括登录、退出登录、提交列表查询、详情查询、PDF 导出。
  * 管理员 token 存储在 localStorage 中，通过请求头传递。
  */
 import axios from 'axios'
 import request from './index'
+import { getAdminToken, handleAdminUnauthorized } from '../lib/adminAuth'
+import { blobErrorMessage, downloadBlob, filenameFromHeaders } from './download'
 
 /**
  * 管理员登录
@@ -19,12 +21,25 @@ export function adminLogin(password) {
 }
 
 /**
- * 获取所有已提交的列表
+ * 管理员退出登录
  *
+ * @returns {Promise} 退出登录响应
+ */
+export function adminLogout() {
+  return request.post('/admin/logout')
+}
+
+/**
+ * 分页获取已提交的列表
+ *
+ * @param {number} page 当前页码
+ * @param {number} pageSize 每页数量
  * @returns {Promise} 提交列表
  */
-export function getSubmissionList() {
-  return request.get('/admin/submissions')
+export function getSubmissionList(page = 1, pageSize = 20) {
+  return request.get('/admin/submissions', {
+    params: { page, pageSize }
+  })
 }
 
 /**
@@ -45,33 +60,19 @@ export function getSubmissionDetail(submissionId) {
  * @param {number} submissionId 提交记录ID
  */
 export async function exportPdf(submissionId) {
-  const token = localStorage.getItem('adminToken')
+  const token = getAdminToken()
   const response = await axios.get(`/api/admin/export-pdf/${submissionId}`, {
     responseType: 'blob',
+    validateStatus: status => status >= 200 && status < 600,
     headers: { 'X-Admin-Token': token }
   })
-
-  // 从响应头提取文件名，优先使用 filename* (RFC 5987)
-  const contentDisposition = response.headers['content-disposition']
-  let filename = 'webtable_export.pdf'
-  if (contentDisposition) {
-    const starredMatch = contentDisposition.match(/filename\*=UTF-8''(.+)/i)
-    if (starredMatch) {
-      filename = decodeURIComponent(starredMatch[1])
-    } else {
-      const match = contentDisposition.match(/filename="?([^";\s]+)"?/)
-      if (match) {
-        filename = match[1]
-      }
-    }
+  if (response.status === 401) {
+    handleAdminUnauthorized()
+    throw new Error('管理员未登录或 token 已过期')
+  }
+  if (response.status !== 200) {
+    throw new Error(await blobErrorMessage(response, 'PDF 导出失败'))
   }
 
-  // 触发浏览器下载
-  const blob = new Blob([response.data], { type: 'application/pdf' })
-  const url = window.URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = filename
-  link.click()
-  window.URL.revokeObjectURL(url)
+  downloadBlob(response.data, filenameFromHeaders(response.headers, 'webtable_export.pdf'), 'application/pdf')
 }
