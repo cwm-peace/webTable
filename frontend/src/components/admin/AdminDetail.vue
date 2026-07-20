@@ -7,20 +7,27 @@
 -->
 <template>
   <div class="min-h-screen bg-background">
-    <div class="px-4 sm:px-6 lg:px-10 py-6 sm:py-8">
+    <div class="mx-auto max-w-[1180px] px-4 sm:px-6 lg:px-10 py-6 sm:py-8">
       <!-- 顶部导航 -->
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6 rounded-lg border bg-card p-4 shadow-sm">
         <div class="flex items-center gap-3">
-          <Button variant="ghost" size="sm" @click="router.push('/admin/dashboard')">← 返回列表</Button>
+          <Button variant="ghost" size="sm" @click="router.push('/admin/dashboard')">
+            <ArrowLeft class="size-4" />
+            返回列表
+          </Button>
           <h1 class="text-xl sm:text-2xl font-bold tracking-tight">提交详情 #{{ route.params.id }}</h1>
         </div>
         <Button @click="handleExportPdf" class="w-full sm:w-auto">
+          <FileDown class="size-4" />
           导出 PDF
         </Button>
       </div>
 
       <!-- 加载状态 -->
-      <div v-if="loading" class="text-center py-20 text-muted-foreground">加载中...</div>
+      <div v-if="loading" class="flex flex-col items-center justify-center gap-3 py-20 text-muted-foreground">
+        <Loader2 class="size-6 animate-spin" />
+        <span>加载中</span>
+      </div>
 
       <template v-else-if="detail">
         <!-- 基础信息 -->
@@ -57,16 +64,31 @@
                 <h4 class="text-sm font-semibold mb-3">{{ category.label }}</h4>
                 <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
                   <div v-for="photo in getPhotosByCategory(category.key)" :key="photo.id"
+                    :ref="el => registerPhotoTile(el, photo.id)"
                     class="aspect-square rounded-lg overflow-hidden border bg-muted/20"
                   >
                     <img
                       v-if="blobUrls[photo.id]"
                       :src="blobUrls[photo.id]"
                       :alt="photo.photoName"
+                      loading="lazy"
+                      decoding="async"
                       class="w-full h-full object-cover hover:scale-105 transition-transform cursor-pointer"
                       @click="previewPhoto(photo.id)"
                     />
-                    <div v-else class="w-full h-full flex items-center justify-center text-xs text-muted-foreground">加载中</div>
+                    <button
+                      v-else-if="photoLoadErrors[photo.id]"
+                      type="button"
+                      class="w-full h-full flex flex-col items-center justify-center gap-2 text-xs text-muted-foreground"
+                      @click="fetchBlobUrl(photo.id, true)"
+                    >
+                      <RotateCcw class="size-4" />
+                      重试预览
+                    </button>
+                    <div v-else class="w-full h-full flex flex-col items-center justify-center gap-2 text-xs text-muted-foreground">
+                      <div class="h-5 w-5 rounded-full border-2 border-muted border-t-primary animate-spin"></div>
+                      加载中
+                    </div>
                   </div>
                 </div>
               </div>
@@ -151,7 +173,8 @@
  * 加载单个提交的完整数据，展示基础信息、照片、自评。
  * 提供 PDF 导出和照片预览功能。
  */
-import { ref, computed, onMounted, onUnmounted, reactive } from 'vue'
+import { ref, computed, onMounted, onUnmounted, reactive, nextTick } from 'vue'
+import { ArrowLeft, FileDown, Loader2, RotateCcw } from 'lucide-vue-next'
 import { useRoute, useRouter } from 'vue-router'
 import { getSubmissionDetail, exportPdf } from '../../api/admin'
 import { getAdminToken, handleAdminUnauthorized, hasAdminToken } from '../../lib/adminAuth'
@@ -169,6 +192,10 @@ const previewPhotoId = ref(null)
 
 // photoId -> blob object URL，管理端用 X-Admin-Token 鉴权
 const blobUrls = reactive({})
+const photoLoading = reactive({})
+const photoLoadErrors = reactive({})
+const photoTileElements = new Map()
+let photoObserver = null
 
 const photoCategories = [
   { key: 'selfie', label: '自拍' },
@@ -199,15 +226,15 @@ const infoFields = [
 ]
 
 onMounted(async () => {
+  if ('IntersectionObserver' in window) {
+    photoObserver = new IntersectionObserver(handlePhotoIntersection, { rootMargin: '220px' })
+  }
+
   try {
     const res = await getSubmissionDetail(route.params.id)
     detail.value = res.data
-    // 预取所有照片的 blob URL
-    if (res.data && res.data.photos) {
-      for (const photo of res.data.photos) {
-        fetchBlobUrl(photo.id)
-      }
-    }
+    await nextTick()
+    observePhotoTiles()
   } catch (error) {
     console.error('加载提交详情失败：', error)
     if (hasAdminToken()) {
@@ -219,6 +246,7 @@ onMounted(async () => {
 })
 
 onUnmounted(() => {
+  photoObserver?.disconnect()
   for (const [id, url] of Object.entries(blobUrls)) {
     if (url) URL.revokeObjectURL(url)
     blobUrls[id] = null
@@ -228,22 +256,74 @@ onUnmounted(() => {
 /**
  * 用 fetch 携带 X-Admin-Token 下载照片，转为 blob URL 供 img 使用。
  */
-async function fetchBlobUrl(photoId) {
+async function fetchBlobUrl(photoId, force = false) {
+  if (!force && (blobUrls[photoId] || photoLoading[photoId])) return
+  photoLoading[photoId] = true
+  photoLoadErrors[photoId] = ''
+
+  const controller = new AbortController()
+  const timeoutId = window.setTimeout(() => controller.abort(), 45000)
+
   try {
     const adminToken = getAdminToken()
     if (!adminToken) return
     const res = await fetch(`/api/photo/download/${photoId}`, {
-      headers: { 'X-Admin-Token': adminToken }
+      headers: { 'X-Admin-Token': adminToken },
+      signal: controller.signal
     })
     if (res.status === 401 || res.status === 403) {
       handleAdminUnauthorized()
       return
     }
-    if (!res.ok) return
+    if (!res.ok) {
+      photoLoadErrors[photoId] = '照片加载失败'
+      return
+    }
     const blob = await res.blob()
+    if (blobUrls[photoId]) URL.revokeObjectURL(blobUrls[photoId])
     blobUrls[photoId] = URL.createObjectURL(blob)
   } catch (error) {
     console.error('加载照片预览失败：photoId=', photoId, error)
+    photoLoadErrors[photoId] = error.name === 'AbortError' ? '照片加载超时' : '照片加载失败'
+  } finally {
+    window.clearTimeout(timeoutId)
+    photoLoading[photoId] = false
+  }
+}
+
+function registerPhotoTile(el, photoId) {
+  if (!el) {
+    photoTileElements.delete(photoId)
+    return
+  }
+  el.dataset.photoId = String(photoId)
+  photoTileElements.set(photoId, el)
+  observePhotoTile(photoId)
+}
+
+function observePhotoTiles() {
+  if (!detail.value || !detail.value.photos) return
+  for (const photo of detail.value.photos) {
+    observePhotoTile(photo.id)
+  }
+}
+
+function observePhotoTile(photoId) {
+  const el = photoTileElements.get(photoId)
+  if (!el || blobUrls[photoId] || photoLoading[photoId]) return
+  if (photoObserver) {
+    photoObserver.observe(el)
+  } else {
+    fetchBlobUrl(photoId)
+  }
+}
+
+function handlePhotoIntersection(entries) {
+  for (const entry of entries) {
+    if (!entry.isIntersecting) continue
+    const photoId = Number(entry.target.dataset.photoId)
+    fetchBlobUrl(photoId)
+    photoObserver?.unobserve(entry.target)
   }
 }
 

@@ -12,14 +12,17 @@ import request from './index'
  * @param {number} submissionId 提交记录ID
  * @param {string} category 照片类别（selfie/nude/dick/other）
  * @param {File} file 照片文件
+ * @param {object} options axios 上传配置（进度、超时等）
  * @returns {Promise} 操作结果
  */
-export function uploadPhoto(submissionId, category, file) {
+export function uploadPhoto(submissionId, category, file, options = {}) {
   const formData = new FormData()
-  formData.append('file', file)
+  formData.append('file', file, file.name || 'photo.jpg')
   formData.append('category', category)
   return request.post(`/photo/${submissionId}`, formData, {
-    headers: { 'Content-Type': 'multipart/form-data' }
+    timeout: options.timeout || 120000,
+    headers: { 'Content-Type': 'multipart/form-data' },
+    onUploadProgress: options.onUploadProgress
   })
 }
 

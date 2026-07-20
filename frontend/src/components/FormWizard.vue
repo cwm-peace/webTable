@@ -5,16 +5,35 @@
   对应路由：/
 -->
 <template>
-  <div class="min-h-screen bg-background">
-    <div class="px-4 sm:px-6 lg:px-10 py-6 sm:py-8">
+  <div class="form-shell min-h-screen">
+    <div class="mx-auto max-w-[1180px] px-4 sm:px-6 lg:px-10 py-6 sm:py-8">
       <!-- 顶部标题 -->
-      <header class="text-center mb-6 sm:mb-8"
+      <header class="mb-6 sm:mb-8 overflow-hidden rounded-lg border bg-card shadow-sm"
         v-motion
         :initial="{ opacity: 0, y: -20 }"
         :enter="{ opacity: 1, y: 0, transition: { duration: 500 } }"
       >
-        <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">奴测-v3.0-Release</h1>
-        <p class="text-muted-foreground mt-2 text-sm sm:text-base">认真详实的填写相关信息,相关数据完全本地存储</p>
+        <div class="grid gap-4 p-5 sm:p-6 lg:grid-cols-[1fr_auto] lg:items-center">
+          <div>
+            <p class="text-xs font-semibold uppercase text-muted-foreground">Personal Information Form</p>
+            <h1 class="mt-1 text-2xl sm:text-3xl font-bold tracking-tight">奴测-v3.0-Release</h1>
+            <p class="text-muted-foreground mt-2 text-sm sm:text-base">认真详实地填写相关信息，当前草稿会自动保存。</p>
+          </div>
+          <div class="grid grid-cols-3 gap-2 text-center sm:min-w-80">
+            <div class="rounded-md border bg-muted/30 px-3 py-2">
+              <div class="text-lg font-semibold">3</div>
+              <div class="text-xs text-muted-foreground">步骤</div>
+            </div>
+            <div class="rounded-md border bg-muted/30 px-3 py-2">
+              <div class="text-lg font-semibold">16</div>
+              <div class="text-xs text-muted-foreground">照片上限</div>
+            </div>
+            <div class="rounded-md border bg-muted/30 px-3 py-2">
+              <div class="text-lg font-semibold">自动</div>
+              <div class="text-xs text-muted-foreground">草稿</div>
+            </div>
+          </div>
+        </div>
       </header>
 
       <!-- 加载状态 -->
@@ -41,7 +60,7 @@
       </Card>
 
       <!-- 向导步骤 -->
-      <Card v-else>
+      <Card v-else class="border-border/70 shadow-sm">
         <CardContent class="pt-4 sm:pt-6">
           <StepWizard @showPreview="showPreview = true">
             <Step1BasicInfo v-if="formStore.currentStep === 1" :key="1" />
@@ -78,3 +97,16 @@ onMounted(async () => {
   await formStore.initForm()
 })
 </script>
+
+<style scoped>
+.form-shell {
+  background: #f8fafc;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--muted) 52%, var(--background)), var(--background) 18rem);
+}
+
+@supports not (background: color-mix(in srgb, white 50%, black)) {
+  .form-shell {
+    background: linear-gradient(180deg, #f8fafc, #ffffff 18rem);
+  }
+}
+</style>

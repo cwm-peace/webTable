@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- 步骤条 -->
-    <div class="flex justify-center items-start mb-10">
+    <div class="flex justify-center items-start gap-1 mb-8 sm:mb-10">
       <div
         v-for="(step, index) in steps"
         :key="index"
@@ -13,8 +13,8 @@
           class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 relative z-10"
           :class="stepCircleClass(index)"
         >
-          <span v-if="formStore.currentStep > index + 1" class="text-base">✓</span>
-          <span v-else>{{ index + 1 }}</span>
+          <Check v-if="formStore.currentStep > index + 1" class="size-4" />
+          <component v-else :is="step.icon" class="size-4" />
         </div>
 
         <!-- 步骤标签 -->
@@ -57,7 +57,8 @@
         :disabled="formStore.saving"
         class="order-2 sm:order-1 h-11 sm:h-9"
       >
-        ← 上一步
+        <ChevronLeft class="size-4" />
+        上一步
       </Button>
       <div v-else class="hidden sm:block"></div>
 
@@ -68,7 +69,9 @@
           :disabled="formStore.saving"
           class="flex-1 sm:flex-none h-11 sm:h-9"
         >
-          {{ formStore.saving ? '保存中...' : '下一步 →' }}
+          <Loader2 v-if="formStore.saving" class="size-4 animate-spin" />
+          <span>{{ formStore.saving ? '保存中' : '下一步' }}</span>
+          <ChevronRight v-if="!formStore.saving" class="size-4" />
         </Button>
         <Button
           v-if="formStore.currentStep === 3"
@@ -77,7 +80,9 @@
           :disabled="formStore.saving"
           class="flex-1 sm:flex-none h-11 sm:h-9 bg-emerald-600 hover:bg-emerald-700"
         >
-          {{ formStore.saving ? '保存中...' : '保存提交' }}
+          <Loader2 v-if="formStore.saving" class="size-4 animate-spin" />
+          <Send v-else class="size-4" />
+          {{ formStore.saving ? '保存中' : '保存提交' }}
         </Button>
       </div>
     </div>
@@ -90,15 +95,16 @@
  */
 import { useFormStore } from '../stores/form'
 import { Button } from '@/components/ui/button'
+import { Camera, Check, ChevronLeft, ChevronRight, ClipboardList, Loader2, Send, UserRound } from 'lucide-vue-next'
 
 const emit = defineEmits(['showPreview'])
 
 const formStore = useFormStore()
 
 const steps = [
-  { label: '基础信息' },
-  { label: '附图部分' },
-  { label: '接受程度自评' }
+  { label: '基础信息', icon: UserRound },
+  { label: '附图部分', icon: Camera },
+  { label: '接受程度自评', icon: ClipboardList }
 ]
 
 function stepCircleClass(index) {

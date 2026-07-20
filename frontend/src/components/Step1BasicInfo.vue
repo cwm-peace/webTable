@@ -17,13 +17,13 @@
       <p class="text-muted-foreground mt-1">以下部分未知或记不清可不填</p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
       <!-- 基本身体信息 -->
-      <Card v-motion :initial="{ opacity: 0, y: 30 }" :enter="{ opacity: 1, y: 0, transition: { delay: 100 } }">
-        <CardHeader>
+      <Card class="field-section" v-motion :initial="{ opacity: 0, y: 30 }" :enter="{ opacity: 1, y: 0, transition: { delay: 100 } }">
+        <CardHeader class="pb-2">
           <CardTitle class="text-base">基本信息</CardTitle>
         </CardHeader>
-        <CardContent class="space-y-4">
+        <CardContent class="space-y-3.5">
           <div v-for="field in basicFields" :key="field.key" class="space-y-1.5">
             <Label :for="field.key">{{ field.label }}</Label>
             <Input :id="field.key" v-model="store.basicInfo[field.key]" :placeholder="'请输入' + field.label" />
@@ -32,11 +32,11 @@
       </Card>
 
       <!-- 联系方式 -->
-      <Card v-motion :initial="{ opacity: 0, y: 30 }" :enter="{ opacity: 1, y: 0, transition: { delay: 200 } }">
-        <CardHeader>
+      <Card class="field-section" v-motion :initial="{ opacity: 0, y: 30 }" :enter="{ opacity: 1, y: 0, transition: { delay: 200 } }">
+        <CardHeader class="pb-2">
           <CardTitle class="text-base">联系方式</CardTitle>
         </CardHeader>
-        <CardContent class="space-y-4">
+        <CardContent class="space-y-3.5">
           <div v-for="field in contactFields" :key="field.key" class="space-y-1.5">
             <Label :for="field.key">{{ field.label }}</Label>
             <Input :id="field.key" v-model="store.basicInfo[field.key]" :placeholder="'请输入' + field.label" />
@@ -45,11 +45,11 @@
       </Card>
 
       <!-- 个人经历 -->
-      <Card v-motion :initial="{ opacity: 0, y: 30 }" :enter="{ opacity: 1, y: 0, transition: { delay: 300 } }">
-        <CardHeader>
+      <Card class="field-section" v-motion :initial="{ opacity: 0, y: 30 }" :enter="{ opacity: 1, y: 0, transition: { delay: 300 } }">
+        <CardHeader class="pb-2">
           <CardTitle class="text-base">个人经历</CardTitle>
         </CardHeader>
-        <CardContent class="space-y-4">
+        <CardContent class="space-y-3.5">
           <div v-for="field in experienceFields" :key="field.key" class="space-y-1.5">
             <Label :for="field.key">{{ field.label }}</Label>
             <Input :id="field.key" v-model="store.basicInfo[field.key]" :placeholder="'请输入'" />
@@ -58,12 +58,12 @@
       </Card>
 
       <!-- 个人习惯 -->
-      <Card class="lg:col-span-2" v-motion :initial="{ opacity: 0, y: 30 }" :enter="{ opacity: 1, y: 0, transition: { delay: 400 } }">
-        <CardHeader>
+      <Card class="field-section lg:col-span-2" v-motion :initial="{ opacity: 0, y: 30 }" :enter="{ opacity: 1, y: 0, transition: { delay: 400 } }">
+        <CardHeader class="pb-2">
           <CardTitle class="text-base">个人习惯</CardTitle>
         </CardHeader>
-        <CardContent class="space-y-4">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CardContent class="space-y-3.5">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
             <div v-for="field in habitFields" :key="field.key" class="space-y-1.5">
               <Label :for="field.key">{{ field.label }}</Label>
               <Input :id="field.key" v-model="store.basicInfo[field.key]" :placeholder="field.placeholder || '请输入'" />
@@ -73,12 +73,12 @@
       </Card>
 
       <!-- 其他 -->
-      <Card class="md:col-span-2 lg:col-span-3" v-motion :initial="{ opacity: 0, y: 30 }" :enter="{ opacity: 1, y: 0, transition: { delay: 500 } }">
-        <CardHeader>
+      <Card class="field-section md:col-span-2 lg:col-span-3" v-motion :initial="{ opacity: 0, y: 30 }" :enter="{ opacity: 1, y: 0, transition: { delay: 500 } }">
+        <CardHeader class="pb-2">
           <CardTitle class="text-base">其他</CardTitle>
         </CardHeader>
         <CardContent>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
             <div v-for="field in otherFields" :key="field.key" class="space-y-1.5">
               <Label :for="field.key">{{ field.label }}</Label>
               <Textarea v-if="field.key === 'remark' || field.key === 'trainingIntention'" :id="field.key" v-model="store.basicInfo[field.key]" placeholder="补充说明..." rows="3" />
@@ -153,3 +153,11 @@ const otherFields = [
   { key: 'trainingIntention', label: '培养意向' }
 ]
 </script>
+
+<style scoped>
+.field-section {
+  border-color: var(--border);
+  background: var(--card);
+  box-shadow: 0 1px 2px rgb(15 23 42 / 0.04);
+}
+</style>

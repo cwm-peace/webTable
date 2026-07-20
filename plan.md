@@ -176,6 +176,7 @@ frontend/src/
 - [x] 管理员系统（登录+列表+详情+PDF导出）
 - [x] vue-router 路由配置
 - [x] 手机端适配 + PC 端宽屏差异化布局
+- [x] 前端 UI/弱网体验优化（照片懒加载、上传进度、大图压缩、移动端自评纵向布局）
 - [x] 部署指南 + SQL 脚本说明 + 用户/管理员手册初版
 - [ ] 联调测试
 
@@ -186,6 +187,11 @@ frontend/src/
 - PC 端（lg: ≥1024px）：Step1 3列网格，Step2 4列网格，Step3 左右栏并排，AdminDetail 信息 4列/照片 6列
 - 手机端（<768px）：`style.css` 全局补丁，input/button 最小高度 44px
 - 步骤标签：`text-xs sm:text-sm` 防小屏溢出；导航按钮 `h-11 sm:h-9`
+- UI 精修：首页改为带摘要数据的信息带，步骤导航和管理端操作按钮加入 lucide 图标，加载态统一使用 spinner，基础信息卡片减少视觉噪音
+- 第3步自评在手机端从 `项目 + 选择 + 备注` 同行挤压改为纵向控件布局，select 和备注输入保持 44px 触控高度，提升 iOS、Android、鸿蒙窄屏操作稳定性
+- 填写端照片槽位展示按后端 `photoOrder` 映射 1-4 槽，删除中间照片后仍保持正确槽位显示
+- 填写端和管理端照片预览改为 IntersectionObserver 可视区域懒加载，并保留失败重试入口，避免弱网下进入页面后一次性拉取所有原图 blob
+- 照片上传增加上传进度、上传专用 120 秒超时和浏览器端大图压缩；大于 2MB 的非 GIF 图片优先压缩为最长边 1600px 的 JPEG，压缩失败或 GIF 自动回退原文件
 - 草稿恢复改为优先复用已存在会话，前端 token 持久化到 localStorage + sessionStorage，切步时分步保存
 - 创建草稿入口增加 Redis 原子计数限流，按客户端哈希 key 限制默认 10 分钟最多 20 次，防止脚本刷库
 - 后端 `completeSubmission()`、步骤读写接口支持 Redis miss 后回源数据库，并校验 `sessionToken -> submissionId` 归属关系
@@ -302,6 +308,7 @@ frontend/src/
 - `./mvnw clean compile` 后端编译通过
 - `./mvnw test` 后端完整测试通过（59 个测试），覆盖 `AdminConfigTest`、`CorsConfigTest`、`RequestBodySizeFilterTest`、`SecurityHeadersFilterTest`、`ApiResponseStatusAdviceTest`、`GlobalExceptionHandlerTest`、`AdminServiceImplTest`（含管理端草稿拒绝、PDF 中文/emoji fallback 导出）、`PhotoControllerTest`（管理端草稿照片拒绝）、`FormServiceImplTest`（含输入规模和自评级别边界）、`ExportServiceImplTest`、`PhotoServiceImplTest` 与应用上下文启动测试
 - `npm run build` 前端生产构建通过；当前仅保留 Node/Vite 的 `[DEP0205] module.register()` deprecation warning
+- 前端 UI 巡检：`npm run dev -- --host 127.0.0.1` + `./mvnw spring-boot:run` 本地联调可进入填写流程；390px 移动视口下 Step1/Step2/Step3 均无横向溢出，input/button/select/备注输入触控高度为 44px，Step2 上传槽位保持正方形，Step3 自评行改为纵向控件布局；1280px 桌面视口下 Step3 双栏行布局无横向溢出
 - `scripts/preflight-check.sh` 联调/部署前置检查 Java、Node.js、Maven Wrapper、必要环境变量、Redis、MySQL、业务表、模板数量与端口占用；当前缺 `WEBTABLE_ADMIN_PASSWORD`、`WEBTABLE_DB_PASSWORD`，且 Redis `127.0.0.1:6379` 不可达，MySQL 连接因数据库密码为空被跳过，因此真实端到端联调暂未执行
 - `docs/DEPLOYMENT.md`、`docs/SQL_GUIDE.md`、`docs/USER_MANUAL.md` 已补齐初版交付说明，后续真实联调完成后继续补充环境实测记录
 - `npm run dev` 前端启动

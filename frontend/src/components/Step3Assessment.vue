@@ -16,17 +16,19 @@
     </div>
 
     <!-- 级别说明 -->
-    <div class="flex flex-wrap items-center gap-2 mb-6 text-sm"
+    <div class="rounded-lg border bg-muted/25 p-3 sm:p-4 mb-6"
       v-motion
       :initial="{ opacity: 0, y: 10 }"
       :enter="{ opacity: 1, y: 0, transition: { delay: 100 } }"
     >
-      <span class="font-semibold text-muted-foreground">级别：</span>
-      <Badge class="bg-emerald-500 hover:bg-emerald-500">A 超级喜欢</Badge>
-      <Badge class="bg-blue-500 hover:bg-blue-500">B 喜欢</Badge>
-      <Badge class="bg-amber-500 hover:bg-amber-500">C 不喜欢但接受</Badge>
-      <Badge class="bg-red-400 hover:bg-red-400">D 强迫才接受</Badge>
-      <Badge variant="secondary">E 绝对不接受</Badge>
+      <div class="mb-2 text-xs font-semibold text-muted-foreground">级别说明</div>
+      <div class="grid grid-cols-1 min-[420px]:grid-cols-2 lg:grid-cols-5 gap-2 text-sm">
+        <Badge class="justify-center bg-emerald-500 hover:bg-emerald-500">A 超级喜欢</Badge>
+        <Badge class="justify-center bg-blue-500 hover:bg-blue-500">B 喜欢</Badge>
+        <Badge class="justify-center bg-amber-500 hover:bg-amber-500">C 不喜欢但接受</Badge>
+        <Badge class="justify-center bg-red-400 hover:bg-red-400">D 强迫才接受</Badge>
+        <Badge variant="secondary" class="justify-center">E 绝对不接受</Badge>
+      </div>
     </div>
 
     <!-- PC 端两列，手机端单列 -->
@@ -38,22 +40,22 @@
       <!-- 左栏：所有分组在同一列容器内流式堆叠 -->
       <div>
         <div v-for="group in leftGroups" :key="'left-' + group.typeName">
-          <div class="flex items-center gap-2 mt-6 mb-2">
+          <div class="sticky top-0 z-10 flex items-center gap-2 mt-6 mb-2 bg-background/95 py-1 backdrop-blur sm:static sm:bg-transparent sm:py-0 sm:backdrop-blur-none">
             <span class="text-xs font-semibold text-primary">{{ group.typeName }}</span>
             <div class="flex-1 h-px bg-border"></div>
           </div>
           <div v-for="row in group.items" :key="rowKey(row, 'left')"
-            class="grid grid-cols-[1fr_auto_auto] items-center gap-2 py-1.5"
+            class="assessment-row"
           >
-            <TruncatedText :text="row.itemName" class="text-sm" />
+            <TruncatedText :text="row.itemName" class="assessment-row__name" />
             <select
               v-model="row.level"
-              class="h-8 w-[6.5rem] sm:w-32 rounded-md border border-input bg-transparent px-2 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              class="assessment-row__select"
             >
               <option value="">—</option>
               <option v-for="opt in levelOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
             </select>
-            <Input v-model="row.remark" placeholder="备注" class="h-8 w-[5rem] sm:w-28 text-sm" />
+            <Input v-model="row.remark" placeholder="备注" class="assessment-row__remark" />
           </div>
         </div>
       </div>
@@ -61,22 +63,22 @@
       <!-- 右栏：所有分组在同一列容器内流式堆叠 -->
       <div>
         <div v-for="group in rightGroups" :key="'right-' + group.typeName">
-          <div class="flex items-center gap-2 mt-6 mb-2">
+          <div class="sticky top-0 z-10 flex items-center gap-2 mt-6 mb-2 bg-background/95 py-1 backdrop-blur sm:static sm:bg-transparent sm:py-0 sm:backdrop-blur-none">
             <span class="text-xs font-semibold text-primary">{{ group.typeName }}</span>
             <div class="flex-1 h-px bg-border"></div>
           </div>
           <div v-for="row in group.items" :key="rowKey(row, 'right')"
-            class="grid grid-cols-[1fr_auto_auto] items-center gap-2 py-1.5"
+            class="assessment-row"
           >
-            <TruncatedText :text="row.itemName" class="text-sm" />
+            <TruncatedText :text="row.itemName" class="assessment-row__name" />
             <select
               v-model="row.level"
-              class="h-8 w-[6.5rem] sm:w-32 rounded-md border border-input bg-transparent px-2 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              class="assessment-row__select"
             >
               <option value="">—</option>
               <option v-for="opt in levelOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
             </select>
-            <Input v-model="row.remark" placeholder="备注" class="h-8 w-[5rem] sm:w-28 text-sm" />
+            <Input v-model="row.remark" placeholder="备注" class="assessment-row__remark" />
           </div>
         </div>
       </div>
@@ -130,3 +132,72 @@ function rowKey(row, side) {
   return `${side}-${row.rowOrder ?? row.itemName}`
 }
 </script>
+
+<style scoped>
+.assessment-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 9rem) minmax(0, 8rem);
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0;
+}
+
+.assessment-row__name {
+  min-width: 0;
+  font-size: 0.875rem;
+}
+
+.assessment-row__select,
+.assessment-row__remark {
+  height: 2rem;
+  min-width: 0;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+}
+
+.assessment-row__select {
+  width: 100%;
+  border: 1px solid var(--input);
+  background: transparent;
+  padding: 0 0.5rem;
+}
+
+.assessment-row__select:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--ring) 35%, transparent);
+}
+
+@media (max-width: 640px) {
+  .assessment-row {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    background: color-mix(in srgb, var(--muted) 25%, transparent);
+  }
+
+  .assessment-row + .assessment-row {
+    margin-top: 0.5rem;
+  }
+
+  .assessment-row__select,
+  .assessment-row__remark {
+    height: 2.75rem;
+    width: 100%;
+    font-size: 1rem;
+  }
+}
+
+@supports not (background: color-mix(in srgb, white 50%, black)) {
+  .assessment-row__select:focus-visible {
+    box-shadow: 0 0 0 2px rgb(148 163 184 / 0.35);
+  }
+
+  @media (max-width: 640px) {
+    .assessment-row {
+      background: #f8fafc;
+    }
+  }
+}
+</style>

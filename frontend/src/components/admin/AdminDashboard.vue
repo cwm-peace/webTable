@@ -7,22 +7,34 @@
 -->
 <template>
   <div class="min-h-screen bg-background">
-    <div class="px-4 sm:px-6 lg:px-10 py-6 sm:py-8">
+    <div class="mx-auto max-w-[1180px] px-4 sm:px-6 lg:px-10 py-6 sm:py-8">
       <!-- 顶部导航 -->
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6 rounded-lg border bg-card p-4 shadow-sm">
         <div>
           <h1 class="text-xl sm:text-2xl font-bold tracking-tight">提交管理</h1>
           <p class="text-muted-foreground text-sm mt-1">共 {{ pagination.total }} 条提交记录</p>
         </div>
         <div class="flex flex-wrap gap-2">
-          <Button variant="outline" size="sm" @click="loadSubmissions()">刷新</Button>
-          <Button variant="outline" size="sm" @click="handleExportExcel">导出 Excel</Button>
-          <Button variant="ghost" size="sm" @click="handleLogout" class="text-muted-foreground">退出登录</Button>
+          <Button variant="outline" size="sm" @click="loadSubmissions()">
+            <RefreshCw class="size-4" />
+            刷新
+          </Button>
+          <Button variant="outline" size="sm" @click="handleExportExcel">
+            <Download class="size-4" />
+            导出 Excel
+          </Button>
+          <Button variant="ghost" size="sm" @click="handleLogout" class="text-muted-foreground">
+            <LogOut class="size-4" />
+            退出登录
+          </Button>
         </div>
       </div>
 
       <!-- 加载状态 -->
-      <div v-if="loading" class="text-center py-20 text-muted-foreground">加载中...</div>
+      <div v-if="loading" class="flex flex-col items-center justify-center gap-3 py-20 text-muted-foreground">
+        <Loader2 class="size-6 animate-spin" />
+        <span>加载中</span>
+      </div>
 
       <!-- 空状态 -->
       <Card v-else-if="submissions.length === 0" class="text-center py-16">
@@ -58,8 +70,14 @@
                 <td class="p-3 text-sm text-muted-foreground">{{ formatDate(item.updateTime) }}</td>
                 <td class="p-3 text-right">
                   <div class="flex justify-end gap-2">
-                    <Button variant="outline" size="sm" @click="goToDetail(item.id)">查看详情</Button>
-                    <Button variant="outline" size="sm" @click="handleExportPdf(item.id)">导出 PDF</Button>
+                    <Button variant="outline" size="sm" @click="goToDetail(item.id)">
+                      <Eye class="size-4" />
+                      查看详情
+                    </Button>
+                    <Button variant="outline" size="sm" @click="handleExportPdf(item.id)">
+                      <FileDown class="size-4" />
+                      导出 PDF
+                    </Button>
                   </div>
                 </td>
               </tr>
@@ -88,8 +106,14 @@
               <div>更新：{{ formatDate(item.updateTime) }}</div>
             </div>
             <div class="flex gap-2">
-              <Button variant="outline" class="flex-1 h-11 text-sm" @click="goToDetail(item.id)">查看详情</Button>
-              <Button variant="outline" class="flex-1 h-11 text-sm" @click="handleExportPdf(item.id)">导出 PDF</Button>
+              <Button variant="outline" class="flex-1 h-11 text-sm" @click="goToDetail(item.id)">
+                <Eye class="size-4" />
+                查看详情
+              </Button>
+              <Button variant="outline" class="flex-1 h-11 text-sm" @click="handleExportPdf(item.id)">
+                <FileDown class="size-4" />
+                导出 PDF
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -129,6 +153,7 @@
  */
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { Download, Eye, FileDown, Loader2, LogOut, RefreshCw } from 'lucide-vue-next'
 import { getSubmissionList, exportPdf, adminLogout } from '../../api/admin'
 import { exportAll } from '../../api/export'
 import { clearAdminToken } from '../../lib/adminAuth'
