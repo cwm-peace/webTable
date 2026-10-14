@@ -1,0 +1,863 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-10-14T13-37-52-795Z",
+  "startedAt": "2026-10-14T13:37:52.795Z",
+  "requiredRounds": 11,
+  "completedRounds": 11,
+  "status": "passed-selected-scope",
+  "environment": {
+    "node": "v26.7.0",
+    "platform": "darwin",
+    "release": "27.0.0",
+    "architecture": "arm64",
+    "cpu": "Apple M5 Pro",
+    "logicalCpus": 18,
+    "memoryBytes": 68719476736
+  },
+  "scope": "Each round runs Node unit/security tests, every selected Playwright project and at least 30 seconds with 100 static HTTP clients. Static clients do not run image decoding or PDF generation. Browser engines in automation do not establish real-device certification.",
+  "browserProjects": [
+    "chromium",
+    "webkit"
+  ],
+  "unverifiedProjects": [
+    "firefox"
+  ],
+  "scopeLimitation": "Firefox 157 cannot launch in this macOS environment (profile/sandbox failure); Firefox and real OS/browser devices remain unverified.",
+  "artifacts": "artifacts/regression-2026-10-14T13-37-52-795Z",
+  "rounds": [
+    {
+      "number": 1,
+      "seed": 1,
+      "startedAt": "2026-10-14T13:37:53.671Z",
+      "status": "passed",
+      "unit": {
+        "command": [
+          "npm",
+          "test"
+        ],
+        "exitCode": 0,
+        "signal": null,
+        "elapsedSeconds": 5.150215042000001,
+        "log": "artifacts/regression-2026-10-14T13-37-52-795Z/round-01/unit.log",
+        "counts": {
+          "tests": 53,
+          "pass": 53,
+          "fail": 0,
+          "skipped": 0
+        }
+      },
+      "browser": {
+        "command": [
+          "npm",
+          "run",
+          "test:e2e",
+          "--",
+          "--project=chromium",
+          "--project=webkit",
+          "--reporter=line,json",
+          "--output",
+          "/Users/hhh/Work/github/webTable/artifacts/regression-2026-10-14T13-37-52-795Z/round-01/browser-results"
+        ],
+        "exitCode": 0,
+        "signal": null,
+        "elapsedSeconds": 74.021576,
+        "log": "artifacts/regression-2026-10-14T13-37-52-795Z/round-01/browser.log",
+        "stats": {
+          "startTime": "2026-10-14T13:37:59.236Z",
+          "duration": 73605.499,
+          "expected": 22,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        }
+      },
+      "load": {
+        "command": [
+          "/opt/homebrew/Cellar/node/26.7.0/bin/node",
+          "/Users/hhh/Work/github/webTable/scripts/load-test.mjs",
+          "--duration",
+          "30",
+          "--clients",
+          "100",
+          "--seed",
+          "1",
+          "--output",
+          "/Users/hhh/Work/github/webTable/artifacts/regression-2026-10-14T13-37-52-795Z/round-01/load.json"
+        ],
+        "exitCode": 0,
+        "signal": null,
+        "elapsedSeconds": 30.248975000000005,
+        "log": "artifacts/regression-2026-10-14T13-37-52-795Z/round-01/load.log",
+        "metrics": {
+          "requests": 29385,
+          "errors": 0,
+          "p95Ms": 2.953958000000057,
+          "bodyBytes": 853185000,
+          "peakRssBytes": 162955264,
+          "report": "artifacts/regression-2026-10-14T13-37-52-795Z/round-01/load.json"
+        }
+      },
+      "completedAt": "2026-10-14T13:39:43.136Z"
+    },
+    {
+      "number": 2,
+      "seed": 2,
+      "startedAt": "2026-10-14T13:39:43.136Z",
+      "status": "passed",
+      "unit": {
+        "command": [
+          "npm",
+          "test"
+        ],
+        "exitCode": 0,
+        "signal": null,
+        "elapsedSeconds": 4.921791874999995,
+        "log": "artifacts/regression-2026-10-14T13-37-52-795Z/round-02/unit.log",
+        "counts": {
+          "tests": 53,
+          "pass": 53,
+          "fail": 0,
+          "skipped": 0
+        }
+      },
+      "browser": {
+        "command": [
+          "npm",
+          "run",
+          "test:e2e",
+          "--",
+          "--project=chromium",
+          "--project=webkit",
+          "--reporter=line,json",
+          "--output",
+          "/Users/hhh/Work/github/webTable/artifacts/regression-2026-10-14T13-37-52-795Z/round-02/browser-results"
+        ],
+        "exitCode": 0,
+        "signal": null,
+        "elapsedSeconds": 73.427160708,
+        "log": "artifacts/regression-2026-10-14T13-37-52-795Z/round-02/browser.log",
+        "stats": {
+          "startTime": "2026-10-14T13:39:48.541Z",
+          "duration": 72933.289,
+          "expected": 22,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        }
+      },
+      "load": {
+        "command": [
+          "/opt/homebrew/Cellar/node/26.7.0/bin/node",
+          "/Users/hhh/Work/github/webTable/scripts/load-test.mjs",
+          "--duration",
+          "30",
+          "--clients",
+          "100",
+          "--seed",
+          "2",
+          "--output",
+          "/Users/hhh/Work/github/webTable/artifacts/regression-2026-10-14T13-37-52-795Z/round-02/load.json"
+        ],
+        "exitCode": 0,
+        "signal": null,
+        "elapsedSeconds": 30.309884415999985,
+        "log": "artifacts/regression-2026-10-14T13-37-52-795Z/round-02/load.log",
+        "metrics": {
+          "requests": 29312,
+          "errors": 0,
+          "p95Ms": 2.5114590000002863,
+          "bodyBytes": 853185000,
+          "peakRssBytes": 162856960,
+          "report": "artifacts/regression-2026-10-14T13-37-52-795Z/round-02/load.json"
+        }
+      },
+      "completedAt": "2026-10-14T13:41:31.857Z"
+    },
+    {
+      "number": 3,
+      "seed": 3,
+      "startedAt": "2026-10-14T13:41:31.858Z",
+      "status": "passed",
+      "unit": {
+        "command": [
+          "npm",
+          "test"
+        ],
+        "exitCode": 0,
+        "signal": null,
+        "elapsedSeconds": 6.346148875000013,
+        "log": "artifacts/regression-2026-10-14T13-37-52-795Z/round-03/unit.log",
+        "counts": {
+          "tests": 53,
+          "pass": 53,
+          "fail": 0,
+          "skipped": 0
+        }
+      },
+      "browser": {
+        "command": [
+          "npm",
+          "run",
+          "test:e2e",
+          "--",
+          "--project=chromium",
+          "--project=webkit",
+          "--reporter=line,json",
+          "--output",
+          "/Users/hhh/Work/github/webTable/artifacts/regression-2026-10-14T13-37-52-795Z/round-03/browser-results"
+        ],
+        "exitCode": 0,
+        "signal": null,
+        "elapsedSeconds": 75.82610120900002,
+        "log": "artifacts/regression-2026-10-14T13-37-52-795Z/round-03/browser.log",
+        "stats": {
+          "startTime": "2026-10-14T13:41:38.924Z",
+          "duration": 75112.127,
+          "expected": 22,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        }
+      },
+      "load": {
+        "command": [
+          "/opt/homebrew/Cellar/node/26.7.0/bin/node",
+          "/Users/hhh/Work/github/webTable/scripts/load-test.mjs",
+          "--duration",
+          "30",
+          "--clients",
+          "100",
+          "--seed",
+          "3",
+          "--output",
+          "/Users/hhh/Work/github/webTable/artifacts/regression-2026-10-14T13-37-52-795Z/round-03/load.json"
+        ],
+        "exitCode": 0,
+        "signal": null,
+        "elapsedSeconds": 30.26734379199997,
+        "log": "artifacts/regression-2026-10-14T13-37-52-795Z/round-03/load.log",
+        "metrics": {
+          "requests": 29345,
+          "errors": 0,
+          "p95Ms": 2.5534159999988333,
+          "bodyBytes": 853185000,
+          "peakRssBytes": 164216832,
+          "report": "artifacts/regression-2026-10-14T13-37-52-795Z/round-03/load.json"
+        }
+      },
+      "completedAt": "2026-10-14T13:43:24.345Z"
+    },
+    {
+      "number": 4,
+      "seed": 4,
+      "startedAt": "2026-10-14T13:43:24.346Z",
+      "status": "passed",
+      "unit": {
+        "command": [
+          "npm",
+          "test"
+        ],
+        "exitCode": 0,
+        "signal": null,
+        "elapsedSeconds": 5.19289841699996,
+        "log": "artifacts/regression-2026-10-14T13-37-52-795Z/round-04/unit.log",
+        "counts": {
+          "tests": 53,
+          "pass": 53,
+          "fail": 0,
+          "skipped": 0
+        }
+      },
+      "browser": {
+        "command": [
+          "npm",
+          "run",
+          "test:e2e",
+          "--",
+          "--project=chromium",
+          "--project=webkit",
+          "--reporter=line,json",
+          "--output",
+          "/Users/hhh/Work/github/webTable/artifacts/regression-2026-10-14T13-37-52-795Z/round-04/browser-results"
+        ],
+        "exitCode": 0,
+        "signal": null,
+        "elapsedSeconds": 61.139314250000055,
+        "log": "artifacts/regression-2026-10-14T13-37-52-795Z/round-04/browser.log",
+        "stats": {
+          "startTime": "2026-10-14T13:43:29.846Z",
+          "duration": 60836.435,
+          "expected": 22,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        }
+      },
+      "load": {
+        "command": [
+          "/opt/homebrew/Cellar/node/26.7.0/bin/node",
+          "/Users/hhh/Work/github/webTable/scripts/load-test.mjs",
+          "--duration",
+          "30",
+          "--clients",
+          "100",
+          "--seed",
+          "4",
+          "--output",
+          "/Users/hhh/Work/github/webTable/artifacts/regression-2026-10-14T13-37-52-795Z/round-04/load.json"
+        ],
+        "exitCode": 0,
+        "signal": null,
+        "elapsedSeconds": 30.23023558400001,
+        "log": "artifacts/regression-2026-10-14T13-37-52-795Z/round-04/load.log",
+        "metrics": {
+          "requests": 29385,
+          "errors": 0,
+          "p95Ms": 3.1144160000003467,
+          "bodyBytes": 853185000,
+          "peakRssBytes": 161185792,
+          "report": "artifacts/regression-2026-10-14T13-37-52-795Z/round-04/load.json"
+        }
+      },
+      "completedAt": "2026-10-14T13:45:00.939Z"
+    },
+    {
+      "number": 5,
+      "seed": 5,
+      "startedAt": "2026-10-14T13:45:00.939Z",
+      "status": "passed",
+      "unit": {
+        "command": [
+          "npm",
+          "test"
+        ],
+        "exitCode": 0,
+        "signal": null,
+        "elapsedSeconds": 3.907766917000001,
+        "log": "artifacts/regression-2026-10-14T13-37-52-795Z/round-05/unit.log",
+        "counts": {
+          "tests": 53,
+          "pass": 53,
+          "fail": 0,
+          "skipped": 0
+        }
+      },
+      "browser": {
+        "command": [
+          "npm",
+          "run",
+          "test:e2e",
+          "--",
+          "--project=chromium",
+          "--project=webkit",
+          "--reporter=line,json",
+          "--output",
+          "/Users/hhh/Work/github/webTable/artifacts/regression-2026-10-14T13-37-52-795Z/round-05/browser-results"
+        ],
+        "exitCode": 0,
+        "signal": null,
+        "elapsedSeconds": 60.397746791999964,
+        "log": "artifacts/regression-2026-10-14T13-37-52-795Z/round-05/browser.log",
+        "stats": {
+          "startTime": "2026-10-14T13:45:05.138Z",
+          "duration": 60110.789,
+          "expected": 22,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        }
+      },
+      "load": {
+        "command": [
+          "/opt/homebrew/Cellar/node/26.7.0/bin/node",
+          "/Users/hhh/Work/github/webTable/scripts/load-test.mjs",
+          "--duration",
+          "30",
+          "--clients",
+          "100",
+          "--seed",
+          "5",
+          "--output",
+          "/Users/hhh/Work/github/webTable/artifacts/regression-2026-10-14T13-37-52-795Z/round-05/load.json"
+        ],
+        "exitCode": 0,
+        "signal": null,
+        "elapsedSeconds": 30.203184000000007,
+        "log": "artifacts/regression-2026-10-14T13-37-52-795Z/round-05/load.log",
+        "metrics": {
+          "requests": 29288,
+          "errors": 0,
+          "p95Ms": 3.64129099999991,
+          "bodyBytes": 853185000,
+          "peakRssBytes": 162742272,
+          "report": "artifacts/regression-2026-10-14T13-37-52-795Z/round-05/load.json"
+        }
+      },
+      "completedAt": "2026-10-14T13:46:35.477Z"
+    },
+    {
+      "number": 6,
+      "seed": 6,
+      "startedAt": "2026-10-14T13:46:35.478Z",
+      "status": "passed",
+      "unit": {
+        "command": [
+          "npm",
+          "test"
+        ],
+        "exitCode": 0,
+        "signal": null,
+        "elapsedSeconds": 3.9061732090000296,
+        "log": "artifacts/regression-2026-10-14T13-37-52-795Z/round-06/unit.log",
+        "counts": {
+          "tests": 53,
+          "pass": 53,
+          "fail": 0,
+          "skipped": 0
+        }
+      },
+      "browser": {
+        "command": [
+          "npm",
+          "run",
+          "test:e2e",
+          "--",
+          "--project=chromium",
+          "--project=webkit",
+          "--reporter=line,json",
+          "--output",
+          "/Users/hhh/Work/github/webTable/artifacts/regression-2026-10-14T13-37-52-795Z/round-06/browser-results"
+        ],
+        "exitCode": 0,
+        "signal": null,
+        "elapsedSeconds": 60.529811041999956,
+        "log": "artifacts/regression-2026-10-14T13-37-52-795Z/round-06/browser.log",
+        "stats": {
+          "startTime": "2026-10-14T13:46:39.694Z",
+          "duration": 60223.729,
+          "expected": 22,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        }
+      },
+      "load": {
+        "command": [
+          "/opt/homebrew/Cellar/node/26.7.0/bin/node",
+          "/Users/hhh/Work/github/webTable/scripts/load-test.mjs",
+          "--duration",
+          "30",
+          "--clients",
+          "100",
+          "--seed",
+          "6",
+          "--output",
+          "/Users/hhh/Work/github/webTable/artifacts/regression-2026-10-14T13-37-52-795Z/round-06/load.json"
+        ],
+        "exitCode": 0,
+        "signal": null,
+        "elapsedSeconds": 30.188178999999888,
+        "log": "artifacts/regression-2026-10-14T13-37-52-795Z/round-06/load.log",
+        "metrics": {
+          "requests": 29296,
+          "errors": 0,
+          "p95Ms": 3.459791999997833,
+          "bodyBytes": 853185000,
+          "peakRssBytes": 160366592,
+          "report": "artifacts/regression-2026-10-14T13-37-52-795Z/round-06/load.json"
+        }
+      },
+      "completedAt": "2026-10-14T13:48:10.131Z"
+    },
+    {
+      "number": 7,
+      "seed": 7,
+      "startedAt": "2026-10-14T13:48:10.131Z",
+      "status": "passed",
+      "unit": {
+        "command": [
+          "npm",
+          "test"
+        ],
+        "exitCode": 0,
+        "signal": null,
+        "elapsedSeconds": 3.9673359580000396,
+        "log": "artifacts/regression-2026-10-14T13-37-52-795Z/round-07/unit.log",
+        "counts": {
+          "tests": 53,
+          "pass": 53,
+          "fail": 0,
+          "skipped": 0
+        }
+      },
+      "browser": {
+        "command": [
+          "npm",
+          "run",
+          "test:e2e",
+          "--",
+          "--project=chromium",
+          "--project=webkit",
+          "--reporter=line,json",
+          "--output",
+          "/Users/hhh/Work/github/webTable/artifacts/regression-2026-10-14T13-37-52-795Z/round-07/browser-results"
+        ],
+        "exitCode": 0,
+        "signal": null,
+        "elapsedSeconds": 60.27959250000003,
+        "log": "artifacts/regression-2026-10-14T13-37-52-795Z/round-07/browser.log",
+        "stats": {
+          "startTime": "2026-10-14T13:48:14.394Z",
+          "duration": 59987.975000000006,
+          "expected": 22,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        }
+      },
+      "load": {
+        "command": [
+          "/opt/homebrew/Cellar/node/26.7.0/bin/node",
+          "/Users/hhh/Work/github/webTable/scripts/load-test.mjs",
+          "--duration",
+          "30",
+          "--clients",
+          "100",
+          "--seed",
+          "7",
+          "--output",
+          "/Users/hhh/Work/github/webTable/artifacts/regression-2026-10-14T13-37-52-795Z/round-07/load.json"
+        ],
+        "exitCode": 0,
+        "signal": null,
+        "elapsedSeconds": 30.17633270899998,
+        "log": "artifacts/regression-2026-10-14T13-37-52-795Z/round-07/load.log",
+        "metrics": {
+          "requests": 29290,
+          "errors": 0,
+          "p95Ms": 3.3895839999986492,
+          "bodyBytes": 853185000,
+          "peakRssBytes": 162414592,
+          "report": "artifacts/regression-2026-10-14T13-37-52-795Z/round-07/load.json"
+        }
+      },
+      "completedAt": "2026-10-14T13:49:44.583Z"
+    },
+    {
+      "number": 8,
+      "seed": 8,
+      "startedAt": "2026-10-14T13:49:44.583Z",
+      "status": "passed",
+      "unit": {
+        "command": [
+          "npm",
+          "test"
+        ],
+        "exitCode": 0,
+        "signal": null,
+        "elapsedSeconds": 3.873843332999968,
+        "log": "artifacts/regression-2026-10-14T13-37-52-795Z/round-08/unit.log",
+        "counts": {
+          "tests": 53,
+          "pass": 53,
+          "fail": 0,
+          "skipped": 0
+        }
+      },
+      "browser": {
+        "command": [
+          "npm",
+          "run",
+          "test:e2e",
+          "--",
+          "--project=chromium",
+          "--project=webkit",
+          "--reporter=line,json",
+          "--output",
+          "/Users/hhh/Work/github/webTable/artifacts/regression-2026-10-14T13-37-52-795Z/round-08/browser-results"
+        ],
+        "exitCode": 0,
+        "signal": null,
+        "elapsedSeconds": 60.57507062500005,
+        "log": "artifacts/regression-2026-10-14T13-37-52-795Z/round-08/browser.log",
+        "stats": {
+          "startTime": "2026-10-14T13:49:48.760Z",
+          "duration": 60274.289,
+          "expected": 22,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        }
+      },
+      "load": {
+        "command": [
+          "/opt/homebrew/Cellar/node/26.7.0/bin/node",
+          "/Users/hhh/Work/github/webTable/scripts/load-test.mjs",
+          "--duration",
+          "30",
+          "--clients",
+          "100",
+          "--seed",
+          "8",
+          "--output",
+          "/Users/hhh/Work/github/webTable/artifacts/regression-2026-10-14T13-37-52-795Z/round-08/load.json"
+        ],
+        "exitCode": 0,
+        "signal": null,
+        "elapsedSeconds": 30.17838533399999,
+        "log": "artifacts/regression-2026-10-14T13-37-52-795Z/round-08/load.log",
+        "metrics": {
+          "requests": 29297,
+          "errors": 0,
+          "p95Ms": 3.3830830000006245,
+          "bodyBytes": 853185000,
+          "peakRssBytes": 157171712,
+          "report": "artifacts/regression-2026-10-14T13-37-52-795Z/round-08/load.json"
+        }
+      },
+      "completedAt": "2026-10-14T13:51:19.237Z"
+    },
+    {
+      "number": 9,
+      "seed": 9,
+      "startedAt": "2026-10-14T13:51:19.238Z",
+      "status": "passed",
+      "unit": {
+        "command": [
+          "npm",
+          "test"
+        ],
+        "exitCode": 0,
+        "signal": null,
+        "elapsedSeconds": 3.8815561250000026,
+        "log": "artifacts/regression-2026-10-14T13-37-52-795Z/round-09/unit.log",
+        "counts": {
+          "tests": 53,
+          "pass": 53,
+          "fail": 0,
+          "skipped": 0
+        }
+      },
+      "browser": {
+        "command": [
+          "npm",
+          "run",
+          "test:e2e",
+          "--",
+          "--project=chromium",
+          "--project=webkit",
+          "--reporter=line,json",
+          "--output",
+          "/Users/hhh/Work/github/webTable/artifacts/regression-2026-10-14T13-37-52-795Z/round-09/browser-results"
+        ],
+        "exitCode": 0,
+        "signal": null,
+        "elapsedSeconds": 60.359244334000046,
+        "log": "artifacts/regression-2026-10-14T13-37-52-795Z/round-09/browser.log",
+        "stats": {
+          "startTime": "2026-10-14T13:51:23.406Z",
+          "duration": 60074.486,
+          "expected": 22,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        }
+      },
+      "load": {
+        "command": [
+          "/opt/homebrew/Cellar/node/26.7.0/bin/node",
+          "/Users/hhh/Work/github/webTable/scripts/load-test.mjs",
+          "--duration",
+          "30",
+          "--clients",
+          "100",
+          "--seed",
+          "9",
+          "--output",
+          "/Users/hhh/Work/github/webTable/artifacts/regression-2026-10-14T13-37-52-795Z/round-09/load.json"
+        ],
+        "exitCode": 0,
+        "signal": null,
+        "elapsedSeconds": 30.243274749999983,
+        "log": "artifacts/regression-2026-10-14T13-37-52-795Z/round-09/load.log",
+        "metrics": {
+          "requests": 29398,
+          "errors": 0,
+          "p95Ms": 3.287958000000799,
+          "bodyBytes": 853185000,
+          "peakRssBytes": 164085760,
+          "report": "artifacts/regression-2026-10-14T13-37-52-795Z/round-09/load.json"
+        }
+      },
+      "completedAt": "2026-10-14T13:52:53.750Z"
+    },
+    {
+      "number": 10,
+      "seed": 10,
+      "startedAt": "2026-10-14T13:52:53.750Z",
+      "status": "passed",
+      "unit": {
+        "command": [
+          "npm",
+          "test"
+        ],
+        "exitCode": 0,
+        "signal": null,
+        "elapsedSeconds": 3.941863000000012,
+        "log": "artifacts/regression-2026-10-14T13-37-52-795Z/round-10/unit.log",
+        "counts": {
+          "tests": 53,
+          "pass": 53,
+          "fail": 0,
+          "skipped": 0
+        }
+      },
+      "browser": {
+        "command": [
+          "npm",
+          "run",
+          "test:e2e",
+          "--",
+          "--project=chromium",
+          "--project=webkit",
+          "--reporter=line,json",
+          "--output",
+          "/Users/hhh/Work/github/webTable/artifacts/regression-2026-10-14T13-37-52-795Z/round-10/browser-results"
+        ],
+        "exitCode": 0,
+        "signal": null,
+        "elapsedSeconds": 61.0045682920001,
+        "log": "artifacts/regression-2026-10-14T13-37-52-795Z/round-10/browser.log",
+        "stats": {
+          "startTime": "2026-10-14T13:52:58.000Z",
+          "duration": 60699.307,
+          "expected": 22,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        }
+      },
+      "load": {
+        "command": [
+          "/opt/homebrew/Cellar/node/26.7.0/bin/node",
+          "/Users/hhh/Work/github/webTable/scripts/load-test.mjs",
+          "--duration",
+          "30",
+          "--clients",
+          "100",
+          "--seed",
+          "10",
+          "--output",
+          "/Users/hhh/Work/github/webTable/artifacts/regression-2026-10-14T13-37-52-795Z/round-10/load.json"
+        ],
+        "exitCode": 0,
+        "signal": null,
+        "elapsedSeconds": 30.21237525000004,
+        "log": "artifacts/regression-2026-10-14T13-37-52-795Z/round-10/load.log",
+        "metrics": {
+          "requests": 29316,
+          "errors": 0,
+          "p95Ms": 3.143292000000656,
+          "bodyBytes": 853185000,
+          "peakRssBytes": 163463168,
+          "report": "artifacts/regression-2026-10-14T13-37-52-795Z/round-10/load.json"
+        }
+      },
+      "completedAt": "2026-10-14T13:54:28.939Z"
+    },
+    {
+      "number": 11,
+      "seed": 11,
+      "startedAt": "2026-10-14T13:54:28.939Z",
+      "status": "passed",
+      "unit": {
+        "command": [
+          "npm",
+          "test"
+        ],
+        "exitCode": 0,
+        "signal": null,
+        "elapsedSeconds": 4.023783832999994,
+        "log": "artifacts/regression-2026-10-14T13-37-52-795Z/round-11/unit.log",
+        "counts": {
+          "tests": 53,
+          "pass": 53,
+          "fail": 0,
+          "skipped": 0
+        }
+      },
+      "browser": {
+        "command": [
+          "npm",
+          "run",
+          "test:e2e",
+          "--",
+          "--project=chromium",
+          "--project=webkit",
+          "--reporter=line,json",
+          "--output",
+          "/Users/hhh/Work/github/webTable/artifacts/regression-2026-10-14T13-37-52-795Z/round-11/browser-results"
+        ],
+        "exitCode": 0,
+        "signal": null,
+        "elapsedSeconds": 60.72768241700006,
+        "log": "artifacts/regression-2026-10-14T13-37-52-795Z/round-11/browser.log",
+        "stats": {
+          "startTime": "2026-10-14T13:54:33.276Z",
+          "duration": 60416.377,
+          "expected": 22,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        }
+      },
+      "load": {
+        "command": [
+          "/opt/homebrew/Cellar/node/26.7.0/bin/node",
+          "/Users/hhh/Work/github/webTable/scripts/load-test.mjs",
+          "--duration",
+          "30",
+          "--clients",
+          "100",
+          "--seed",
+          "11",
+          "--output",
+          "/Users/hhh/Work/github/webTable/artifacts/regression-2026-10-14T13-37-52-795Z/round-11/load.json"
+        ],
+        "exitCode": 0,
+        "signal": null,
+        "elapsedSeconds": 30.24440962500009,
+        "log": "artifacts/regression-2026-10-14T13-37-52-795Z/round-11/load.log",
+        "metrics": {
+          "requests": 29297,
+          "errors": 0,
+          "p95Ms": 3.881125000000111,
+          "bodyBytes": 853185000,
+          "peakRssBytes": 163184640,
+          "report": "artifacts/regression-2026-10-14T13-37-52-795Z/round-11/load.json"
+        }
+      },
+      "completedAt": "2026-10-14T13:56:03.964Z"
+    }
+  ],
+  "buildCommand": {
+    "command": [
+      "npm",
+      "run",
+      "build"
+    ],
+    "exitCode": 0,
+    "signal": null,
+    "elapsedSeconds": 0.840894084,
+    "log": "artifacts/regression-2026-10-14T13-37-52-795Z/build.log"
+  },
+  "source": {
+    "sha256": "6d554feff2dae98d1eba5ad5fbe94e6bd4e55bcf86b72e9a2333f2c6e897567f",
+    "files": 63
+  },
+  "build": {
+    "sha256": "2fdbe3b326c37bbb9b1b0318389d2ca41e7fe70faeebf2124819896f3c85e75f",
+    "files": 11
+  },
+  "completedAt": "2026-10-14T13:56:03.965Z"
+}

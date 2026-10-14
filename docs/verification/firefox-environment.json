@@ -1,0 +1,9 @@
+{
+  "date": "2026-10-14T13:32:08.325Z",
+  "platform": "darwin",
+  "node": "v26.7.0",
+  "attempt": "Playwright 1.64.0 Firefox 157 (1555), clean isolated default profile",
+  "passed": false,
+  "error": "browserType.launch: Failed to launch the browser process.\nBrowser logs:\n\n<launching> /Users/hhh/Library/Caches/ms-playwright/firefox-1555/firefox/Nightly.app/Contents/MacOS/firefox -no-remote -headless -profile /var/folders/f8/plmr254x2rl632311_n8nbx40000gn/T/playwright_firefoxdev_profile-3RmYKT -juggler-pipe -silent\n<launched> pid=37400\n[pid=37400][err] *** You are running in headless mode.\n[pid=37400][err] Could not find profile folder.\n[pid=37400] <process did exit: exitCode=1, signal=null>\n[pid=37400] starting temporary directories cleanup\nCall log:\n\u001b[2m  - <launching> /Users/hhh/Library/Caches/ms-playwright/firefox-1555/firefox/Nightly.app/Contents/MacOS/firefox -no-remote -headless -profile /var/folders/f8/plmr254x2rl632311_n8nbx40000gn/T/playwright_firefoxdev_profile-3RmYKT -juggler-pipe -silent\u001b[22m\n\u001b[2m  - <launched> pid=37400\u001b[22m\n\u001b[2m  - [pid=37400][err] *** You are running in headless mode.\u001b[22m\n\u001b[2m  - [pid=37400][err] Could not find profile folder.\u001b[22m\n\u001b[2m  - [pid=37400] <process did exit: exitCode=1, signal=null>\u001b[22m\n\u001b[2m  - [pid=37400] starting temporary directories cleanup\u001b[22m\n\u001b[2m  - [pid=37400] <gracefully close start>\u001b[22m\n\u001b[2m  - [pid=37400] <kill>\u001b[22m\n\u001b[2m  - [pid=37400] <skipped force kill spawnedProcess.killed=false processClosed=true>\u001b[22m\n\u001b[2m  - [pid=37400] finished temporary directories cleanup\u001b[22m\n\u001b[2m  - [pid=37400] <gracefully close end>\u001b[22m\n",
+  "additionalAttempts": "TMPDIR=/private/tmp, persistent profile, headful also failed; Firefox 151 (1532) timed out. No Firefox application acceptance claimed."
+}

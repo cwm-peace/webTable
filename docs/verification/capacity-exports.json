@@ -1,0 +1,1171 @@
+{
+  "scope": "Automated browser synthetic capacity checks, not total process memory or real device certification",
+  "runs": [
+    {
+      "browser": "chromium",
+      "attachmentBytes": 33554432,
+      "photoCount": 16,
+      "before": {
+        "usedJSHeapSize": 44700000,
+        "totalJSHeapSize": 53500000,
+        "jsHeapSizeLimit": 3760000000
+      },
+      "exports": [
+        {
+          "iteration": 1,
+          "durationMs": 2924,
+          "size": 40945109,
+          "header": "%PDF-1.7",
+          "generatedHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "afterReturnHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "revoked": true
+        },
+        {
+          "iteration": 2,
+          "durationMs": 2439,
+          "size": 40945107,
+          "header": "%PDF-1.7",
+          "generatedHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "afterReturnHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "revoked": true
+        },
+        {
+          "iteration": 3,
+          "durationMs": 1876,
+          "size": 40945107,
+          "header": "%PDF-1.7",
+          "generatedHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "afterReturnHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "revoked": true
+        }
+      ],
+      "afterClear": {
+        "usedJSHeapSize": 44700000,
+        "totalJSHeapSize": 53500000,
+        "jsHeapSizeLimit": 3760000000
+      },
+      "limitation": "桌面自动化浏览器和合成小像素 PNG 容量边界；不代表手机真机、大像素解码、系统总内存或无内存泄漏证明。JS 堆计数不包含 Worker、Blob 和浏览器原生内存。"
+    },
+    {
+      "browser": "webkit",
+      "attachmentBytes": 33554432,
+      "photoCount": 16,
+      "before": null,
+      "exports": [
+        {
+          "iteration": 1,
+          "durationMs": 3545,
+          "size": 40943528,
+          "header": "%PDF-1.7",
+          "generatedHeap": null,
+          "afterReturnHeap": null,
+          "revoked": true
+        },
+        {
+          "iteration": 2,
+          "durationMs": 2523,
+          "size": 40943528,
+          "header": "%PDF-1.7",
+          "generatedHeap": null,
+          "afterReturnHeap": null,
+          "revoked": true
+        },
+        {
+          "iteration": 3,
+          "durationMs": 3020,
+          "size": 40943528,
+          "header": "%PDF-1.7",
+          "generatedHeap": null,
+          "afterReturnHeap": null,
+          "revoked": true
+        }
+      ],
+      "afterClear": null,
+      "limitation": "桌面自动化浏览器和合成小像素 PNG 容量边界；不代表手机真机、大像素解码、系统总内存或无内存泄漏证明。JS 堆计数不包含 Worker、Blob 和浏览器原生内存。"
+    },
+    {
+      "browser": "chromium",
+      "attachmentBytes": 33554432,
+      "photoCount": 16,
+      "before": {
+        "usedJSHeapSize": 42100000,
+        "totalJSHeapSize": 53500000,
+        "jsHeapSizeLimit": 3760000000
+      },
+      "exports": [
+        {
+          "iteration": 1,
+          "durationMs": 2960,
+          "size": 40945107,
+          "header": "%PDF-1.7",
+          "generatedHeap": {
+            "usedJSHeapSize": 42100000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "afterReturnHeap": {
+            "usedJSHeapSize": 42100000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "revoked": true
+        },
+        {
+          "iteration": 2,
+          "durationMs": 2443,
+          "size": 40945107,
+          "header": "%PDF-1.7",
+          "generatedHeap": {
+            "usedJSHeapSize": 42100000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "afterReturnHeap": {
+            "usedJSHeapSize": 42100000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "revoked": true
+        },
+        {
+          "iteration": 3,
+          "durationMs": 2404,
+          "size": 40945107,
+          "header": "%PDF-1.7",
+          "generatedHeap": {
+            "usedJSHeapSize": 42100000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "afterReturnHeap": {
+            "usedJSHeapSize": 42100000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "revoked": true
+        }
+      ],
+      "afterClear": {
+        "usedJSHeapSize": 42100000,
+        "totalJSHeapSize": 53500000,
+        "jsHeapSizeLimit": 3760000000
+      },
+      "limitation": "桌面自动化浏览器和合成小像素 PNG 容量边界；不代表手机真机、大像素解码、系统总内存或无内存泄漏证明。JS 堆计数不包含 Worker、Blob 和浏览器原生内存。"
+    },
+    {
+      "browser": "webkit",
+      "attachmentBytes": 33554432,
+      "photoCount": 16,
+      "before": null,
+      "exports": [
+        {
+          "iteration": 1,
+          "durationMs": 1973,
+          "size": 40943526,
+          "header": "%PDF-1.7",
+          "generatedHeap": null,
+          "afterReturnHeap": null,
+          "revoked": true
+        },
+        {
+          "iteration": 2,
+          "durationMs": 2004,
+          "size": 40943526,
+          "header": "%PDF-1.7",
+          "generatedHeap": null,
+          "afterReturnHeap": null,
+          "revoked": true
+        },
+        {
+          "iteration": 3,
+          "durationMs": 2002,
+          "size": 40943528,
+          "header": "%PDF-1.7",
+          "generatedHeap": null,
+          "afterReturnHeap": null,
+          "revoked": true
+        }
+      ],
+      "afterClear": null,
+      "limitation": "桌面自动化浏览器和合成小像素 PNG 容量边界；不代表手机真机、大像素解码、系统总内存或无内存泄漏证明。JS 堆计数不包含 Worker、Blob 和浏览器原生内存。"
+    },
+    {
+      "browser": "chromium",
+      "attachmentBytes": 33554432,
+      "photoCount": 16,
+      "before": {
+        "usedJSHeapSize": 47400000,
+        "totalJSHeapSize": 53500000,
+        "jsHeapSizeLimit": 3760000000
+      },
+      "exports": [
+        {
+          "iteration": 1,
+          "durationMs": 3424,
+          "size": 40945109,
+          "header": "%PDF-1.7",
+          "generatedHeap": {
+            "usedJSHeapSize": 47400000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "afterReturnHeap": {
+            "usedJSHeapSize": 47400000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "revoked": true
+        },
+        {
+          "iteration": 2,
+          "durationMs": 2993,
+          "size": 40945107,
+          "header": "%PDF-1.7",
+          "generatedHeap": {
+            "usedJSHeapSize": 47400000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "afterReturnHeap": {
+            "usedJSHeapSize": 47400000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "revoked": true
+        },
+        {
+          "iteration": 3,
+          "durationMs": 2965,
+          "size": 40945107,
+          "header": "%PDF-1.7",
+          "generatedHeap": {
+            "usedJSHeapSize": 47400000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "afterReturnHeap": {
+            "usedJSHeapSize": 47400000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "revoked": true
+        }
+      ],
+      "afterClear": {
+        "usedJSHeapSize": 47400000,
+        "totalJSHeapSize": 53500000,
+        "jsHeapSizeLimit": 3760000000
+      },
+      "limitation": "桌面自动化浏览器和合成小像素 PNG 容量边界；不代表手机真机、大像素解码、系统总内存或无内存泄漏证明。JS 堆计数不包含 Worker、Blob 和浏览器原生内存。"
+    },
+    {
+      "browser": "webkit",
+      "attachmentBytes": 33554432,
+      "photoCount": 16,
+      "before": null,
+      "exports": [
+        {
+          "iteration": 1,
+          "durationMs": 2422,
+          "size": 40943530,
+          "header": "%PDF-1.7",
+          "generatedHeap": null,
+          "afterReturnHeap": null,
+          "revoked": true
+        },
+        {
+          "iteration": 2,
+          "durationMs": 1954,
+          "size": 40943528,
+          "header": "%PDF-1.7",
+          "generatedHeap": null,
+          "afterReturnHeap": null,
+          "revoked": true
+        },
+        {
+          "iteration": 3,
+          "durationMs": 1971,
+          "size": 40943528,
+          "header": "%PDF-1.7",
+          "generatedHeap": null,
+          "afterReturnHeap": null,
+          "revoked": true
+        }
+      ],
+      "afterClear": null,
+      "limitation": "桌面自动化浏览器和合成小像素 PNG 容量边界；不代表手机真机、大像素解码、系统总内存或无内存泄漏证明。JS 堆计数不包含 Worker、Blob 和浏览器原生内存。"
+    },
+    {
+      "browser": "chromium",
+      "attachmentBytes": 33554432,
+      "photoCount": 16,
+      "before": {
+        "usedJSHeapSize": 44700000,
+        "totalJSHeapSize": 53500000,
+        "jsHeapSizeLimit": 3760000000
+      },
+      "exports": [
+        {
+          "iteration": 1,
+          "durationMs": 1861,
+          "size": 40945107,
+          "header": "%PDF-1.7",
+          "generatedHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "afterReturnHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "revoked": true
+        },
+        {
+          "iteration": 2,
+          "durationMs": 1880,
+          "size": 40945107,
+          "header": "%PDF-1.7",
+          "generatedHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "afterReturnHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "revoked": true
+        },
+        {
+          "iteration": 3,
+          "durationMs": 1874,
+          "size": 40945107,
+          "header": "%PDF-1.7",
+          "generatedHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "afterReturnHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "revoked": true
+        }
+      ],
+      "afterClear": {
+        "usedJSHeapSize": 44700000,
+        "totalJSHeapSize": 53500000,
+        "jsHeapSizeLimit": 3760000000
+      },
+      "limitation": "桌面自动化浏览器和合成小像素 PNG 容量边界；不代表手机真机、大像素解码、系统总内存或无内存泄漏证明。JS 堆计数不包含 Worker、Blob 和浏览器原生内存。"
+    },
+    {
+      "browser": "webkit",
+      "attachmentBytes": 33554432,
+      "photoCount": 16,
+      "before": null,
+      "exports": [
+        {
+          "iteration": 1,
+          "durationMs": 1906,
+          "size": 40943530,
+          "header": "%PDF-1.7",
+          "generatedHeap": null,
+          "afterReturnHeap": null,
+          "revoked": true
+        },
+        {
+          "iteration": 2,
+          "durationMs": 1978,
+          "size": 40943530,
+          "header": "%PDF-1.7",
+          "generatedHeap": null,
+          "afterReturnHeap": null,
+          "revoked": true
+        },
+        {
+          "iteration": 3,
+          "durationMs": 1964,
+          "size": 40943530,
+          "header": "%PDF-1.7",
+          "generatedHeap": null,
+          "afterReturnHeap": null,
+          "revoked": true
+        }
+      ],
+      "afterClear": null,
+      "limitation": "桌面自动化浏览器和合成小像素 PNG 容量边界；不代表手机真机、大像素解码、系统总内存或无内存泄漏证明。JS 堆计数不包含 Worker、Blob 和浏览器原生内存。"
+    },
+    {
+      "browser": "chromium",
+      "attachmentBytes": 33554432,
+      "photoCount": 16,
+      "before": {
+        "usedJSHeapSize": 44700000,
+        "totalJSHeapSize": 53500000,
+        "jsHeapSizeLimit": 3760000000
+      },
+      "exports": [
+        {
+          "iteration": 1,
+          "durationMs": 1911,
+          "size": 40945107,
+          "header": "%PDF-1.7",
+          "generatedHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "afterReturnHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "revoked": true
+        },
+        {
+          "iteration": 2,
+          "durationMs": 1857,
+          "size": 40945107,
+          "header": "%PDF-1.7",
+          "generatedHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "afterReturnHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "revoked": true
+        },
+        {
+          "iteration": 3,
+          "durationMs": 1820,
+          "size": 40945107,
+          "header": "%PDF-1.7",
+          "generatedHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "afterReturnHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "revoked": true
+        }
+      ],
+      "afterClear": {
+        "usedJSHeapSize": 44700000,
+        "totalJSHeapSize": 53500000,
+        "jsHeapSizeLimit": 3760000000
+      },
+      "limitation": "桌面自动化浏览器和合成小像素 PNG 容量边界；不代表手机真机、大像素解码、系统总内存或无内存泄漏证明。JS 堆计数不包含 Worker、Blob 和浏览器原生内存。"
+    },
+    {
+      "browser": "webkit",
+      "attachmentBytes": 33554432,
+      "photoCount": 16,
+      "before": null,
+      "exports": [
+        {
+          "iteration": 1,
+          "durationMs": 1939,
+          "size": 40943528,
+          "header": "%PDF-1.7",
+          "generatedHeap": null,
+          "afterReturnHeap": null,
+          "revoked": true
+        },
+        {
+          "iteration": 2,
+          "durationMs": 1444,
+          "size": 40943530,
+          "header": "%PDF-1.7",
+          "generatedHeap": null,
+          "afterReturnHeap": null,
+          "revoked": true
+        },
+        {
+          "iteration": 3,
+          "durationMs": 1462,
+          "size": 40943528,
+          "header": "%PDF-1.7",
+          "generatedHeap": null,
+          "afterReturnHeap": null,
+          "revoked": true
+        }
+      ],
+      "afterClear": null,
+      "limitation": "桌面自动化浏览器和合成小像素 PNG 容量边界；不代表手机真机、大像素解码、系统总内存或无内存泄漏证明。JS 堆计数不包含 Worker、Blob 和浏览器原生内存。"
+    },
+    {
+      "browser": "chromium",
+      "attachmentBytes": 33554432,
+      "photoCount": 16,
+      "before": {
+        "usedJSHeapSize": 44700000,
+        "totalJSHeapSize": 53500000,
+        "jsHeapSizeLimit": 3760000000
+      },
+      "exports": [
+        {
+          "iteration": 1,
+          "durationMs": 1909,
+          "size": 40945107,
+          "header": "%PDF-1.7",
+          "generatedHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "afterReturnHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "revoked": true
+        },
+        {
+          "iteration": 2,
+          "durationMs": 1829,
+          "size": 40945107,
+          "header": "%PDF-1.7",
+          "generatedHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "afterReturnHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "revoked": true
+        },
+        {
+          "iteration": 3,
+          "durationMs": 1817,
+          "size": 40945107,
+          "header": "%PDF-1.7",
+          "generatedHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "afterReturnHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "revoked": true
+        }
+      ],
+      "afterClear": {
+        "usedJSHeapSize": 44700000,
+        "totalJSHeapSize": 53500000,
+        "jsHeapSizeLimit": 3760000000
+      },
+      "limitation": "桌面自动化浏览器和合成小像素 PNG 容量边界；不代表手机真机、大像素解码、系统总内存或无内存泄漏证明。JS 堆计数不包含 Worker、Blob 和浏览器原生内存。"
+    },
+    {
+      "browser": "webkit",
+      "attachmentBytes": 33554432,
+      "photoCount": 16,
+      "before": null,
+      "exports": [
+        {
+          "iteration": 1,
+          "durationMs": 1925,
+          "size": 40943528,
+          "header": "%PDF-1.7",
+          "generatedHeap": null,
+          "afterReturnHeap": null,
+          "revoked": true
+        },
+        {
+          "iteration": 2,
+          "durationMs": 1459,
+          "size": 40943526,
+          "header": "%PDF-1.7",
+          "generatedHeap": null,
+          "afterReturnHeap": null,
+          "revoked": true
+        },
+        {
+          "iteration": 3,
+          "durationMs": 1452,
+          "size": 40943528,
+          "header": "%PDF-1.7",
+          "generatedHeap": null,
+          "afterReturnHeap": null,
+          "revoked": true
+        }
+      ],
+      "afterClear": null,
+      "limitation": "桌面自动化浏览器和合成小像素 PNG 容量边界；不代表手机真机、大像素解码、系统总内存或无内存泄漏证明。JS 堆计数不包含 Worker、Blob 和浏览器原生内存。"
+    },
+    {
+      "browser": "chromium",
+      "attachmentBytes": 33554432,
+      "photoCount": 16,
+      "before": {
+        "usedJSHeapSize": 44700000,
+        "totalJSHeapSize": 53500000,
+        "jsHeapSizeLimit": 3760000000
+      },
+      "exports": [
+        {
+          "iteration": 1,
+          "durationMs": 1862,
+          "size": 40945107,
+          "header": "%PDF-1.7",
+          "generatedHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "afterReturnHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "revoked": true
+        },
+        {
+          "iteration": 2,
+          "durationMs": 1828,
+          "size": 40945107,
+          "header": "%PDF-1.7",
+          "generatedHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "afterReturnHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "revoked": true
+        },
+        {
+          "iteration": 3,
+          "durationMs": 1821,
+          "size": 40945107,
+          "header": "%PDF-1.7",
+          "generatedHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "afterReturnHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "revoked": true
+        }
+      ],
+      "afterClear": {
+        "usedJSHeapSize": 44700000,
+        "totalJSHeapSize": 53500000,
+        "jsHeapSizeLimit": 3760000000
+      },
+      "limitation": "桌面自动化浏览器和合成小像素 PNG 容量边界；不代表手机真机、大像素解码、系统总内存或无内存泄漏证明。JS 堆计数不包含 Worker、Blob 和浏览器原生内存。"
+    },
+    {
+      "browser": "webkit",
+      "attachmentBytes": 33554432,
+      "photoCount": 16,
+      "before": null,
+      "exports": [
+        {
+          "iteration": 1,
+          "durationMs": 1932,
+          "size": 40943528,
+          "header": "%PDF-1.7",
+          "generatedHeap": null,
+          "afterReturnHeap": null,
+          "revoked": true
+        },
+        {
+          "iteration": 2,
+          "durationMs": 1448,
+          "size": 40943528,
+          "header": "%PDF-1.7",
+          "generatedHeap": null,
+          "afterReturnHeap": null,
+          "revoked": true
+        },
+        {
+          "iteration": 3,
+          "durationMs": 1454,
+          "size": 40943528,
+          "header": "%PDF-1.7",
+          "generatedHeap": null,
+          "afterReturnHeap": null,
+          "revoked": true
+        }
+      ],
+      "afterClear": null,
+      "limitation": "桌面自动化浏览器和合成小像素 PNG 容量边界；不代表手机真机、大像素解码、系统总内存或无内存泄漏证明。JS 堆计数不包含 Worker、Blob 和浏览器原生内存。"
+    },
+    {
+      "browser": "chromium",
+      "attachmentBytes": 33554432,
+      "photoCount": 16,
+      "before": {
+        "usedJSHeapSize": 44700000,
+        "totalJSHeapSize": 53500000,
+        "jsHeapSizeLimit": 3760000000
+      },
+      "exports": [
+        {
+          "iteration": 1,
+          "durationMs": 1913,
+          "size": 40945107,
+          "header": "%PDF-1.7",
+          "generatedHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "afterReturnHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "revoked": true
+        },
+        {
+          "iteration": 2,
+          "durationMs": 1824,
+          "size": 40945107,
+          "header": "%PDF-1.7",
+          "generatedHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "afterReturnHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "revoked": true
+        },
+        {
+          "iteration": 3,
+          "durationMs": 1822,
+          "size": 40945107,
+          "header": "%PDF-1.7",
+          "generatedHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "afterReturnHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "revoked": true
+        }
+      ],
+      "afterClear": {
+        "usedJSHeapSize": 44700000,
+        "totalJSHeapSize": 53500000,
+        "jsHeapSizeLimit": 3760000000
+      },
+      "limitation": "桌面自动化浏览器和合成小像素 PNG 容量边界；不代表手机真机、大像素解码、系统总内存或无内存泄漏证明。JS 堆计数不包含 Worker、Blob 和浏览器原生内存。"
+    },
+    {
+      "browser": "webkit",
+      "attachmentBytes": 33554432,
+      "photoCount": 16,
+      "before": null,
+      "exports": [
+        {
+          "iteration": 1,
+          "durationMs": 1929,
+          "size": 40943526,
+          "header": "%PDF-1.7",
+          "generatedHeap": null,
+          "afterReturnHeap": null,
+          "revoked": true
+        },
+        {
+          "iteration": 2,
+          "durationMs": 1444,
+          "size": 40943526,
+          "header": "%PDF-1.7",
+          "generatedHeap": null,
+          "afterReturnHeap": null,
+          "revoked": true
+        },
+        {
+          "iteration": 3,
+          "durationMs": 1451,
+          "size": 40943526,
+          "header": "%PDF-1.7",
+          "generatedHeap": null,
+          "afterReturnHeap": null,
+          "revoked": true
+        }
+      ],
+      "afterClear": null,
+      "limitation": "桌面自动化浏览器和合成小像素 PNG 容量边界；不代表手机真机、大像素解码、系统总内存或无内存泄漏证明。JS 堆计数不包含 Worker、Blob 和浏览器原生内存。"
+    },
+    {
+      "browser": "chromium",
+      "attachmentBytes": 33554432,
+      "photoCount": 16,
+      "before": {
+        "usedJSHeapSize": 44700000,
+        "totalJSHeapSize": 53500000,
+        "jsHeapSizeLimit": 3760000000
+      },
+      "exports": [
+        {
+          "iteration": 1,
+          "durationMs": 1846,
+          "size": 40945107,
+          "header": "%PDF-1.7",
+          "generatedHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "afterReturnHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "revoked": true
+        },
+        {
+          "iteration": 2,
+          "durationMs": 1825,
+          "size": 40945107,
+          "header": "%PDF-1.7",
+          "generatedHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "afterReturnHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "revoked": true
+        },
+        {
+          "iteration": 3,
+          "durationMs": 1825,
+          "size": 40945107,
+          "header": "%PDF-1.7",
+          "generatedHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "afterReturnHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 53500000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "revoked": true
+        }
+      ],
+      "afterClear": {
+        "usedJSHeapSize": 44700000,
+        "totalJSHeapSize": 53500000,
+        "jsHeapSizeLimit": 3760000000
+      },
+      "limitation": "桌面自动化浏览器和合成小像素 PNG 容量边界；不代表手机真机、大像素解码、系统总内存或无内存泄漏证明。JS 堆计数不包含 Worker、Blob 和浏览器原生内存。"
+    },
+    {
+      "browser": "webkit",
+      "attachmentBytes": 33554432,
+      "photoCount": 16,
+      "before": null,
+      "exports": [
+        {
+          "iteration": 1,
+          "durationMs": 1961,
+          "size": 40943528,
+          "header": "%PDF-1.7",
+          "generatedHeap": null,
+          "afterReturnHeap": null,
+          "revoked": true
+        },
+        {
+          "iteration": 2,
+          "durationMs": 1461,
+          "size": 40943528,
+          "header": "%PDF-1.7",
+          "generatedHeap": null,
+          "afterReturnHeap": null,
+          "revoked": true
+        },
+        {
+          "iteration": 3,
+          "durationMs": 1451,
+          "size": 40943525,
+          "header": "%PDF-1.7",
+          "generatedHeap": null,
+          "afterReturnHeap": null,
+          "revoked": true
+        }
+      ],
+      "afterClear": null,
+      "limitation": "桌面自动化浏览器和合成小像素 PNG 容量边界；不代表手机真机、大像素解码、系统总内存或无内存泄漏证明。JS 堆计数不包含 Worker、Blob 和浏览器原生内存。"
+    },
+    {
+      "browser": "chromium",
+      "attachmentBytes": 33554432,
+      "photoCount": 16,
+      "before": {
+        "usedJSHeapSize": 44700000,
+        "totalJSHeapSize": 50400000,
+        "jsHeapSizeLimit": 3760000000
+      },
+      "exports": [
+        {
+          "iteration": 1,
+          "durationMs": 1853,
+          "size": 40945107,
+          "header": "%PDF-1.7",
+          "generatedHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 50400000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "afterReturnHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 50400000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "revoked": true
+        },
+        {
+          "iteration": 2,
+          "durationMs": 1830,
+          "size": 40945107,
+          "header": "%PDF-1.7",
+          "generatedHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 50400000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "afterReturnHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 50400000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "revoked": true
+        },
+        {
+          "iteration": 3,
+          "durationMs": 1819,
+          "size": 40945107,
+          "header": "%PDF-1.7",
+          "generatedHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 50400000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "afterReturnHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 50400000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "revoked": true
+        }
+      ],
+      "afterClear": {
+        "usedJSHeapSize": 44700000,
+        "totalJSHeapSize": 50400000,
+        "jsHeapSizeLimit": 3760000000
+      },
+      "limitation": "桌面自动化浏览器和合成小像素 PNG 容量边界；不代表手机真机、大像素解码、系统总内存或无内存泄漏证明。JS 堆计数不包含 Worker、Blob 和浏览器原生内存。"
+    },
+    {
+      "browser": "webkit",
+      "attachmentBytes": 33554432,
+      "photoCount": 16,
+      "before": null,
+      "exports": [
+        {
+          "iteration": 1,
+          "durationMs": 1926,
+          "size": 40943528,
+          "header": "%PDF-1.7",
+          "generatedHeap": null,
+          "afterReturnHeap": null,
+          "revoked": true
+        },
+        {
+          "iteration": 2,
+          "durationMs": 1469,
+          "size": 40943528,
+          "header": "%PDF-1.7",
+          "generatedHeap": null,
+          "afterReturnHeap": null,
+          "revoked": true
+        },
+        {
+          "iteration": 3,
+          "durationMs": 1472,
+          "size": 40943528,
+          "header": "%PDF-1.7",
+          "generatedHeap": null,
+          "afterReturnHeap": null,
+          "revoked": true
+        }
+      ],
+      "afterClear": null,
+      "limitation": "桌面自动化浏览器和合成小像素 PNG 容量边界；不代表手机真机、大像素解码、系统总内存或无内存泄漏证明。JS 堆计数不包含 Worker、Blob 和浏览器原生内存。"
+    },
+    {
+      "browser": "chromium",
+      "attachmentBytes": 33554432,
+      "photoCount": 16,
+      "before": {
+        "usedJSHeapSize": 44700000,
+        "totalJSHeapSize": 50400000,
+        "jsHeapSizeLimit": 3760000000
+      },
+      "exports": [
+        {
+          "iteration": 1,
+          "durationMs": 1861,
+          "size": 40945110,
+          "header": "%PDF-1.7",
+          "generatedHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 50400000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "afterReturnHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 50400000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "revoked": true
+        },
+        {
+          "iteration": 2,
+          "durationMs": 1858,
+          "size": 40945107,
+          "header": "%PDF-1.7",
+          "generatedHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 50400000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "afterReturnHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 50400000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "revoked": true
+        },
+        {
+          "iteration": 3,
+          "durationMs": 1821,
+          "size": 40945110,
+          "header": "%PDF-1.7",
+          "generatedHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 50400000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "afterReturnHeap": {
+            "usedJSHeapSize": 44700000,
+            "totalJSHeapSize": 50400000,
+            "jsHeapSizeLimit": 3760000000
+          },
+          "revoked": true
+        }
+      ],
+      "afterClear": {
+        "usedJSHeapSize": 44700000,
+        "totalJSHeapSize": 50400000,
+        "jsHeapSizeLimit": 3760000000
+      },
+      "limitation": "桌面自动化浏览器和合成小像素 PNG 容量边界；不代表手机真机、大像素解码、系统总内存或无内存泄漏证明。JS 堆计数不包含 Worker、Blob 和浏览器原生内存。"
+    },
+    {
+      "browser": "webkit",
+      "attachmentBytes": 33554432,
+      "photoCount": 16,
+      "before": null,
+      "exports": [
+        {
+          "iteration": 1,
+          "durationMs": 1917,
+          "size": 40943528,
+          "header": "%PDF-1.7",
+          "generatedHeap": null,
+          "afterReturnHeap": null,
+          "revoked": true
+        },
+        {
+          "iteration": 2,
+          "durationMs": 1445,
+          "size": 40943528,
+          "header": "%PDF-1.7",
+          "generatedHeap": null,
+          "afterReturnHeap": null,
+          "revoked": true
+        },
+        {
+          "iteration": 3,
+          "durationMs": 1444,
+          "size": 40943528,
+          "header": "%PDF-1.7",
+          "generatedHeap": null,
+          "afterReturnHeap": null,
+          "revoked": true
+        }
+      ],
+      "afterClear": null,
+      "limitation": "桌面自动化浏览器和合成小像素 PNG 容量边界；不代表手机真机、大像素解码、系统总内存或无内存泄漏证明。JS 堆计数不包含 Worker、Blob 和浏览器原生内存。"
+    }
+  ]
+}

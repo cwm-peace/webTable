@@ -1,91 +1,13 @@
-# CLAUDE.md
+# 项目维护约定
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+当前项目是Vue 3纯静态本机填写工具，不再有Spring Boot、API、管理员、MySQL或Redis。任务开始前先读`plan.md`，修改需求或代码时同步`plan.md`、`README.md`、`CHANGELOG.md`。
 
-## Project Overview
+使用Node.js≥22.13。根目录执行`npm ci`、`npm run dev`、`npm run build`、`npm test`、`npm run test:e2e`。完整固定版本验证执行`npm run verify:rounds`。
 
-个人信息收集系统（Spring Boot 3.5.13 + Java 21），包含**填写系统**和**查看管理系统**。填写系统支持上千人同时在线填写，管理员系统支持查看所有提交数据并导出 PDF。所有页面适配手机端。
+只修改当前任务必需的文件，修改前明确必要性及影响范围。保留未提交改动，不重置或删除重构前数据库。源码及旧后端恢复材料在项目外恢复目录，见plan.md；不要发布恢复材料。
 
-## Build & Run Commands
+所有填写数据留在浏览器。不得引入上传、IP采集、远程字体、统计或错误上报。新增行为必须保持用户明确确认保存后才清理，不把下载事件作为保存证明。处理Worker、Blob URL、自动保存、标签页版本和清除代次时须覆盖失败与竞态。
 
-```bash
-# 后端编译
-./mvnw clean package
+前端文件头解释用途；方法JSDoc解释参数、返回及用途；行注释说明原因。组件保持shadcn-vue和Tailwind语义样式，手机布局、可访问控件和可见错误反馈。元数据由src/data与formValidation统一维护，页面和PDF不另建题库。
 
-# 后端运行（端口 8081）
-./mvnw spring-boot:run
-
-# 运行单个测试
-./mvnw test -Dtest=WebTableApplicationTests#contextLoads
-
-# 前端开发（在 frontend/ 目录）
-npm run dev  # 端口 5173
-```
-
-## Tech Stack
-
-- **后端：** Spring Boot 3.5.13 (Java 21) + MyBatis-Plus 3.5.9 + MySQL + Redis + Apache POI + OpenPDF
-- **前端：** Vue 3 + Vite + shadcn-vue + Tailwind CSS v4 + @vueuse/motion + vxe-table + Pinia + vue-router
-
-## Project Documentation
-
-每次代码或需求变更必须同步更新：
-- `plan.md` — 实现计划和设计文档
-- `README.md` — 项目介绍和使用说明
-- `CHANGELOG.md` — 变更记录
-
-每次执行任务前必须先读取 `plan.md`。
-
-## 修改文件准则
-
-不要自行修改其他文件，除非该问题**必须要**修改该文件才能解决。修改前必须通过以下三个问题自检：
-
-1. **真的要改吗？** — 是否存在不改文件也能解决问题的方案（如运行时配置、解释说明等）？
-2. **必要性是什么？** — 明确说明本次修改为什么是不可避免的。
-3. **会不会造成其他功能 bug？** — 评估本次修改对其他模块、已有功能的影响范围，确保不会引入回归问题。
-
-只有三个问题都有明确肯定的回答时，才执行修改。
-
-## Code Conventions
-
-**后端（Java）：**
-- Package root: `com.peace.webtable`
-- Javadoc 类注释 + 方法注释，行注释说明原因
-- Logger 关键操作日志，敏感信息脱敏（session token 只显示前4位）
-- 按业务域命名 Controller
-
-**前端（Vue/JS）：**
-- 文件头部块注释，JSDoc 方法注释，模板行注释
-- 使用 shadcn-vue 组件 + Tailwind class 样式
-- 所有页面适配手机端（Tailwind 响应式断点 sm/md/lg）
-
-## Architecture
-
-```
-后端：
-com.peace.webtable/
-├── config/          RedisConfig, CorsConfig, MyBatisPlusConfig, AdminConfig
-├── controller/      FormController, PhotoController, ExportController, AdminController
-├── service/         FormService, PhotoService, ExportService, AdminService + impl/
-├── mapper/          7 个 Mapper（含 Template）
-├── entity/          7 个 Entity（含 Template）
-├── dto/             ApiResponse, StepDataRequest
-└── util/            SessionUtil, RedisUtil
-
-前端：
-frontend/src/
-├── App.vue                    路由出口
-├── components/FormWizard.vue  填写向导
-├── components/admin/          管理员页面（登录/列表/详情）
-├── api/                       API 层（form/photo/export/admin）
-├── stores/form.js             Pinia 状态管理
-├── router/index.js            路由配置
-└── components/ui/             shadcn-vue 组件库
-```
-
-## Routes
-
-- `/` — 填写页面（三步向导）
-- `/admin` — 管理员登录
-- `/admin/dashboard` — 提交列表
-- `/admin/detail/:id` — 提交详情
+纯前端、18岁声明和自动化测试不能证明内容合法。未真机验证的平台不得标为通过，法律报告不能承诺零风险。测试只能用虚构文字与合成图片。
