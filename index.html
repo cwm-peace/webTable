@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="%BASE_URL%favicon.svg" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="referrer" content="no-referrer" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="format-detection" content="telephone=no" />
+    <title>WebTable · 本地填写</title>
+  </head>
+  <body>
+    <p id="boot-message">
+      正在打开本地填写工具。若页面未继续加载，请使用最新版系统浏览器或主流浏览器，通过
+      HTTPS 访问；不支持 IE。
+    </p>
+    <noscript
+      >本工具需要 JavaScript 在浏览器中保存草稿和生成
+      PDF，请启用后重新打开。</noscript
+    >
+    <p id="runtime-failure" role="alert" hidden>
+      页面遇到异常。请保留当前标签页，尝试重新打开站点恢复已保存的草稿。尚未保存的内容请先自行保留。
+    </p>
+    <div id="app"></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

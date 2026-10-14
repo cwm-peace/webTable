@@ -1,42 +1,15 @@
-HELP.md
+node_modules/
+dist/
+artifacts/
 target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
-.claude
-.mvn
-mvnw
-mvnw.cmd
-logs/
+playwright-report/
+test-results/
+*.local
 *.log
-
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-### VS Code ###
+.env
+.env.*
+!.env.example
+.DS_Store
+.idea/
 .vscode/
-
-### 数据库备份 ###
-database/backup-sql/
+**/__pycache__/

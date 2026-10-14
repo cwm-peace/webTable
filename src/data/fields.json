@@ -1,0 +1,194 @@
+[
+  {
+    "key": "name",
+    "label": "名字",
+    "maxLength": 100,
+    "required": true
+  },
+  {
+    "key": "height",
+    "label": "身高cm",
+    "maxLength": 20,
+    "required": true
+  },
+  {
+    "key": "weight",
+    "label": "体重kg",
+    "maxLength": 20,
+    "required": true
+  },
+  {
+    "key": "education",
+    "label": "学历",
+    "maxLength": 50,
+    "required": true
+  },
+  {
+    "key": "occupation",
+    "label": "职业",
+    "maxLength": 100,
+    "required": true
+  },
+  {
+    "key": "shoeSize",
+    "label": "鞋码EU",
+    "maxLength": 20,
+    "required": true
+  },
+  {
+    "key": "province",
+    "label": "所在地(省)",
+    "maxLength": 50,
+    "required": true
+  },
+  {
+    "key": "city",
+    "label": "所在地(市)",
+    "maxLength": 50,
+    "required": true
+  },
+  {
+    "key": "qq",
+    "label": "QQ号",
+    "maxLength": 30,
+    "required": true
+  },
+  {
+    "key": "wechat",
+    "label": "微信号",
+    "maxLength": 50,
+    "required": true
+  },
+  {
+    "key": "weibo",
+    "label": "微博名",
+    "maxLength": 50,
+    "required": true
+  },
+  {
+    "key": "phone",
+    "label": "电话号码",
+    "maxLength": 20,
+    "required": true
+  },
+  {
+    "key": "firstMasturbationAge",
+    "label": "第一次自慰年龄",
+    "maxLength": 20,
+    "required": true
+  },
+  {
+    "key": "firstSexAge",
+    "label": "破处年龄",
+    "maxLength": 20,
+    "required": true
+  },
+  {
+    "key": "isSingle",
+    "label": "是否单身",
+    "maxLength": 10,
+    "required": true
+  },
+  {
+    "key": "cheatedOnPartner",
+    "label": "是否绿过伴侣",
+    "maxLength": 10,
+    "required": true
+  },
+  {
+    "key": "beenCheated",
+    "label": "是否被伴侣绿过",
+    "maxLength": 10,
+    "required": true
+  },
+  {
+    "key": "longestLockTime",
+    "label": "最长带锁时间",
+    "maxLength": 50,
+    "required": true
+  },
+  {
+    "key": "sexFrequency",
+    "label": "做爱频率",
+    "maxLength": 50,
+    "required": true
+  },
+  {
+    "key": "masturbationFrequency",
+    "label": "自慰频率",
+    "maxLength": 50,
+    "required": true
+  },
+  {
+    "key": "masturbationTool",
+    "label": "自慰工具",
+    "maxLength": 100,
+    "required": true
+  },
+  {
+    "key": "analInsertableSize",
+    "label": "菊穴可完全插入尺寸",
+    "maxLength": 50,
+    "required": true
+  },
+  {
+    "key": "urethraInsertableSize",
+    "label": "尿道可完全插入尺寸",
+    "maxLength": 50,
+    "required": true
+  },
+  {
+    "key": "dogAge",
+    "label": "犬龄",
+    "maxLength": 50,
+    "required": true
+  },
+  {
+    "key": "meetingCount",
+    "label": "约调次数",
+    "maxLength": 20,
+    "required": true
+  },
+  {
+    "key": "masterCount",
+    "label": "侍主人数",
+    "maxLength": 20,
+    "required": true
+  },
+  {
+    "key": "semenVolume",
+    "label": "精液量ml",
+    "maxLength": 20,
+    "required": true
+  },
+  {
+    "key": "dailyMaxEjaculation",
+    "label": "每日最高射精次数",
+    "maxLength": 20,
+    "required": true
+  },
+  {
+    "key": "preferredName",
+    "label": "喜欢被叫的称呼",
+    "maxLength": 100,
+    "required": true
+  },
+  {
+    "key": "selfDescription",
+    "label": "一句话形容自己",
+    "maxLength": 500,
+    "required": true
+  },
+  {
+    "key": "remark",
+    "label": "备注",
+    "maxLength": 2000,
+    "required": true
+  },
+  {
+    "key": "trainingIntention",
+    "label": "培养意向",
+    "maxLength": 2000,
+    "required": true
+  }
+]

@@ -1,0 +1,411 @@
+{
+  "schemaVersion": 1,
+  "measuredAt": "2026-10-14T14:01:02.573Z",
+  "node": "v26.7.0",
+  "build": {
+    "sha256": "2fdbe3b326c37bbb9b1b0318389d2ca41e7fe70faeebf2124819896f3c85e75f",
+    "files": 11
+  },
+  "buildUnchanged": true,
+  "compression": {
+    "gzip": "Node zlib default level 6",
+    "br": "Node Brotli quality 4, matching static-server.mjs",
+    "measurement": "Compressed response-body bytes; excludes HTTP/TLS headers, retransmission and CDN billing rules."
+  },
+  "files": [
+    {
+      "path": "assets/image.worker-Dwdn1zKq.js",
+      "raw": 3843,
+      "gzip": 1908,
+      "br": 1921
+    },
+    {
+      "path": "assets/index-CESiuAjX.js",
+      "raw": 256766,
+      "gzip": 88955,
+      "br": 89580
+    },
+    {
+      "path": "assets/index-DJDI9EGR.css",
+      "raw": 66102,
+      "gzip": 12657,
+      "br": 12762
+    },
+    {
+      "path": "assets/pdf-BfPCbGBg.js",
+      "raw": 2063,
+      "gzip": 1105,
+      "br": 1099
+    },
+    {
+      "path": "assets/pdf.worker-De7v6_Q5.js",
+      "raw": 1165027,
+      "gzip": 512164,
+      "br": 508027
+    },
+    {
+      "path": "assets/pdfCore-D15BEmt6.js",
+      "raw": 1137965,
+      "gzip": 505146,
+      "br": 500674
+    },
+    {
+      "path": "favicon.svg",
+      "raw": 2910,
+      "gzip": 1481,
+      "br": 1463
+    },
+    {
+      "path": "fonts/NotoSansSC-Regular.otf",
+      "raw": 8331336,
+      "gzip": 7205054,
+      "br": 7438089
+    },
+    {
+      "path": "fonts/OFL.txt",
+      "raw": 4301,
+      "gzip": 1914,
+      "br": 1814
+    },
+    {
+      "path": "fonts/SOURCE.md",
+      "raw": 831,
+      "gzip": 649,
+      "br": 659
+    },
+    {
+      "path": "index.html",
+      "raw": 1255,
+      "gzip": 790,
+      "br": 745
+    }
+  ],
+  "totals": {
+    "raw": 10972399,
+    "gzip": 8331823,
+    "br": 8556833
+  },
+  "budgets": {
+    "entry": {
+      "paths": [
+        "assets/index-CESiuAjX.js",
+        "assets/index-DJDI9EGR.css",
+        "favicon.svg",
+        "index.html"
+      ],
+      "bytes": {
+        "raw": 327033,
+        "gzip": 103883,
+        "br": 104550
+      },
+      "method": "index.html plus statically imported JS, CSS URL assets and HTML references; excludes dynamic imports and workers"
+    },
+    "normalFirstExportAdditional": {
+      "paths": [
+        "assets/pdf-BfPCbGBg.js",
+        "assets/pdf.worker-De7v6_Q5.js",
+        "fonts/NotoSansSC-Regular.otf"
+      ],
+      "bytes": {
+        "raw": 9498426,
+        "gzip": 7718323,
+        "br": 7947215
+      },
+      "method": "Lazy PDF module, PDF worker and font; worker includes its bundled libraries"
+    },
+    "imageProcessingAdditional": {
+      "paths": [
+        "assets/image.worker-Dwdn1zKq.js"
+      ],
+      "bytes": {
+        "raw": 3843,
+        "gzip": 1908,
+        "br": 1921
+      },
+      "method": "Worker loaded on the first local image processing task"
+    },
+    "normalCompleteUse": {
+      "paths": [
+        "index.html",
+        "assets/index-DJDI9EGR.css",
+        "assets/index-CESiuAjX.js",
+        "favicon.svg",
+        "assets/image.worker-Dwdn1zKq.js",
+        "assets/pdf-BfPCbGBg.js",
+        "assets/pdf.worker-De7v6_Q5.js",
+        "fonts/NotoSansSC-Regular.otf"
+      ],
+      "bytes": {
+        "raw": 9829302,
+        "gzip": 7824114,
+        "br": 8053686
+      },
+      "method": "Union of entry resources, image worker, lazy PDF module, PDF worker and font; excludes the main-thread PDF fallback bundle"
+    },
+    "fallbackFirstExportAdditional": {
+      "paths": [
+        "assets/pdf-BfPCbGBg.js",
+        "assets/pdfCore-D15BEmt6.js",
+        "fonts/NotoSansSC-Regular.otf"
+      ],
+      "bytes": {
+        "raw": 9471364,
+        "gzip": 7711305,
+        "br": 7939862
+      },
+      "method": "Conservative sum of non-entry non-worker JS chunks plus font; fallback path may load only a subset"
+    },
+    "allRuntimeResources": {
+      "paths": [
+        "assets/image.worker-Dwdn1zKq.js",
+        "assets/index-CESiuAjX.js",
+        "assets/index-DJDI9EGR.css",
+        "assets/pdf-BfPCbGBg.js",
+        "assets/pdf.worker-De7v6_Q5.js",
+        "assets/pdfCore-D15BEmt6.js",
+        "favicon.svg",
+        "fonts/NotoSansSC-Regular.otf",
+        "index.html"
+      ],
+      "bytes": {
+        "raw": 10967267,
+        "gzip": 8329260,
+        "br": 8554360
+      },
+      "method": "Upper bound if every runtime branch is loaded once; ordinary use does not necessarily request every chunk"
+    }
+  },
+  "realHttpCacheChecks": [
+    {
+      "path": "index.html",
+      "encoding": "br",
+      "status": 200,
+      "encodedBodyBytes": 745,
+      "expectedBodyBytes": 745,
+      "cacheControl": "no-cache",
+      "etag": "\"558hGPv2se_HAnHH1J8aDmWhwbFr9mkne3R3x-aEcxU\"",
+      "repeatedStatus": 304,
+      "repeatedBodyBytes": 0,
+      "passed": true
+    },
+    {
+      "path": "index.html",
+      "encoding": "gzip",
+      "status": 200,
+      "encodedBodyBytes": 790,
+      "expectedBodyBytes": 790,
+      "cacheControl": "no-cache",
+      "etag": "\"TOy_idWU4wy1PHtaVPlUWbfet4ANyZsenC0mTLKZvW0\"",
+      "repeatedStatus": 304,
+      "repeatedBodyBytes": 0,
+      "passed": true
+    },
+    {
+      "path": "index.html",
+      "encoding": "identity",
+      "status": 200,
+      "encodedBodyBytes": 1255,
+      "expectedBodyBytes": 1255,
+      "cacheControl": "no-cache",
+      "etag": "\"TuLUYHA3mObLm7moUVtXL5DnZQ2ODozJO8y_ViT5UWc\"",
+      "repeatedStatus": 304,
+      "repeatedBodyBytes": 0,
+      "passed": true
+    },
+    {
+      "path": "assets/index-CESiuAjX.js",
+      "encoding": "br",
+      "status": 200,
+      "encodedBodyBytes": 89580,
+      "expectedBodyBytes": 89580,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "etag": "\"F70zzsJatowO9iBtewr88oC9WCIOVuFWYcya1UPDi_c\"",
+      "repeatedStatus": 304,
+      "repeatedBodyBytes": 0,
+      "passed": true
+    },
+    {
+      "path": "assets/index-CESiuAjX.js",
+      "encoding": "gzip",
+      "status": 200,
+      "encodedBodyBytes": 88955,
+      "expectedBodyBytes": 88955,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "etag": "\"asace8d_FqI6Oo3D2LfsCH-0FcIzpD8gBaU5kTdGVl4\"",
+      "repeatedStatus": 304,
+      "repeatedBodyBytes": 0,
+      "passed": true
+    },
+    {
+      "path": "assets/index-CESiuAjX.js",
+      "encoding": "identity",
+      "status": 200,
+      "encodedBodyBytes": 256766,
+      "expectedBodyBytes": 256766,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "etag": "\"n4sI3IuCosbsezyVASwXnDgoo8u-1PvGuIJ0crdAuzQ\"",
+      "repeatedStatus": 304,
+      "repeatedBodyBytes": 0,
+      "passed": true
+    },
+    {
+      "path": "fonts/NotoSansSC-Regular.otf",
+      "encoding": "br",
+      "status": 200,
+      "encodedBodyBytes": 7438089,
+      "expectedBodyBytes": 7438089,
+      "cacheControl": "no-cache",
+      "etag": "\"ZlGZ_9CXOudumsT0hxaN3U7XelyFjrifHb5adRicVhM\"",
+      "repeatedStatus": 304,
+      "repeatedBodyBytes": 0,
+      "passed": true
+    },
+    {
+      "path": "fonts/NotoSansSC-Regular.otf",
+      "encoding": "gzip",
+      "status": 200,
+      "encodedBodyBytes": 7205054,
+      "expectedBodyBytes": 7205054,
+      "cacheControl": "no-cache",
+      "etag": "\"f4r3WP66qmxKAzNoxO2geCZFjJJE5sKDHanT6dB4mpg\"",
+      "repeatedStatus": 304,
+      "repeatedBodyBytes": 0,
+      "passed": true
+    },
+    {
+      "path": "fonts/NotoSansSC-Regular.otf",
+      "encoding": "identity",
+      "status": 200,
+      "encodedBodyBytes": 8331336,
+      "expectedBodyBytes": 8331336,
+      "cacheControl": "no-cache",
+      "etag": "\"-qbJ32UhFt3nidNRNZ89fl0ihaKyofBKLXJE33BtXqk\"",
+      "repeatedStatus": 304,
+      "repeatedBodyBytes": 0,
+      "passed": true
+    },
+    {
+      "path": "assets/pdf.worker-De7v6_Q5.js",
+      "encoding": "br",
+      "status": 200,
+      "encodedBodyBytes": 508027,
+      "expectedBodyBytes": 508027,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "etag": "\"Vs9ItLTZHuedjiUNN8t9Ii1_0qWiHCgAFDUeNXR34pI\"",
+      "repeatedStatus": 304,
+      "repeatedBodyBytes": 0,
+      "passed": true
+    },
+    {
+      "path": "assets/pdf.worker-De7v6_Q5.js",
+      "encoding": "gzip",
+      "status": 200,
+      "encodedBodyBytes": 512164,
+      "expectedBodyBytes": 512164,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "etag": "\"u5MMHWKwrSJckUDfjb9dENkbPhCtrwsO2VEXnk9onFA\"",
+      "repeatedStatus": 304,
+      "repeatedBodyBytes": 0,
+      "passed": true
+    },
+    {
+      "path": "assets/pdf.worker-De7v6_Q5.js",
+      "encoding": "identity",
+      "status": 200,
+      "encodedBodyBytes": 1165027,
+      "expectedBodyBytes": 1165027,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "etag": "\"j28v9C7bYxVHtqk1d7HyO2ymsf3Mxjxg8c3wo3oq0zw\"",
+      "repeatedStatus": 304,
+      "repeatedBodyBytes": 0,
+      "passed": true
+    }
+  ],
+  "browserHomepageNetwork": {
+    "status": "measured",
+    "browser": "Chromium 156.0.8078.4",
+    "note": "CDP encodedDataLength includes response transport/header accounting; body-only budgets are reported separately. Same-page reload still revalidates index.html.",
+    "cold": {
+      "encodedBytes": 105649,
+      "requests": [
+        {
+          "url": "http://127.0.0.1:54173/",
+          "method": "GET",
+          "encodedBytes": 1578,
+          "status": 200,
+          "diskCache": false,
+          "serviceWorker": false,
+          "mime": "text/html"
+        },
+        {
+          "url": "http://127.0.0.1:54173/assets/index-CESiuAjX.js",
+          "method": "GET",
+          "encodedBytes": 90448,
+          "status": 200,
+          "diskCache": false,
+          "serviceWorker": false,
+          "mime": "text/javascript"
+        },
+        {
+          "url": "http://127.0.0.1:54173/assets/index-DJDI9EGR.css",
+          "method": "GET",
+          "encodedBytes": 13623,
+          "status": 200,
+          "diskCache": false,
+          "serviceWorker": false,
+          "mime": "text/css"
+        }
+      ]
+    },
+    "warm": {
+      "encodedBytes": 822,
+      "requests": [
+        {
+          "url": "http://127.0.0.1:54173/",
+          "method": "GET",
+          "encodedBytes": 822,
+          "status": 200,
+          "diskCache": false,
+          "serviceWorker": false,
+          "mime": "text/html"
+        },
+        {
+          "url": "http://127.0.0.1:54173/assets/index-CESiuAjX.js",
+          "method": "GET",
+          "encodedBytes": 0,
+          "memoryCache": true,
+          "status": 200,
+          "diskCache": false,
+          "serviceWorker": false,
+          "mime": "text/javascript"
+        },
+        {
+          "url": "http://127.0.0.1:54173/assets/index-DJDI9EGR.css",
+          "method": "GET",
+          "encodedBytes": 0,
+          "memoryCache": true,
+          "status": 200,
+          "diskCache": false,
+          "serviceWorker": false,
+          "mime": "text/css"
+        }
+      ]
+    },
+    "failed": []
+  },
+  "planning": {
+    "assumptions": {
+      "peakUsers": 100,
+      "desiredLoadSeconds": 10,
+      "overheadFactor": 1.3,
+      "monthlyColdFullUses": 10000
+    },
+    "coldFullMonthlyGB": 85.5436,
+    "entryPeakMbps": 10.8732,
+    "normalFullUseMonthlyGB": 80.53686,
+    "normalFullUsePeakMbps": 837.5833440000001,
+    "fullPeakMbps": 889.65344,
+    "note": "Photos, IndexedDB drafts and generated PDFs remain local and do not add server payload traffic. Cached immutable resources need no body transfer until changed; unhashed fonts currently revalidate using ETag."
+  },
+  "passed": true
+}

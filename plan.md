@@ -1,195 +1,41 @@
-# 个人信息收集系统 - 实现计划
+# WebTable 纯前端实施记录
 
-## Context
+2026-10-14：按用户最终要求，停止后端与管理员方案，改为公开、免费、无商业用途的本机填写工具。运营者不收集、不接收填写结果，也不要求提交PDF。旧数据库不迁移、不删除。
 
-基于范本文件 `奴测-空白版.xlsx` 构建个人信息收集系统，包含填写系统和查看管理系统。支持上千人同时在线填写，管理员查看所有提交数据并导出 PDF。所有页面适配手机端。
+## 当前架构
 
-## 1. 依赖
+项目根目录即Vue前端，构建仅输出静态文件。固定元数据驱动填写、完整性校验和PDF。Pinia持有当前编辑，IndexedDB为本机草稿来源；无API、账号、IP采集、管理员路由或服务端业务数据库。
 
-### 后端
-- Spring Boot 3.5.13 + Java 21
-- `mybatis-plus-spring-boot3-starter` 3.5.9 + `mybatis-plus-jsqlparser` 3.5.9
-- `gson`、`fastjson2` 2.0.53、`poi-ooxml` 5.3.0、`openpdf` 1.3.35
-- `spring-boot-starter-web`、`spring-boot-starter-data-redis`、`spring-boot-starter-jdbc`
-- `mysql-connector-j`、`lombok`、`spring-boot-devtools`
+浏览器本地保存采用事务版本、9秒编辑租约与清除代次。文字约1秒防抖保存，写入、图片变更与续租串行执行。取得租约后重读内容，避免旧内容配上新版本号。正常第二标签页只读；初次只读加载可在旧页退出后重新读取接管。已发生编辑的冲突必须明确重读，不静默覆盖。清理后的旧操作不可恢复数据。
 
-### 前端
-- Vue 3 + Vite + vue-router
-- shadcn-vue（Reka UI + Lucide + Slate 主题）
-- Tailwind CSS v4 + @tailwindcss/vite
-- @vueuse/motion（动画）
-- vxe-table（第3步自评表格编辑）
-- axios、pinia
+## 功能规则
 
-## 2. 配置（application.yml）
+- 32基础字段、125级别、125备注、16图片槽位全部必填。空白及不可见占位无效，文字允许“无／不适用”，其他有内容值受长度和合理格式约束。
+- 每份草稿一次18岁确认，恢复草稿沿用确认。采用使用者声明尽力确认年龄，不新增身份核验API或证件收集，不把无法验证真实年龄本身认定为违法。
+- 图片接受浏览器内置解码器能处理的常见格式：JPEG、PNG、WebP、GIF按容器规范校验，BMP、AVIF、TIFF、SVG、HEIC／HEIF经解码确认（HEIC／HEIF取决于浏览器）。输入≤64 MiB；超过2500万像素或边长8192自动等比缩小，超过200兆像素或边长32768才拒绝；动图取第一帧。原件≤2 MiB、1300万像素、边长4096且为静态JPEG/PNG/WebP时保留原字节；其余压缩并标记。预览≤512 KiB，16附件总上限32 MiB。原始和最终摘要分别判重。
+- PDF在本机生成，报告式版面（章节色带、两列资料网格、自评表格、单页照片带细边框、页眉页脚与页码），只用黑白灰三级灰阶且不新增字体字重；含全部文字、16显示图片和16原件或标记的压缩附件；按需加载字体和PDF模块。中文字体缺失字形的字符（如 emoji）用 □ 代替并列出码位，不静默丢字也不阻断导出，草稿原文不变。Worker不可用时本机回退；取消、失败、下载未保存均保留草稿。
+- 只有明确确认已保存或主动确认放弃时才清理。可验证删除IndexedDB内容及撤销本页URL，不能证明物理擦除或删除设备副本。存储不可访问时清除临时内存并提示磁盘状态无法验证。
+- 三主题及独立明暗模式共用组件。375／768／1024／1440px布局，文件选择、错误定位、保存失败和重试均可见。
 
-- Spring Boot 3.5.13，端口 8081
-- 数据源：`jdbc:mysql://localhost:3306/webtable`
-- Redis：localhost:6379，无密码
-- MyBatis-Plus：驼峰映射 + SQL 日志
-- 文件上传限制：50MB
-- 管理员密码：`admin.password`
+## 实施与验证进度
 
-## 3. 数据库设计（7 张表）
+1. 已保存项目外恢复快照及Git差异，隔离前端并移出旧后端、管理端、旧构建与旧验证结果。没有重置Git、提交、推送或删除数据库。
+2. 已实现本机存储、统一必填、图片处理、PDF和确认清理闭环。
+3. 已安装并应用Humanizer（文案审阅）与ui-ux-pro-max（界面设计）。Humanizer不提供安全测试能力，测试使用Node、Playwright与实际文件解析。
+4. 已建立静态只读部署、安全头、依赖审计、三引擎功能与安全测试及容量压力测试。Chromium/WebKit固定版本连续11轮已通过（每轮53模块+22浏览器+100客户端30秒静态压力）；Firefox启动受本机环境阻塞，结果及范围以 `docs/VERIFICATION.md` 和机器结果为准，旧后端测试不计入本次验收。
+5. 图片策略调整：支持浏览器内置解码器能处理的常见格式，超过2500万像素或边长8192自动缩小（输入上限提高到64 MiB，超过200兆像素或边长32768才拒绝），动图取第一帧。中文字体缺失字形（emoji 等）改为用 □ 代替并列出码位，不再阻断 PDF 导出。本机单元测试59项、Chromium与WebKit浏览器测试32项通过；固定版本11轮回归未在本轮重跑，真机与Firefox仍按第5条及原记录待验收。
+6. 真机矩阵和部署环境检查单独保留，无法用自动化视口替代。法律审查按实际主体划分：作者不接收或查看填写资料，不承担控制使用者独立展示或他人服务器的当然义务；自带题库的法律性质未形成结论，不将其记为已认定违法。
 
-```sql
-submissions, personal_info, photos, assessment_left, assessment_right,
-assessment_left_template（65条）, assessment_right_template（60条）
-```
+## 删除与保留
 
-## 4. Redis 缓存策略
+当前发布包不包含Java/Maven、数据库初始化、Redis、API、管理页面、Excel和邀请/历史版本功能。未使用组件、图标、旧代理服务器和过时测试移出活动项目。保留必要shadcn-vue组件、固定元数据、字体许可、真实测试和部署示例。
 
-| 用途 | Key 格式 | TTL |
-|---|---|---|
-| 会话→提交映射 | `wt:session:{token}` → submissionId | 2h |
-| 步骤1缓存 | `wt:step:{id}:1` → PersonalInfo | 2h |
-| 步骤3左侧缓存 | `wt:step:{id}:3:left` → List | 2h |
-| 步骤3右侧缓存 | `wt:step:{id}:3:right` → List | 2h |
-| 管理员 token | `wt:admin:{token}` → "admin" | 24h |
+本机恢复路径：`/Users/hhh/Work/github/webTable-recovery/20261014-202944-pure-frontend`。其中包括重构前源码归档、暂存及未暂存差异、被移出的后端和旧测试材料。此目录不公开部署，旧库生命周期由拥有者另行决定。
 
-## 5. 后端结构
+## 交付文档
 
-```
-com.peace.webtable/
-├── config/          RedisConfig, CorsConfig, MyBatisPlusConfig, AdminConfig
-├── controller/      FormController, PhotoController, ExportController, AdminController
-├── service/         FormService, PhotoService, ExportService, AdminService + impl/
-├── mapper/          7 个 Mapper（含 Template）
-├── entity/          7 个 Entity（含 Template）
-├── dto/             ApiResponse, StepDataRequest
-└── util/            SessionUtil, RedisUtil
-```
+`README.md`说明当前项目；`CHANGELOG.md`保留重构记录；`docs/USER_MANUAL.md`说明保存与清理；`docs/DEPLOYMENT.md`和`OPERATIONS.md`说明静态部署及日志边界；`COMPATIBILITY.md`、`VERIFICATION.md`、`BANDWIDTH.md`区分测量结果与未验证项；`LEGAL_REVIEW.md`记录工程事实、法律依据和剩余风险。
 
-## 5.1 代码规范
+## 法律文档责任边界修订
 
-**后端：** Javadoc 类/方法注释，行注释说明原因，Logger 关键操作日志，敏感信息脱敏
-**前端：** 文件头部块注释，JSDoc 方法注释，模板行注释
-
-## 5.2 安全措施
-
-- CORS 只允许 localhost:5173，限制 HTTP 方法和请求头
-- 照片上传白名单校验（jpeg/png/gif/webp/bmp）
-- 文件名去除路径分隔符
-- 日志中 session token 只显示前4位
-- 错误信息不暴露内部异常
-- 管理员 token 验证（Redis 存储，24h 过期）
-
-## 6. API 设计
-
-### 填写系统
-| 方法 | 路径 | 功能 |
-|---|---|---|
-| POST | `/api/form` | 新建提交 |
-| GET | `/api/form/status` | 查询状态 |
-| PUT | `/api/form/complete` | 标记完成 |
-| GET/PUT | `/api/form/step1/{id}` | 基础信息 |
-| GET/PUT | `/api/form/step3/left/{id}` | 左侧自评 |
-| GET/PUT | `/api/form/step3/right/{id}` | 右侧自评 |
-| GET | `/api/form/template/left|right` | 模板数据 |
-| POST/GET/DELETE | `/api/photo/*` | 照片管理 |
-| GET | `/api/export/all` | 导出 Excel |
-
-### 管理系统
-| 方法 | 路径 | 功能 |
-|---|---|---|
-| POST | `/api/admin/login` | 管理员登录 |
-| GET | `/api/admin/submissions` | 提交列表 |
-| GET | `/api/admin/submissions/{id}` | 提交详情 |
-| GET | `/api/admin/export-pdf/{id}` | 导出 PDF |
-
-## 7. 前端结构
-
-```
-frontend/src/
-├── App.vue                          路由出口（<router-view />）
-├── main.js                          入口（Pinia + Router + Motion + VxeTable）
-├── style.css                        Tailwind + shadcn-vue CSS 变量
-├── lib/utils.js                     cn() 工具函数
-├── router/index.js                  路由配置（4条路由）
-├── api/
-│   ├── index.js                     axios 实例（自动附加 sessionToken + adminToken）
-│   ├── form.js                      填写系统 API
-│   ├── photo.js                     照片 API
-│   ├── export.js                    导出 Excel API
-│   └── admin.js                     管理员 API（登录/列表/详情/PDF导出）
-├── components/
-│   ├── FormWizard.vue               填写向导页面（原 App.vue 拆分）
-│   ├── StepWizard.vue               步骤指示器 + 导航按钮
-│   ├── Step1BasicInfo.vue           基础信息（shadcn Card/Input）
-│   ├── Step2Photos.vue              附图部分
-│   ├── Step3Assessment.vue          自评表格（vxe-table）
-│   ├── PhotoUploader.vue            照片上传（4 槽位）
-│   ├── PreviewDialog.vue            预览弹窗（shadcn Dialog）
-│   ├── admin/
-│   │   ├── AdminLogin.vue           登录页（密码输入）
-│   │   ├── AdminDashboard.vue       列表页（表格/卡片）
-│   │   └── AdminDetail.vue          详情页（基础信息+照片+自评+导出PDF）
-│   └── ui/                          shadcn-vue 组件库
-└── stores/form.js                   Pinia store
-```
-
-### 路由
-- `/` — 填写页面（三步向导）
-- `/admin` — 管理员登录
-- `/admin/dashboard` — 提交列表
-- `/admin/detail/:id` — 提交详情
-
-### 手机端适配
-所有页面使用 Tailwind 响应式断点（sm/md/lg）：
-- 表单：窄屏单列，宽屏双列
-- 照片：窄屏 2 列，宽屏 4 列
-- 表格：窄屏转为卡片列表
-- 按钮：窄屏全宽
-- 步骤导航：窄屏纵向排列
-
-## 8. 实施进度
-
-- [x] 后端全部代码
-- [x] 数据库 DDL + 预设数据
-- [x] 前端 UI v1 → v2 → v3
-- [x] shadcn-vue + Tailwind CSS + Motion
-- [x] 保存流程重构（统一保存 + 预览弹窗）
-- [x] 安全加固
-- [x] 管理员系统（登录+列表+详情+PDF导出）
-- [x] vue-router 路由配置
-- [x] 手机端适配 + PC 端宽屏差异化布局
-- [ ] 联调测试
-
-## 8.2 iOS 刷新修复与本地缓存兜底
-
-### 根因分析
-| 根因 | 严重性 | 说明 |
-|---|---|---|
-| iOS 下拉刷新 | HIGH | CSS 未设置 `overscroll-behavior: none`，手指下滑触发原生刷新 |
-| `maximum-scale=5.0` | HIGH | 键盘弹出时 Safari 重新计算视口，导致页面重载 |
-| 表单数据无本地缓存 | HIGH | 刷新后需 4+ API 请求恢复，任一失败数据丢失 |
-| `initForm` 网络错误静默 return | MEDIUM | 非会话错误时表单卡在加载态，无恢复路径 |
-
-### 修复措施
-- `index.html`：`maximum-scale=5.0` → `maximum-scale=1.0`，锁死视口缩放
-- `style.css`：`html, body { overscroll-behavior: none }` 禁止下拉刷新 + `env(safe-area-inset-*)` 安全区域
-- `stores/form.js`：新增本地缓存模块
-  - `saveDraftToLocal()`：序列化表单数据到 `localStorage['wt:formDraft']`
-  - `restoreDraftFromLocal()`：从缓存恢复，支持 submissionId 校验和 24h 过期
-  - `startAutoSave()`：15 秒定时保存 + `visibilitychange` + `beforeunload` 事件监听
-  - `initForm`：网络异常时不再 `return`，改为尝试本地缓存兜底
-  - `submitAll`：提交成功后清理本地缓存并停止自动保存
-
-## 8.1 当前实施变更
-
-### 手机端适配与 PC 端宽屏布局
-- 所有页面容器：`max-w-[1100px]` → `px-4 sm:px-6 lg:px-10` 全宽
-- PC 端（lg: ≥1024px）：Step1 3列网格，Step2 4列网格，Step3 左右栏并排，AdminDetail 信息 4列/照片 6列
-- 手机端（<768px）：`style.css` 全局补丁，input/button 最小高度 44px
-- 步骤标签：`text-xs sm:text-sm` 防小屏溢出；导航按钮 `h-11 sm:h-9`
-- 草稿恢复改为优先复用已存在会话，前端 token 持久化到 localStorage + sessionStorage，切步时分步保存
-- 后端 `completeSubmission()`、步骤读写接口支持 Redis miss 后回源数据库，并校验 `sessionToken -> submissionId` 归属关系
-- 最终提交后清理本地 token 与 Redis 草稿缓存，避免继续复用旧草稿
-
-## 9. 验证方式
-
-- `./mvnw clean compile` 后端编译通过
-- `npm run dev` 前端启动
-- 填写流程测试 + 预览弹窗 + 保存
-- /admin 登录 → 列表 → 详情 → 导出 PDF
-- 手机浏览器访问各页面
+依据用户进一步澄清，撤回将本机技术处理直接归为作者处理个人信息、将实名认证或控制用户分享列为作者当然义务的表述。区分作者自带静态内容、使用者填写资料和第三方部署行为。同步更正README、验证报告及部署说明；此次仅修改文档，不改功能，不新增数据收集。
