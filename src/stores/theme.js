@@ -1,15 +1,10 @@
-/** 本机外观偏好：三种视觉主题和独立明暗模式，不发送网络请求。 */
+/** 本机显示偏好：固定原型色板和独立日间/夜间模式，不发送网络请求。 */
 import { defineStore } from "pinia";
 import { ref } from "vue";
 
 export const useThemeStore = defineStore("theme", () => {
   const theme = ref("minimal");
-  const mode = ref("system");
-  const themes = [
-    { value: "minimal", label: "极简" },
-    { value: "tech", label: "科技" },
-    { value: "flat", label: "扁平" },
-  ];
+  const mode = ref("dark");
   let media;
   /**
    * 将当前外观写入页面根节点，系统模式跟随设备设置。
@@ -23,15 +18,12 @@ export const useThemeStore = defineStore("theme", () => {
     document.documentElement.style.colorScheme = dark ? "dark" : "light";
   }
   /**
-   * 恢复本机偏好并监听系统明暗变化，存储不可用时继续使用内存状态。
+   * 仅恢复显示模式并监听系统变化；旧风格偏好不再参与色板选择。
    * @returns {void} 无返回值
    */
   function load() {
     try {
-      const savedTheme = localStorage.getItem("webtable-theme");
       const savedMode = localStorage.getItem("webtable-color-mode");
-      if (themes.some((item) => item.value === savedTheme))
-        theme.value = savedTheme;
       if (["system", "light", "dark"].includes(savedMode))
         mode.value = savedMode;
     } catch {
@@ -58,18 +50,16 @@ export const useThemeStore = defineStore("theme", () => {
     }
   }
   /**
-   * 切换本机视觉主题。
-   * @param {string} value minimal、tech 或 flat
+   * 保留旧调用入口，但始终固定为原型色板，避免旧页面调用时报错。
+   * @param {string} _value 已废弃的旧主题值
    * @returns {void} 无返回值
    */
-  function setTheme(value) {
-    if (!themes.some((item) => item.value === value)) return;
-    theme.value = value;
-    persist("webtable-theme", value);
+  function setTheme(_value) {
+    theme.value = "minimal";
     apply();
   }
   /**
-   * 切换本机明暗模式。
+   * 切换本机显示模式。
    * @param {string} value system、light 或 dark
    * @returns {void} 无返回值
    */
@@ -79,5 +69,5 @@ export const useThemeStore = defineStore("theme", () => {
     persist("webtable-color-mode", value);
     apply();
   }
-  return { theme, mode, themes, load, setTheme, setMode };
+  return { theme, mode, load, setTheme, setMode };
 });

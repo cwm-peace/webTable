@@ -128,7 +128,9 @@ async function disableAdvancedImageApis(page) {
 async function openPhotos(page) {
   // 空数组避免测试准备依赖已禁用的createImageBitmap，图片处理仅经生产UI执行。
   await seedDraft(page, { images: [], name: "合成图片边界测试" });
-  await page.getByRole("button", { name: "检查并继续", exact: true }).click();
+  await page.getByRole("button", { name: "检查并进入自评", exact: true }).click();
+  await expect(page.locator("#assessment-heading")).toBeVisible();
+  await page.getByRole("button", { name: "检查并添加照片", exact: true }).click();
   await expect(page.locator("#photo-selfie-1")).toBeEnabled();
 }
 

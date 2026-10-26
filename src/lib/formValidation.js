@@ -109,6 +109,13 @@ const numericFields = new Set([
 ]);
 const digestPattern = /^[a-f0-9]{64}$/;
 
+/** 步骤编号与名称的对应，错误分组和页面标题共用。 */
+export const STEP_LABELS = Object.freeze({
+  1: "基础信息",
+  2: "喜好自评",
+  3: "照片及导出",
+});
+
 /**
  * 提取实际可见内容，用于识别仅包含空白或不可见字符的输入。
  * @param {unknown} value 用户输入或本地存储恢复值。
@@ -146,6 +153,58 @@ function isEntry(value) {
 }
 
 /**
+ * 校验单个基础字段，供失焦即时提示与整表校验共用同一套规则。
+ * @param {string} key 字段键名
+ * @param {unknown} value 字段当前值
+ * @returns {string} 错误说明；无错误或键名未知时为空串
+ */
+export function validateBasicField(key, value) {
+  const field = allBasicFields.find((item) => item.key === key);
+  if (!field) return "";
+  const text = meaningful(value);
+  if (!text) return `请填写「${field.label}」，没有内容可填写“无／不适用”`;
+  if (typeof value === "string" && value.length > field.maxLength)
+    return `「${field.label}」最多${field.maxLength}字`;
+  if (noContentValues.has(text)) return "";
+  const trimmed = String(value).trim();
+  if (
+    key === "phone" &&
+    (!/^\+?[0-9 ()-]{5,20}$/.test(trimmed) ||
+      (trimmed.match(/\d/g) || []).length < 5)
+  )
+    return "电话号码格式不正确";
+  if (key === "qq" && !/^[1-9]\d{4,19}$/.test(trimmed))
+    return "QQ号应为5至20位数字";
+  if (numericFields.has(key) && !/^\d+(?:\.\d+)?$/.test(trimmed))
+    return `「${field.label}」请填写非负数或“无／不适用”`;
+  return "";
+}
+
+/**
+ * 把校验错误按步骤聚合，避免一次性平铺上百条提示。
+ * @param {Array<{step:number,id:string,message:string}>} issues 校验错误列表
+ * @returns {Array<{step:number,label:string,count:number,first:object,issues:Array}>} 按步骤排序的分组
+ */
+export function summarizeIssues(issues) {
+  const groups = new Map();
+  for (const issue of Array.isArray(issues) ? issues : []) {
+    const step = STEP_LABELS[issue?.step] ? issue.step : 0;
+    if (!groups.has(step))
+      groups.set(step, {
+        step,
+        label: STEP_LABELS[step] || "其他",
+        count: 0,
+        first: issue,
+        issues: [],
+      });
+    const group = groups.get(step);
+    group.count += 1;
+    group.issues.push(issue);
+  }
+  return [...groups.values()].sort((left, right) => left.step - right.step);
+}
+
+/**
  * 检查全部基础字段、125题以及16个图片槽位。
  * @param {object} draft 本地草稿，可能来自异常或旧版站点存储。
  * @param {Array} [items=questions] 固定问卷元数据。
@@ -156,32 +215,11 @@ export function validateRevision(draft, items = questions) {
   const add = (step, id, message) => errors.push({ step, id, message });
 
   for (const field of allBasicFields) {
-    const value = draft?.basicInfo?.[field.key];
-    const text = meaningful(value);
-    const id = `basic-${field.key}`;
-    if (!text) {
-      add(1, id, `请填写「${field.label}」，没有内容可填写“无／不适用”`);
-      continue;
-    }
-    if (value.length > field.maxLength) {
-      add(1, id, `「${field.label}」最多${field.maxLength}字`);
-      continue;
-    }
-    if (noContentValues.has(text)) continue;
-    const trimmed = value.trim();
-    if (
-      field.key === "phone" &&
-      (!/^\+?[0-9 ()-]{5,20}$/.test(trimmed) ||
-        (trimmed.match(/\d/g) || []).length < 5)
-    ) {
-      add(1, id, "电话号码格式不正确");
-    }
-    if (field.key === "qq" && !/^[1-9]\d{4,19}$/.test(trimmed)) {
-      add(1, id, "QQ号应为5至20位数字");
-    }
-    if (numericFields.has(field.key) && !/^\d+(?:\.\d+)?$/.test(trimmed)) {
-      add(1, id, `「${field.label}」请填写非负数或“无／不适用”`);
-    }
+    const message = validateBasicField(
+      field.key,
+      draft?.basicInfo?.[field.key],
+    );
+    if (message) add(1, `basic-${field.key}`, message);
   }
 
   const storedPhotos = Array.isArray(draft?.photos) ? draft.photos : [];
@@ -189,9 +227,9 @@ export function validateRevision(draft, items = questions) {
   const originals = new Set();
   const finals = new Set();
   if (storedPhotos.length > 16)
-    add(2, "photos-heading", "照片数量不能超过16张");
+    add(3, "photos-heading", "照片数量不能超过16张");
   if (storedPhotos.length !== photos.length)
-    add(2, "photos-heading", "照片记录损坏，请重新选择对应照片");
+    add(3, "photos-heading", "照片记录损坏，请重新选择对应照片");
   for (const category of photoCategories) {
     for (let slot = 1; slot <= 4; slot += 1) {
       const matches = photos.filter(
@@ -199,7 +237,7 @@ export function validateRevision(draft, items = questions) {
       );
       const id = `photo-${category.key}-${slot}`;
       if (matches.length !== 1) {
-        add(2, id, `请为「${category.label}」第${slot}个槽位选择一张照片`);
+        add(3, id, `请为「${category.label}」第${slot}个槽位选择一张照片`);
         continue;
       }
       const photo = matches[0];
@@ -207,10 +245,10 @@ export function validateRevision(draft, items = questions) {
         !digestPattern.test(photo.sha256 || "") ||
         !digestPattern.test(photo.sourceSha256 || "")
       ) {
-        add(2, id, "照片摘要无效，请重新选择");
+        add(3, id, "照片摘要无效，请重新选择");
       }
       if (originals.has(photo.sourceSha256) || finals.has(photo.sha256)) {
-        add(2, id, "图片内容重复，请更换");
+        add(3, id, "图片内容重复，请更换");
       }
       originals.add(photo.sourceSha256);
       finals.add(photo.sha256);
@@ -222,7 +260,7 @@ export function validateRevision(draft, items = questions) {
         !photo.previewBlob.size ||
         photo.previewBlob.size > 512 * 1024
       ) {
-        add(2, id, "照片文件缺失或超过容量限制，请重新选择");
+        add(3, id, "照片文件缺失或超过容量限制，请重新选择");
       }
     }
   }
@@ -240,24 +278,25 @@ export function validateRevision(draft, items = questions) {
       validItems.length ||
     answers.some((answer) => !expectedIds.has(answer.questionId))
   ) {
-    add(3, "assessment-heading", "自评数据不完整，请重新读取草稿");
+    add(2, "assessment-heading", "自评数据不完整，请重新读取草稿");
   }
   for (const question of validItems) {
     const answer = answers.find((item) => item.questionId === question.id);
     if (!Object.hasOwn(grades, answer?.grade || "")) {
-      add(3, `grade-${question.id}`, `请选择第${question.id}项的级别`);
+      add(2, `grade-${question.id}`, `请选择第${question.id}项的级别`);
     }
     if (!meaningful(answer?.remark)) {
       add(
-        3,
+        2,
         `remark-${question.id}`,
         `请填写第${question.id}项备注，没有内容可填“无”`,
       );
     } else if (answer.remark.length > 500) {
-      add(3, `remark-${question.id}`, `第${question.id}项备注最多500字`);
+      add(2, `remark-${question.id}`, `第${question.id}项备注最多500字`);
     }
   }
-  return errors;
+  // 错误定位与前进检查遵循基础信息、自评、照片的页面顺序。
+  return errors.sort((left, right) => left.step - right.step);
 }
 
 /**
@@ -274,6 +313,7 @@ export function newDraft() {
     ),
     ageConfirmedAt: null,
     updatedAt: null,
+    currentStep: 1,
     basicInfo: basicPayload(),
     answers: questions.map((question) => ({
       questionId: question.id,

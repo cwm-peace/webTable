@@ -28,7 +28,7 @@ test("真实填写、刷新恢复、图片判重、PDF 下载和跨标签页清�
   );
   page.on("pageerror", (error) => pageErrors.push(error.message));
   await acceptAge(page);
-  await page.getByRole("button", { name: "检查并继续" }).click();
+  await page.getByRole("button", { name: "检查并进入自评" }).click();
   await expect(page.locator("#issues-title")).toHaveText("还有 32 项需要完成");
   await expect(page.locator("#basic-name")).toHaveAttribute(
     "aria-invalid",
@@ -40,7 +40,20 @@ test("真实填写、刷新恢复、图片判重、PDF 下载和跨标签页清�
   await expect(page.locator("#basic-name")).toHaveValue(name);
   await expect(page.locator("#basic-name")).toBeEnabled();
   await expect(page.locator("#age-confirm")).toHaveCount(0);
-  await page.getByRole("button", { name: "检查并继续" }).click();
+  await page.getByRole("button", { name: "检查并进入自评" }).click();
+  await expect(page.locator("#assessment-heading")).toBeVisible();
+  await page.getByRole("button", { name: "检查并添加照片" }).click();
+  await expect(page.locator("#issues-title")).toContainText("250");
+  // 125 个答案由 IndexedDB 准备，代表性答案仍通过真实 radio 与备注编辑器修改。
+  await seedDraft(page, { answersOnly: true, currentStep: 2 });
+  await page.locator('label[for="grade-1-B"]').click();
+  await page
+    .locator(".question-card")
+    .first()
+    .getByRole("button", { name: /展开备注/ })
+    .click();
+  await page.locator("#remark-1").fill("通过真实输入完成的自评备注");
+  await page.getByRole("button", { name: "检查并添加照片" }).click();
   await expect(page.locator("#photo-selfie-1")).toBeVisible();
   const images = syntheticImages();
   for (const [index, image] of images.entries()) {
@@ -69,15 +82,6 @@ test("真实填写、刷新恢复、图片判重、PDF 下载和跨标签页清�
     }
   }
   await expect.poll(async () => (await storageSummary(page)).photos).toBe(16);
-  await page.getByRole("button", { name: "检查并继续" }).click();
-  await page.getByRole("button", { name: "检查并生成 PDF" }).click();
-  await expect(page.locator("#issues-title")).toContainText("250");
-  // 125 个答案由 IndexedDB 准备，后续仍通过正式页面更改和校验代表性答案。
-  await seedDraft(page, { answersOnly: true });
-  await goToExport(page);
-  await page.locator(".assessment-group summary").first().click();
-  await page.locator("#grade-1").selectOption("B");
-  await page.locator("#remark-1").fill("通过真实输入完成的自评备注");
   const started = Date.now();
   await page.getByRole("button", { name: "检查并生成 PDF" }).click();
   await expect(page.getByRole("heading", { name: "PDF 已生成" })).toBeVisible();
@@ -127,8 +131,8 @@ test("真实填写、刷新恢复、图片判重、PDF 下载和跨标签页清�
   expect((await storageSummary(page)).draft).toBe(true);
   const other = await context.newPage();
   await other.goto("/");
-  await expect(other.locator("#basic-name")).toHaveValue(name);
-  await expect(other.locator("#basic-name")).toBeDisabled();
+  await expect(other.locator("#step-heading")).toHaveText("照片及导出");
+  await expect(other.locator("#photo-selfie-1")).toBeDisabled();
   await page
     .getByRole("checkbox", {
       name: "我已把 PDF 保存到设备，并检查了文件内容。",
@@ -259,68 +263,79 @@ test("字体缺字的 emoji 自动用占位符代替并明确提示", async ({ p
   expect(await download.getAttribute("href")).toMatch(/^blob:/);
 });
 
-test("三步骤在四个宽度和六种外观下无横向溢出，严重可访问性问题为零", async ({
+test("原型日间和夜间在四种宽度无溢出，显示偏好恢复且跟随系统", async ({
   page,
 }, testInfo) => {
-  await seedDraft(page);
-  const measurements = [];
-  for (const theme of ["minimal", "tech", "flat"])
-    for (const mode of ["light", "dark"]) {
-      await page
-        .getByRole("combobox", { name: "界面风格" })
-        .selectOption(theme);
-      await page.getByRole("combobox", { name: "明暗模式" }).selectOption(mode);
-      await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
-      for (const width of [375, 768, 1024, 1440]) {
-        await page.setViewportSize({ width, height: 900 });
-        for (let step = 1; step <= 3; step += 1) {
-          await page
-            .getByRole("navigation", { name: "填写步骤" })
-            .getByRole("button")
-            .nth(step - 1)
-            .click();
-          const overflow = await page.evaluate(
-            () => document.documentElement.scrollWidth - window.innerWidth,
-          );
-          expect(
-            overflow,
-            `${theme}/${mode}/${width}/step${step}`,
-          ).toBeLessThanOrEqual(1);
-          measurements.push({ theme, mode, width, step, overflow });
-          if (
-            width === 1440 &&
-            step === 1 &&
-            mode === "light" &&
-            theme === "minimal"
-          ) {
-            await page.screenshot({
-              path: testInfo.outputPath("minimal-light-1440.png"),
-              fullPage: false,
-            });
-          }
-        }
-      }
-      await page.setViewportSize({ width: 375, height: 900 });
-      await page.locator(".assessment-group summary").first().click();
-      const result = await new AxeBuilder({ page })
-        .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
-        .analyze();
-      const severe = result.violations.filter((item) =>
-        ["serious", "critical"].includes(item.impact),
-      );
-      expect(
-        severe.map((item) => ({
-          id: item.id,
-          targets: item.nodes.map((node) => node.target),
-        })),
-      ).toEqual([]);
-      await page.screenshot({
-        path: testInfo.outputPath(`${theme}-${mode}-375.png`),
-        fullPage: false,
-      });
-      await page.locator(".assessment-group summary").first().click();
+  // 旧风格偏好不应改变原型；只初始化一次，刷新仍能检验新选择的持久化。
+  await page.addInitScript(() => {
+    if (!sessionStorage.getItem("display-mode-regression")) {
+      localStorage.setItem("webtable-theme", "tech");
+      localStorage.setItem("webtable-color-mode", "light");
+      sessionStorage.setItem("display-mode-regression", "ready");
     }
-  await page.getByRole("combobox", { name: "明暗模式" }).selectOption("system");
+  });
+  await seedDraft(page);
+  await expect(page.getByRole("combobox", { name: "界面风格" })).toHaveCount(0);
+  const displayMode = page.getByRole("combobox", { name: "显示模式" });
+  await expect(displayMode).toHaveValue("light");
+  await expect(displayMode.locator("option")).toHaveText([
+    "跟随系统",
+    "日间",
+    "夜间",
+  ]);
+  expect(
+    await page.evaluate(() =>
+      getComputedStyle(document.documentElement)
+        .getPropertyValue("--primary")
+        .trim(),
+    ),
+  ).toBe("#7f1f3d");
+  const measurements = [];
+  for (const mode of ["light", "dark"]) {
+    await displayMode.selectOption(mode);
+    for (const width of [375, 768, 1024, 1440]) {
+      await page.setViewportSize({ width, height: 900 });
+      for (let step = 1; step <= 3; step += 1) {
+        await page
+          .getByRole("navigation", { name: "填写步骤" })
+          .getByRole("button")
+          .nth(step - 1)
+          .click();
+        const overflow = await page.evaluate(
+          () => document.documentElement.scrollWidth - window.innerWidth,
+        );
+        expect(overflow, `${mode}/${width}/step${step}`).toBeLessThanOrEqual(1);
+        measurements.push({ mode, width, step, overflow });
+      }
+    }
+    await page.setViewportSize({ width: 375, height: 900 });
+    await page
+      .getByRole("navigation", { name: "填写步骤" })
+      .getByRole("button")
+      .nth(1)
+      .click();
+    await expect(page.locator("#grade-1-A")).toBeVisible();
+    const result = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
+      .analyze();
+    const severe = result.violations.filter((item) =>
+      ["serious", "critical"].includes(item.impact),
+    );
+    expect(
+      severe.map((item) => ({
+        id: item.id,
+        targets: item.nodes.map((node) => node.target),
+      })),
+    ).toEqual([]);
+    await page.screenshot({
+      path: testInfo.outputPath(`prototype-${mode}-375.png`),
+    });
+  }
+  await displayMode.selectOption("light");
+  await page.reload();
+  await expect(displayMode).toHaveValue("light");
+  await expect(page.locator("html")).not.toHaveClass(/dark/);
+  await displayMode.selectOption("system");
   await page.emulateMedia({ colorScheme: "dark" });
   await expect(page.locator("html")).toHaveClass(/dark/);
   await page.emulateMedia({ colorScheme: "light" });

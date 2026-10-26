@@ -1,16 +1,14 @@
 # WebTable 本机填写系统设计规范
 
-本规范应用于 Vue 3 + shadcn-vue 的长表单。使用系统中文字体、Lucide 图标，不加载外部字体或营销模块。三套风格共用组件、信息结构和业务逻辑。
+本规范应用于 Vue 3 + shadcn-vue 的长表单。使用系统中文字体、Lucide 图标，不加载外部字体或营销模块。界面固定采用原型的纸色/酒红视觉，日间与夜间只改变明暗层级。
 
 ## 主题令牌
 
-| 风格 | data-theme | 主色（浅色/暗色） | 圆角 | 表面 |
+| 模式 | data-theme | 主色（日间/夜间） | 圆角 | 表面 |
 |---|---|---|---|---|
-| 极简 | minimal | #254c3f / #9bd7be | 10px | 暖白、细边框、少量阴影 |
-| 科技 | tech | #245ac3 / #94baff | 6px | 冷灰、蓝色强调、清晰分区 |
-| 扁平 | flat | #8c3a20 / #ffb398 | 16px | 温暖背景、纯色分区、无投影 |
+| 原型 | minimal | #7f1f3d / #a13b56 | 4px | 纸色/深色背景、细边框、无阴影 |
 
-统一使用 background、foreground、card、muted、muted-foreground、primary、primary-foreground、border、input、ring、destructive、success 等语义令牌。暗黑模式独立于风格，使用 html.dark；局部组件禁止写入风格专属颜色。使用者选择风格和明暗模式，偏好保存在本浏览器。
+统一使用 background、foreground、card、muted、muted-foreground、primary、primary-foreground、border、input、ring、destructive、success 等语义令牌。夜间模式使用 html.dark；局部组件禁止写入页面专属颜色。使用者选择显示模式，偏好保存在本浏览器。
 
 ## 布局与排版
 

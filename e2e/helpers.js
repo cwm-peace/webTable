@@ -69,7 +69,7 @@ export async function fillBasic(page, name = "回归测试资料") {
 /**
  * 在空白的同源测试页面读写已有数据库，避免应用保存队列与准备数据互相覆盖。
  * @param {import('@playwright/test').Page} page 当前测试页面
- * @param {object} options answersOnly仅补齐答案；images用于创建完整图片草稿
+ * @param {object} options answersOnly仅补齐答案；images为合成图片；currentStep为恢复阶段；emptyAnswers准备空自评
  * @returns {Promise<void>} 准备完成并回到正式页面
  */
 export async function seedDraft(
@@ -78,6 +78,8 @@ export async function seedDraft(
     answersOnly = false,
     images = syntheticImages(),
     name = "测试本地草稿",
+    currentStep = 1,
+    emptyAnswers = false,
   } = {},
 ) {
   await page.route("**/__e2e_seed", (route) =>
@@ -92,7 +94,15 @@ export async function seedDraft(
     buffer: [...image.buffer],
   }));
   await page.evaluate(
-    async ({ fields, questions, images, answersOnly, name }) => {
+    async ({
+      fields,
+      questions,
+      images,
+      answersOnly,
+      name,
+      currentStep,
+      emptyAnswers,
+    }) => {
       const db = await new Promise((resolve, reject) => {
         const request = indexedDB.open("webtable-local-v1", 1);
         request.onupgradeneeded = () => {
@@ -158,10 +168,13 @@ export async function seedDraft(
             transaction.abort();
             return;
           }
+          // null 专用于准备尚未记录填写阶段的旧草稿。
+          if (currentStep === null) delete draft.currentStep;
+          else draft.currentStep = currentStep;
           draft.answers = questions.map((question) => ({
             questionId: question.id,
-            grade: "A",
-            remark: `测试备注${question.id}`,
+            grade: emptyAnswers ? "" : "A",
+            remark: emptyAnswers ? "" : `测试备注${question.id}`,
           }));
           state.put(draft, "draft");
           state.put(
@@ -180,17 +193,28 @@ export async function seedDraft(
       });
       db.close();
     },
-    { fields, questions, images: payload, answersOnly, name },
+    {
+      fields,
+      questions,
+      images: payload,
+      answersOnly,
+      name,
+      currentStep,
+      emptyAnswers,
+    },
   );
   await page.unroute("**/__e2e_seed");
   await page.goto("/");
-  await expect(page.locator("#basic-name")).toBeEnabled();
+  const restoredStep = [1, 2, 3].includes(currentStep) ? currentStep : 1;
+  await expect(page.locator("#step-heading")).toHaveText(
+    { 1: "基础信息", 2: "喜好自评", 3: "照片及导出" }[restoredStep],
+  );
 }
 
 /**
  * 读取存储数量与虚构姓名，检查刷新和清理时不泄露图片内容到日志。
  * @param {import('@playwright/test').Page} page 当前同源页面
- * @returns {Promise<{draft:boolean,photos:number,name:string|null,stateKeys:string[]}>} 不含实际文件的存储摘要
+ * @returns {Promise<{draft:boolean,photos:number,name:string|null,currentStep:number|undefined,version:number|undefined,stateKeys:string[]}>} 不含实际文件的存储摘要
  */
 export async function storageSummary(page) {
   return page.evaluate(async () => {
@@ -204,11 +228,14 @@ export async function storageSummary(page) {
       const draft = transaction.objectStore("state").get("draft");
       const photos = transaction.objectStore("photos").count();
       const keys = transaction.objectStore("state").getAllKeys();
+      const control = transaction.objectStore("state").get("control");
       transaction.oncomplete = () =>
         resolve({
           draft: Boolean(draft.result),
           photos: photos.result,
           name: draft.result?.basicInfo?.name || null,
+          currentStep: draft.result?.currentStep,
+          version: control.result?.version,
           stateKeys: keys.result,
         });
       transaction.onabort = () => reject(transaction.error);
@@ -224,9 +251,15 @@ export async function storageSummary(page) {
  * @returns {Promise<void>} 最后一步按钮出现后兑现
  */
 export async function goToExport(page) {
-  await page.getByRole("button", { name: "检查并继续" }).click();
+  await page
+    .getByRole("navigation", { name: "填写步骤" })
+    .getByRole("button")
+    .first()
+    .click();
+  await page.getByRole("button", { name: "检查并进入自评" }).click();
+  await expect(page.locator("#assessment-heading")).toBeVisible();
+  await page.getByRole("button", { name: "检查并添加照片" }).click();
   await expect(page.locator("#photo-selfie-1")).toBeVisible();
-  await page.getByRole("button", { name: "检查并继续" }).click();
   await expect(
     page.getByRole("button", { name: "检查并生成 PDF" }),
   ).toBeVisible();
