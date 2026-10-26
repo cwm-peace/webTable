@@ -2,7 +2,7 @@
  * 在当前设备生成包含完整表单、照片和文件附件的 PDF。
  * 只从同源静态路径加载字体，不上传草稿，不持久保存生成结果。
  */
-import { PDFDocument } from "pdf-lib";
+import { PDFDocument, rgb } from "pdf-lib";
 import fontkit from "@pdf-lib/fontkit";
 import {
   allBasicFields as fields,
@@ -35,6 +35,16 @@ const ASSESSMENT_COLUMNS = [
   { label: "评级", width: 92 },
   { label: "备注", width: CONTENT_WIDTH - 34 - 150 - 92 },
 ];
+/** 评级徽章按等级上色，与网页 A–E 配色一致；E 用正红系，一眼锁定「绝对不接受」。 */
+const GRADE_BADGES = {
+  A: { bg: rgb(0.89, 0.949, 0.914), border: rgb(0.145, 0.502, 0.345), text: rgb(0.145, 0.502, 0.345) },
+  B: { bg: rgb(0.894, 0.925, 0.969), border: rgb(0.216, 0.435, 0.682), text: rgb(0.216, 0.435, 0.682) },
+  C: { bg: rgb(0.961, 0.918, 0.816), border: rgb(0.604, 0.416, 0), text: rgb(0.604, 0.416, 0) },
+  D: { bg: rgb(0.973, 0.894, 0.843), border: rgb(0.722, 0.294, 0.09), text: rgb(0.722, 0.294, 0.09) },
+  E: { bg: rgb(1, 0.918, 0.918), border: rgb(0.9, 0, 0), text: rgb(0.9, 0, 0) },
+};
+/** 章节编号用的中文序数，章节数增加时按需扩展。 */
+const CHAPTER_NUMERALS = ["一", "二", "三", "四", "五", "六", "七", "八"];
 
 /**
  * 在取消后停止导出，调用方可区分主动取消与生成失败。
@@ -323,15 +333,15 @@ export async function generatePdf(
   ]);
   const substitutions = buildSubstitutionReport(sanitizer, placeholder);
   if (substitutions) onSubstitution?.(substitutions);
-  document.setTitle("个人填写记录");
-  document.setCreator("WebTable 本地导出");
-  document.setProducer("WebTable");
+  document.setTitle("奴测 · 档案");
+  document.setCreator("奴测 · 本机导出");
+  document.setProducer("奴测");
   // 不把姓名、站点地址或表单唯一标识放进 PDF 元数据。
   const layout = new PdfLayout(document, font, {
-    runningTitle: "个人填写记录",
+    runningTitle: "奴测 · 档案",
     footerNote: "本机生成 · 内容未上传",
   });
-  layout.title("个人填写记录", {
+  layout.title("奴测 · 档案", {
     meta: `生成时间 ${formatTimestamp(new Date())} · ${fields.length} 项资料 · ${questions.length} 项自评 · ${safePhotos.length} 张照片`,
   });
   layout.text(
@@ -341,8 +351,10 @@ export async function generatePdf(
   if (substitutions) layout.note(`注意：${substitutions.pdfText}`);
 
   // 基础资料按网页同一套分组呈现，短字段两列、长文本独占整幅宽。
+  let chapter = 0;
   for (const group of fieldGroups) {
-    layout.section(group.label);
+    chapter += 1;
+    layout.section(`第${CHAPTER_NUMERALS[chapter - 1]}章 · ${group.label}`);
     let pending = [];
     const flushPending = () => {
       if (pending.length) layout.fieldGrid(pending);
@@ -359,7 +371,8 @@ export async function generatePdf(
   }
 
   onProgress({ stage: "排版自评内容", completed: 0, total: 16, percent: 8 });
-  layout.section("接受程度自评");
+  chapter += 1;
+  layout.section(`第${CHAPTER_NUMERALS[chapter - 1]}章 · 接受程度自评`);
   layout.text(
     `等级说明：${Object.entries(GRADE_LABELS)
       .map(([grade, label]) => `${grade} ${label}`)
@@ -386,7 +399,7 @@ export async function generatePdf(
       {
         text: `${answer.grade} ${GRADE_LABELS[answer.grade]}`,
         width: ASSESSMENT_COLUMNS[2].width,
-        badge: true,
+        badge: GRADE_BADGES[answer.grade] ?? true,
       },
       { text: remarks.get(question.id), width: ASSESSMENT_COLUMNS[3].width },
     ]);

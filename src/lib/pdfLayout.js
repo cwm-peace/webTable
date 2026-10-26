@@ -1,7 +1,8 @@
 /**
- * PDF 的 A4 文本排版与分页：报告式版面，只用黑白灰三级颜色区分层级。
- * 按 Unicode 码点换行，保留长备注和段落；此模块只绘制文字与几何图形，
- * 不解释 HTML，也不为用户输入创建链接或 PDF 动作。
+ * PDF 的 A4 文本排版与分页：骨白文书式版面，与网页「奴测」视觉同源。
+ * 暖灰墨色、酒红主色、暗金线条，A–E 评级按等级上色；产物仅作电子文档，
+ * 不考虑打印与灰度阅读器。按 Unicode 码点换行，保留长备注和段落；
+ * 此模块只绘制文字与几何图形，不解释 HTML，也不为用户输入创建链接或 PDF 动作。
  */
 import { rgb } from "pdf-lib";
 
@@ -14,16 +15,25 @@ export const CONTENT_WIDTH = A4[0] - MARGIN * 2;
 const BODY_TOP = A4[1] - 62;
 const BODY_BOTTOM = 64;
 
-/** 纯黑白灰配色，保证打印与灰度阅读器上层级仍然清楚。 */
-const INK = rgb(0.11, 0.12, 0.13);
-const MUTED = rgb(0.42, 0.44, 0.47);
-const SOFT = rgb(0.62, 0.64, 0.67);
-const HAIRLINE = rgb(0.82, 0.83, 0.85);
-const BAND = rgb(0.945, 0.95, 0.955);
-const ZEBRA = rgb(0.972, 0.974, 0.978);
-const FRAME = rgb(0.8, 0.81, 0.84);
+/** 与网页主题同源的文书配色：骨白纸面、炭黑章节、酒红主色、暗金线条。 */
+const INK = rgb(0.17, 0.13, 0.15);
+const MUTED = rgb(0.46, 0.39, 0.42);
+const SOFT = rgb(0.55, 0.5, 0.53);
+const HAIRLINE = rgb(0.82, 0.72, 0.66);
+const BAND = rgb(0.95, 0.9, 0.92);
+const ZEBRA = rgb(0.949, 0.914, 0.859);
+const FRAME = rgb(0.55, 0.43, 0.21);
+const ACCENT = rgb(0.5, 0.12, 0.24);
+const ACCENT_SOFT = rgb(0.925, 0.847, 0.863);
+const BRASS = rgb(0.55, 0.43, 0.21);
+/** 深色区域的亮酒红与骨白文字，对应网页深色主题。 */
+const ACCENT_BRIGHT = rgb(0.631, 0.231, 0.337);
+const BONE = rgb(0.973, 0.941, 0.894);
+const BONE_TEXT = rgb(0.933, 0.898, 0.847);
+const BONE_MUTED = rgb(0.671, 0.616, 0.627);
+const CHARCOAL = rgb(0.169, 0.129, 0.145);
 
-/** 供调用方绘制少量文字时复用同一套灰阶。 */
+/** 供调用方绘制少量文字或评级徽章时复用同一套配色。 */
 export const PALETTE = Object.freeze({
   ink: INK,
   muted: MUTED,
@@ -32,6 +42,11 @@ export const PALETTE = Object.freeze({
   band: BAND,
   zebra: ZEBRA,
   frame: FRAME,
+  accent: ACCENT,
+  accentSoft: ACCENT_SOFT,
+  brass: BRASS,
+  bone: BONE,
+  charcoal: CHARCOAL,
 });
 
 /**
@@ -99,6 +114,14 @@ export class PdfLayout {
    */
   newPage() {
     this.page = this.document.addPage(A4);
+    // 整页骨白纸面，所有内容都落在暖色底上，呼应网页的骨白主题。
+    this.page.drawRectangle({
+      x: 0,
+      y: 0,
+      width: A4[0],
+      height: A4[1],
+      color: BONE,
+    });
     this.y = BODY_TOP;
     this.pageSections.push(this.currentSection);
     return this.page;
@@ -143,21 +166,37 @@ export class PdfLayout {
   }
 
   /**
-   * 绘制文档标题、标题下粗线与一行概要信息。
+   * 绘制首页题名区：通栏炭黑底、骨白标题、酒红双线，概要信息落在带下。
    * @param {string} text 文档标题
    * @param {{meta?:string}} [options] 概要信息
    * @returns {void} 无返回值
    */
   title(text, { meta = "" } = {}) {
-    this.y -= 34;
-    this.draw(text, MARGIN, this.y, 22, INK);
-    this.y -= 13;
-    this.rule(this.y, { thickness: 1.6, color: INK });
-    this.y -= 17;
-    if (meta) {
-      this.draw(meta, MARGIN, this.y, 9, MUTED);
-      this.y -= 6;
-    }
+    const bandHeight = 108;
+    const bandTop = A4[1];
+    this.page.drawRectangle({
+      x: 0,
+      y: bandTop - bandHeight,
+      width: A4[0],
+      height: bandHeight,
+      color: CHARCOAL,
+    });
+    this.draw(text, MARGIN, bandTop - 52, 24, BONE_TEXT);
+    // 编绳式双线：一粗一细，酒红压暗金。
+    this.page.drawLine({
+      start: { x: MARGIN, y: bandTop - 66 },
+      end: { x: MARGIN + CONTENT_WIDTH, y: bandTop - 66 },
+      thickness: 2,
+      color: ACCENT_BRIGHT,
+    });
+    this.page.drawLine({
+      start: { x: MARGIN, y: bandTop - 71 },
+      end: { x: MARGIN + CONTENT_WIDTH, y: bandTop - 71 },
+      thickness: 0.7,
+      color: BRASS,
+    });
+    if (meta) this.draw(meta, MARGIN, bandTop - 90, 9, BONE_MUTED);
+    this.y = bandTop - bandHeight - 18;
   }
 
   /**
@@ -186,7 +225,7 @@ export class PdfLayout {
   }
 
   /**
-   * 绘制一级章节色带，并把页眉章节名切换到本节。
+   * 绘制一级章节带：炭黑底、骨白标题、酒红竖条与暗金下缘线，并更新页眉章节名。
    * @param {string} title 章节标题
    * @returns {void} 无返回值
    */
@@ -195,24 +234,30 @@ export class PdfLayout {
     this.currentSection = title;
     this.pageSections[this.pageSections.length - 1] = title;
     this.y -= 12;
-    const height = 25;
+    const height = 26;
     this.y -= height;
     this.page.drawRectangle({
       x: MARGIN,
       y: this.y,
       width: CONTENT_WIDTH,
       height,
-      color: BAND,
+      color: CHARCOAL,
     });
     this.page.drawRectangle({
       x: MARGIN,
       y: this.y,
-      width: 3.5,
+      width: 4,
       height,
-      color: INK,
+      color: ACCENT_BRIGHT,
     });
-    this.draw(title, MARGIN + 14, this.y + 8, 11.5, INK);
-    this.y -= 16;
+    this.page.drawLine({
+      start: { x: MARGIN, y: this.y - 3 },
+      end: { x: MARGIN + CONTENT_WIDTH, y: this.y - 3 },
+      thickness: 0.7,
+      color: BRASS,
+    });
+    this.draw(title, MARGIN + 15, this.y + 8.5, 11.5, BONE_TEXT);
+    this.y -= 20;
   }
 
   /**
@@ -224,13 +269,13 @@ export class PdfLayout {
   subheading(title, { note = "" } = {}) {
     this.ensureSpace(58);
     this.y -= 22;
-    this.draw(title, MARGIN, this.y, 10.5, INK);
+    this.draw(title, MARGIN, this.y, 10.5, ACCENT);
     if (note) {
       const width = this.font.widthOfTextAtSize(note, 8.5);
       this.draw(note, MARGIN + CONTENT_WIDTH - width, this.y, 8.5, MUTED);
     }
     this.y -= 5;
-    this.rule(this.y);
+    this.rule(this.y, { color: BRASS });
     this.y -= 12;
   }
 
@@ -315,7 +360,7 @@ export class PdfLayout {
       y: this.y,
       width: 3.5,
       height,
-      color: INK,
+      color: ACCENT,
     });
     lines.forEach((line, index) => {
       if (line) this.draw(line, MARGIN + 16, this.y + height - 14 - index * 14, 9.5, INK);
@@ -344,11 +389,11 @@ export class PdfLayout {
     let x = MARGIN;
     this.y -= 14;
     for (const column of columns) {
-      this.draw(column.label, x, this.y, 8.5, MUTED);
+      this.draw(column.label, x, this.y, 8.5, ACCENT);
       x += column.width;
     }
     this.y -= 5;
-    this.rule(this.y, { thickness: 0.9, color: SOFT });
+    this.rule(this.y, { thickness: 0.9, color: BRASS });
     this.y -= 8;
   }
 
@@ -410,16 +455,18 @@ export class PdfLayout {
           if (!line) return;
           if (cell.badge) {
             const width = this.font.widthOfTextAtSize(line, size);
+            // badge 为对象时按等级配色：bg 底色、border 描边、text 文字色。
+            const tone = typeof cell.badge === "object" ? cell.badge : null;
             this.page.drawRectangle({
               x: cell.x + 5,
               y: baseline - 3.5,
               width: width + 12,
               height: 15,
-              color: BAND,
-              borderColor: HAIRLINE,
+              color: tone?.bg ?? BAND,
+              borderColor: tone?.border ?? HAIRLINE,
               borderWidth: 0.5,
             });
-            this.draw(line, cell.x + 11, baseline, size, INK);
+            this.draw(line, cell.x + 11, baseline, size, tone?.text ?? INK);
           } else this.draw(line, cell.x + 6, baseline, size, INK);
         });
       }
@@ -444,9 +491,9 @@ export class PdfLayout {
     this.currentSection = section;
     this.newPage();
     this.y -= 26;
-    this.draw(title, MARGIN, this.y, 15, INK);
+    this.draw(title, MARGIN, this.y, 15, ACCENT);
     this.y -= 6;
-    this.rule(this.y, { thickness: 1.2, color: INK });
+    this.rule(this.y, { thickness: 1.2, color: ACCENT });
     this.y -= 16;
     for (const line of wrapText(caption, this.font, 9, CONTENT_WIDTH)) {
       this.y -= 13;
