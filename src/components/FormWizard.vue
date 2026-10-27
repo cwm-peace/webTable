@@ -874,19 +874,25 @@ onBeforeUnmount(() => {
             </div>
           </section>
           <template v-else>
-            <p
+            <details
               v-if="store.step === 3"
               id="photos-heading"
               tabindex="-1"
-              class="notice mt-3"
+              class="notice photo-rules mt-3"
             >
-              支持 JPEG、PNG、WebP、GIF、BMP、AVIF、TIFF、SVG
-              等常见图片，按文件内容识别格式，HEIC／HEIF
-              取决于浏览器是否内置解码器。单张最多 64 MiB；超过 2500
-              万像素或边长 8192 会自动缩小，动图取第一帧。 不超过 2 MiB、1300
-              万像素且边长不超过 4096 的图片保留原始字节；其余生成压缩 JPEG
-              附件并标记。 原文件可能保留拍摄位置等元数据。
-            </p>
+              <summary class="min-h-11 py-2 font-medium">
+                图片格式与压缩规则（JPEG／PNG／WebP 等常见格式，单张最多 64
+                MiB，超大图自动缩小）
+              </summary>
+              <p class="mt-2">
+                支持 JPEG、PNG、WebP、GIF、BMP、AVIF、TIFF、SVG
+                等常见图片，按文件内容识别格式，HEIC／HEIF
+                取决于浏览器是否内置解码器。单张最多 64 MiB；超过 2500
+                万像素或边长 8192 会自动缩小，动图取第一帧。 不超过 2 MiB、1300
+                万像素且边长不超过 4096 的图片保留原始字节；其余生成压缩 JPEG
+                附件并标记。 原文件可能保留拍摄位置等元数据。
+              </p>
+            </details>
 
             <fieldset :disabled="inputDisabled" class="min-w-0 space-y-5">
               <template v-if="store.step === 1"
@@ -1064,7 +1070,7 @@ onBeforeUnmount(() => {
                       {{ group.items.length }} 完成</span
                     >
                   </summary>
-                  <div class="divide-y mt-4">
+                  <div v-if="openedGroups.has(group.key)" class="divide-y mt-4">
                     <div
                       v-for="question in group.items"
                       :key="question.id"
@@ -1216,6 +1222,13 @@ onBeforeUnmount(() => {
                               : undefined
                           "
                         />
+                        <p
+                          v-if="!meaningful(question.answer.remark)"
+                          class="text-sm remark-empty-hint"
+                          role="status"
+                        >
+                          备注不能为空；没有补充内容时，可点下方“无”快速填写。
+                        </p>
                         <div
                           class="quick-phrases flex flex-wrap gap-2"
                           :aria-label="`${question.itemName}备注快捷短语`"
@@ -1245,6 +1258,17 @@ onBeforeUnmount(() => {
                 </details></template
               >
             </fieldset>
+            <button
+              v-if="store.step === 2"
+              type="button"
+              class="mobile-progress-fab"
+              :disabled="inputDisabled || !nextIncomplete"
+              @click="nextUnfinished"
+            >
+              自评 {{ assessmentsDone }} / {{ store.questions.length }}
+              <span v-if="nextIncomplete">· 下一未完成项</span>
+              <span v-else>· 全部完成</span>
+            </button>
             <section
               v-if="store.step === 3"
               class="panel export-box space-y-2"

@@ -915,3 +915,72 @@
   opacity: 0.55;
   cursor: not-allowed;
 }
+
+/* 校验摘要按步骤分组，避免长列表一次平铺。 */
+.issue-group {
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+}
+.issue-group:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+.issue-group-header h3 {
+  font-size: 14px;
+}
+.issue-group-list > summary {
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--muted-foreground);
+}
+
+/* 备注为空的即时提示，比正式错误弱一级。 */
+.remark-empty-hint {
+  color: var(--muted-foreground);
+  margin-top: 6px;
+}
+
+/* 照片格式说明默认折叠，保留一行摘要。 */
+.photo-rules > summary {
+  cursor: pointer;
+}
+
+/* 移动端自评进度胶囊：桌面隐藏，小屏悬浮于右下。 */
+.mobile-progress-fab {
+  display: none;
+}
+@media (max-width: 960px) {
+  .mobile-progress-fab {
+    position: fixed;
+    right: 14px;
+    bottom: max(14px, env(safe-area-inset-bottom));
+    z-index: 30;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 44px;
+    padding: 10px 16px;
+    border-radius: 999px;
+    border: 1px solid var(--primary);
+    background: var(--primary);
+    color: var(--primary-foreground);
+    font-size: 13px;
+    font-weight: 600;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
+  }
+  .mobile-progress-fab:disabled {
+    opacity: 0.65;
+  }
+  /* 小屏导航压缩：品牌区精简，步骤条吸附在顶部。 */
+  .form-sidebar .rope-rule,
+  .form-sidebar .brand-kicker {
+    display: none;
+  }
+  .step-navigation {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--background);
+    padding-block: 6px;
+  }
+}

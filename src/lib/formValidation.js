@@ -188,20 +188,25 @@ export function validateBasicField(key, value) {
 export function summarizeIssues(issues) {
   const groups = new Map();
   for (const issue of Array.isArray(issues) ? issues : []) {
-    const step = STEP_LABELS[issue?.step] ? issue.step : 0;
-    if (!groups.has(step))
-      groups.set(step, {
-        step,
-        label: STEP_LABELS[step] || "其他",
+    // 已知步骤按页面顺序排列；未知或缺失步骤归入末尾的“其他”。
+    const known = STEP_LABELS[issue?.step];
+    const sortKey = known ? issue.step : Number.MAX_SAFE_INTEGER;
+    if (!groups.has(sortKey))
+      groups.set(sortKey, {
+        step: known ? issue.step : 0,
+        label: known || "其他",
         count: 0,
         first: issue,
         issues: [],
+        sortKey,
       });
-    const group = groups.get(step);
+    const group = groups.get(sortKey);
     group.count += 1;
     group.issues.push(issue);
   }
-  return [...groups.values()].sort((left, right) => left.step - right.step);
+  return [...groups.values()]
+    .sort((left, right) => left.sortKey - right.sortKey)
+    .map(({ sortKey, ...group }) => group);
 }
 
 /**
