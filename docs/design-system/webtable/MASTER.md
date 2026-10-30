@@ -1,14 +1,15 @@
 # WebTable 本机填写系统设计规范
 
-本规范应用于 Vue 3 + shadcn-vue 的长表单。使用系统中文字体、Lucide 图标，不加载外部字体或营销模块。界面固定采用原型的纸色/酒红视觉，日间与夜间只改变明暗层级。
+本规范应用于 Vue 3 + shadcn-vue 的长表单。使用系统中文字体、Lucide 图标，不加载外部字体或营销模块。「臣服」保留纸色/酒红视觉，「午夜」采用 velvet 原型的钢灰/蓝黑视觉；两套风格共用日间、夜间和跟随系统模式。
 
 ## 主题令牌
 
-| 模式 | data-theme | 主色（日间/夜间） | 圆角 | 表面 |
+| 风格 | data-style | 主色（日间/夜间） | 圆角 | 表面 |
 |---|---|---|---|---|
-| 原型 | minimal | #7f1f3d / #a13b56 | 4px | 纸色/深色背景、细边框、无阴影 |
+| 臣服 | submission | #7f1f3d / #a13b56 | 4px | 纸色/深色背景、细边框、无阴影 |
+| 午夜 | midnight | #1d4ed8 / #2563eb | 8px | 钢灰/蓝黑背景、渐变卡片、蓝色光晕 |
 
-统一使用 background、foreground、card、muted、muted-foreground、primary、primary-foreground、border、input、ring、destructive、success 等语义令牌。夜间模式使用 html.dark；局部组件禁止写入页面专属颜色。使用者选择显示模式，偏好保存在本浏览器。
+统一使用 background、foreground、card、muted、muted-foreground、primary、primary-foreground、border、input、ring、destructive、success 等语义令牌。夜间模式使用 html.dark，data-theme 保留 minimal 兼容值；组件不硬编码配色，两套共用动效在 src/styles/prototype-effects.css，午夜专属布局配色隔离在 src/styles/midnight.css。使用者选择风格与显示模式，偏好保存在本浏览器。
 
 ## 布局与排版
 
@@ -20,4 +21,4 @@
 
 输入必须有可见 label；加载、失败、空状态分别展示。自动保存状态显示“待保存/保存中/已保存/离线待重试/版本冲突”；冲突保留本地编辑，不自动覆盖。清除草稿和确认已保存等操作提供明确确认。表格状态同时使用文字，不能只靠颜色。键盘焦点可见，弹窗可关闭且标题明确，主内容提供跳转入口。
 
-仅使用 150ms 颜色/透明度反馈，遵守 prefers-reduced-motion。不使用装饰性渐入、无限动画或使布局位移的悬停。本机图片处理和PDF生成显示进度，支持失败重试。正文前景对背景至少 4.5:1。所有成功提示通过 aria-live 输出，错误使用 role=alert。
+两套风格的动效以 velvet 原型为准，臣服使用酒红/玫瑰/暖金色晕，午夜使用蓝色色晕：三组极光各自漂移（13/17/11秒）并叠加4.2秒心跳，光点9秒漂浮，归属吊牌与扩散环4.2秒，蓝红进度流光3.2秒，前进/生成主按钮4.2秒呼吸发光并最多缩放至1.03。侧栏透明以透出极光；保留跪姿品牌线稿与绳纹，桌面在真实草稿编号旁显示吊牌，窄屏转到品牌旁。装饰不接受输入且从可访问树隐藏，原生进度语义不变。遵守 prefers-reduced-motion，开启时停止全部动画并隐藏光点，其他元素保留静态形态。本机图片处理和PDF生成显示进度，支持失败重试。正文前景对背景至少4.5:1，午夜蓝色主按钮比原型稍深以保证白字可读。所有成功提示通过 aria-live 输出，错误使用 role=alert。

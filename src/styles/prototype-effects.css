@@ -1,0 +1,375 @@
+/* 两套风格共用的原型动效和徽记；只改变展示，不接触填写、保存与 PDF。 */
+:root[data-style="submission"] {
+  --petal: #9e354b;
+  --aurora-one: rgb(127 31 61 / 12%);
+  --aurora-two: rgb(139 109 53 / 10%);
+  --aurora-three: rgb(161 59 86 / 10%);
+  --primary-end: #4d142a;
+  /* 透明纸底叠加色晕后，补强辅助文字与等级标签的可读性。 */
+  --muted-foreground: #504248;
+  --grade-a: #104c2e;
+  --grade-b: #1d446b;
+  --grade-c: #5b3b00;
+  --grade-d: #752605;
+  --grade-e: #8c1026;
+}
+:root[data-style="submission"].dark {
+  --petal: #e8a0b1;
+  --aurora-one: rgb(161 59 86 / 17%);
+  --aurora-two: rgb(139 109 53 / 11%);
+  --aurora-three: rgb(127 31 61 / 14%);
+  --primary-end: #521e34;
+  --muted-foreground: #ab9da0;
+  --grade-a: #55bd85;
+  --grade-b: #6d9ee8;
+  --grade-c: #e2b13c;
+  --grade-d: #ed7a3c;
+  --grade-e: #ff606b;
+}
+
+@layer components {
+  .theme-atmosphere {
+    display: none;
+  }
+  .prototype-seal,
+  .prototype-progress-track,
+  .prototype-number-label {
+    display: none;
+  }
+  :root[data-style] .theme-atmosphere {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    display: block;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  :root[data-style] .form-shell {
+    position: relative;
+    z-index: 1;
+  }
+  .theme-glow {
+    position: absolute;
+    display: block;
+    border-radius: 50%;
+    filter: blur(70px);
+    mix-blend-mode: multiply;
+  }
+  :root[data-style].dark .theme-glow {
+    mix-blend-mode: screen;
+  }
+  .glow-one {
+    width: 62vw;
+    height: 62vw;
+    right: -14vw;
+    top: -18vw;
+    background: var(--aurora-one);
+    animation:
+      prototype-drift-one 13s ease-in-out infinite,
+      prototype-heartbeat 4.2s ease-in-out infinite;
+  }
+  .glow-two {
+    width: 48vw;
+    height: 48vw;
+    left: -12vw;
+    bottom: -14vw;
+    background: var(--aurora-two);
+    animation:
+      prototype-drift-two 17s ease-in-out infinite,
+      prototype-heartbeat 4.2s ease-in-out 0.35s infinite;
+  }
+  .glow-three {
+    width: 36vw;
+    height: 36vw;
+    left: 38%;
+    top: 32%;
+    background: var(--aurora-three);
+    animation:
+      prototype-drift-three 11s ease-in-out infinite,
+      prototype-heartbeat 4.2s ease-in-out 0.15s infinite;
+  }
+  .theme-dust i {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    left: 12%;
+    bottom: -4vh;
+    border-radius: 50%;
+    background: var(--petal);
+    box-shadow: 0 0 12px 3px var(--aurora-two);
+    opacity: 0;
+    animation: prototype-rise 9s linear infinite;
+  }
+  .theme-dust i:nth-child(2) {
+    width: 3px;
+    height: 3px;
+    left: 28%;
+    animation-delay: 2.2s;
+  }
+  .theme-dust i:nth-child(3) {
+    left: 47%;
+    animation-delay: 4.6s;
+  }
+  .theme-dust i:nth-child(4) {
+    width: 4px;
+    height: 4px;
+    left: 63%;
+    animation-delay: 1.4s;
+  }
+  .theme-dust i:nth-child(5) {
+    width: 3px;
+    height: 3px;
+    left: 78%;
+    animation-delay: 5.8s;
+  }
+  .theme-dust i:nth-child(6) {
+    left: 90%;
+    animation-delay: 3.1s;
+  }
+
+  :root[data-style] .form-sidebar {
+    /* 原型侧栏透出左下极光，不用实色面板遮住背景特效。 */
+    background: transparent;
+  }
+  :root[data-style] .draft-id {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 46px;
+  }
+  :root[data-style] .prototype-number-label {
+    display: inline;
+  }
+  :root[data-style] .prototype-seal {
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    flex: none;
+    color: var(--petal);
+    filter: drop-shadow(0 0 6px var(--aurora-two));
+    pointer-events: none;
+    animation: prototype-sealbeat 4.2s ease-in-out infinite;
+  }
+  :root[data-style] .prototype-seal::after {
+    content: "";
+    position: absolute;
+    inset: -4px;
+    border: 1.5px solid var(--petal);
+    border-radius: 50%;
+    animation: prototype-ringpulse 4.2s ease-out infinite;
+  }
+  :root[data-style] .mobile-draft-seal {
+    display: none;
+  }
+  :root[data-style] [data-slot="button"].bg-primary,
+  :root[data-style] .action-link.primary {
+    background: linear-gradient(135deg, var(--primary), var(--primary-end));
+    box-shadow: 0 0 16px var(--aurora-two);
+  }
+  /* 只让前进/生成主按钮按原型呼吸，不给清除确认操作加吸引注意的动效。 */
+  :root[data-style]
+    .form-actions
+    [data-slot="button"].bg-primary:not(:disabled) {
+    animation: prototype-button-pulse 4.2s ease-in-out infinite;
+  }
+  :root[data-style] .form-actions [data-slot="button"].bg-primary:disabled {
+    box-shadow: none;
+  }
+  :root[data-style] .assessment-progress-wrap {
+    position: relative;
+  }
+  :root[data-style] .assessment-progress {
+    /* 数值语义保留在原生控件；可视填充层由同一完成数驱动。 */
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+  :root[data-style] .prototype-progress-track {
+    display: block;
+    height: 7px;
+    border-radius: 99px;
+    overflow: hidden;
+    background: var(--muted);
+  }
+  :root[data-style] .prototype-progress-fill {
+    display: block;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      var(--primary),
+      var(--petal),
+      var(--primary)
+    );
+    background-size: 200% 100%;
+    border-radius: 99px;
+    box-shadow: 0 0 12px 1px var(--aurora-two);
+    animation: prototype-flow 3.2s linear infinite;
+  }
+  @media (max-width: 960px) {
+    :root[data-style] .mobile-draft-seal {
+      display: inline-grid;
+      margin-left: 4px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .theme-dust {
+      display: none;
+    }
+  }
+}
+@layer utilities {
+  /* 呼吸动画会更新 box-shadow，用独立轮廓保留键盘焦点标记。 */
+  :root[data-style]
+    .form-actions
+    [data-slot="button"].bg-primary:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 3px;
+  }
+  /* 两套风格使用相同聚焦过渡，不覆盖各自输入底色。 */
+  :root[data-style] .form-main [data-slot="input"],
+  :root[data-style] .form-main [data-slot="textarea"] {
+    transition:
+      border-color 0.25s,
+      box-shadow 0.25s;
+  }
+  /* 与默认焦点工具类同层，保留键盘轮廓，同时恢复原型的红边和两层光晕。 */
+  :root[data-style] .form-main [data-slot="input"]:focus,
+  :root[data-style] .form-main [data-slot="textarea"]:focus {
+    border-color: var(--petal);
+    box-shadow:
+      0 0 0 3px var(--aurora-one),
+      0 0 24px 2px var(--aurora-two);
+  }
+  :root[data-style] .form-main [data-slot][aria-invalid="true"]:focus {
+    border-color: var(--destructive);
+  }
+}
+@keyframes prototype-drift-one {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(-9vw, 7vh) scale(1.18);
+  }
+}
+@keyframes prototype-drift-two {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1.05);
+  }
+  50% {
+    transform: translate(10vw, -6vh) scale(0.9);
+  }
+}
+@keyframes prototype-drift-three {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(0.9);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translate(6vw, -8vh) scale(1.25);
+    opacity: 1;
+  }
+}
+@keyframes prototype-heartbeat {
+  0%,
+  100% {
+    opacity: 0.75;
+  }
+  12%,
+  36% {
+    opacity: 1;
+  }
+  24% {
+    opacity: 0.8;
+  }
+  60% {
+    opacity: 0.75;
+  }
+}
+@keyframes prototype-sealbeat {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  12% {
+    transform: scale(1.22);
+  }
+  24% {
+    transform: scale(1.02);
+  }
+  36% {
+    transform: scale(1.18);
+  }
+  60% {
+    transform: scale(1);
+  }
+}
+@keyframes prototype-ringpulse {
+  0%,
+  8% {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+  16% {
+    opacity: 0.9;
+  }
+  55%,
+  100% {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+}
+@keyframes prototype-button-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 14px 2px var(--aurora-one);
+    transform: scale(1);
+  }
+  12% {
+    box-shadow: 0 0 34px 8px var(--aurora-two);
+    transform: scale(1.03);
+  }
+  36% {
+    box-shadow: 0 0 26px 5px var(--aurora-two);
+    transform: scale(1.02);
+  }
+  60% {
+    box-shadow: 0 0 14px 2px var(--aurora-one);
+    transform: scale(1);
+  }
+}
+@keyframes prototype-flow {
+  to {
+    background-position: -200% 0;
+  }
+}
+@keyframes prototype-rise {
+  0% {
+    bottom: -4vh;
+    transform: translateX(0);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.9;
+  }
+  55% {
+    transform: translateX(4vw);
+    opacity: 0.7;
+  }
+  100% {
+    bottom: 104vh;
+    transform: translateX(-3vw);
+    opacity: 0;
+  }
+}

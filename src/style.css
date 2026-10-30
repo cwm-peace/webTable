@@ -1,6 +1,8 @@
 /* 共享语义主题、基础可访问样式与响应式本机表单布局。 */
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "./styles/prototype-effects.css";
+@import "./styles/midnight.css";
 @custom-variant dark (&:is(.dark *));
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
@@ -463,6 +465,11 @@
     font-size: 12px;
     min-width: 94px;
   }
+  .style-switch {
+    font-size: 12px;
+    border-color: var(--input);
+    background: var(--card);
+  }
   .save-state {
     font-size: 12px;
     color: var(--muted-foreground);
@@ -864,7 +871,7 @@
     width: 100%;
   }
   .top-actions [aria-label="外观设置"] {
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
   }
   .grade-legend {
     grid-template-columns: minmax(0, 1fr);

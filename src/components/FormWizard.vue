@@ -41,6 +41,7 @@ import {
   Trash2,
 } from "lucide-vue-next";
 import ThemeControl from "./ThemeControl.vue";
+import PrototypeSeal from "./PrototypeSeal.vue";
 import PhotoSlot from "./form/PhotoSlot.vue";
 const store = useFormStore();
 const ageChecked = ref(false),
@@ -447,6 +448,7 @@ onBeforeUnmount(() => {
           <p class="eyebrow brand-kicker">个人喜好筛选工具</p>
           <h1 class="page-title mt-2">奴测</h1>
         </div>
+        <PrototypeSeal class="mobile-draft-seal" />
       </div>
       <svg
         class="rope-rule"
@@ -464,7 +466,13 @@ onBeforeUnmount(() => {
       <template v-if="store.ageAccepted && store.revision && !store.complete">
         <div class="draft-meta text-sm text-muted-foreground space-y-2">
           <p>本机草稿</p>
-          <p class="break-all">{{ store.revision.id }}</p>
+          <p class="draft-id break-all">
+            <PrototypeSeal />
+            <span class="min-w-0">
+              {{ store.revision.id }}
+              <span class="prototype-number-label"> · 已被编号</span>
+            </span>
+          </p>
           <p>
             {{
               store.storageMode === "memory"
@@ -508,12 +516,23 @@ onBeforeUnmount(() => {
               <dd>{{ store.revision.photos.length }} / 16</dd>
             </div>
           </dl>
-          <progress
-            class="assessment-progress w-full h-2"
-            :value="assessmentsDone"
-            :max="store.questions.length"
-            aria-label="喜好自评完成进度"
-          />
+          <div class="assessment-progress-wrap">
+            <progress
+              class="assessment-progress w-full h-2"
+              :value="assessmentsDone"
+              :max="store.questions.length"
+              aria-label="喜好自评完成进度"
+            />
+            <!-- 流光单独绘制以统一三种浏览器表现，原生进度仍提供真实数值和可访问语义。 -->
+            <div class="prototype-progress-track" aria-hidden="true">
+              <span
+                class="prototype-progress-fill"
+                :style="{
+                  width: `${(assessmentsDone / store.questions.length) * 100}%`,
+                }"
+              ></span>
+            </div>
+          </div>
         </div>
         <details class="text-sm text-muted-foreground">
           <summary class="min-h-11 py-2 font-medium">草稿与隐私说明</summary>

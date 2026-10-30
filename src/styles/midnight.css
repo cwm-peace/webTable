@@ -1,0 +1,113 @@
+/* Velvet 原型的午夜皮肤：仅保留专属视觉令牌与卡片布局，不改变表单、存储或 PDF 行为。 */
+:root[data-style="midnight"] {
+  --radius: 0.5rem;
+  --background: #e2e5ea;
+  --foreground: #131a24;
+  --card: #e9edf2;
+  --panel-raised: #f2f4f7;
+  --muted: #d3d9e2;
+  --muted-foreground: #465364;
+  --primary: #1d4ed8;
+  --primary-foreground: #fff;
+  --border: #c0c8d4;
+  /* 空白输入与卡片同底色，以足够清晰的边框标出可填写区域。 */
+  --input: #748398;
+  --ring: #1d4ed8;
+  --destructive: #a03028;
+  --success: #246245;
+  --sidebar: #e9edf2;
+  --accent-text: #1e40af;
+  --accent-soft: #d5e0f5;
+  --brass: #4e617c;
+  --petal: #a03028;
+  --panel-shadow: 0 8px 24px rgb(40 60 90 / 7%);
+  --aurora-one: rgb(29 78 216 / 14%);
+  --aurora-two: rgb(70 100 150 / 12%);
+  --aurora-three: rgb(40 70 130 / 13%);
+  --primary-end: #0f2a66;
+}
+:root[data-style="midnight"].dark {
+  --background: #0a0f16;
+  --foreground: #e8edf4;
+  --card: #101722;
+  --panel-raised: #141e2c;
+  --muted: #1b2636;
+  --muted-foreground: #9aa8ba;
+  /* 比原型的亮蓝略深，确保主要按钮的白色小字对比度。 */
+  --primary: #2563eb;
+  --primary-foreground: #fff;
+  --border: #263242;
+  --input: #64758d;
+  --ring: #7fb3ff;
+  --destructive: #ffaaa2;
+  --success: #72b493;
+  --sidebar: #101722;
+  --accent-text: #7fb3ff;
+  --accent-soft: #12233d;
+  --brass: #8fa3bd;
+  --petal: #d9544a;
+  --panel-shadow:
+    0 10px 30px rgb(0 0 0 / 22%), inset 0 1px 0 rgb(127 179 255 / 4%);
+  --aurora-one: rgb(59 130 246 / 50%);
+  --aurora-two: rgb(70 120 190 / 38%);
+  --aurora-three: rgb(30 80 160 / 50%);
+  --primary-end: #1e3a8a;
+}
+
+@layer components {
+  :root[data-style="midnight"] .form-main .panel,
+  :root[data-style="midnight"] .form-sidebar .compact-panel {
+    padding: 22px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: linear-gradient(160deg, var(--panel-raised), var(--card));
+    box-shadow: var(--panel-shadow);
+  }
+  :root[data-style="midnight"] .form-sidebar .compact-panel {
+    padding: 18px;
+  }
+  :root[data-style="midnight"] .form-main .panel > h3 {
+    font-family: var(--serif);
+    font-size: 22px;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+  }
+  :root[data-style="midnight"] .step-button,
+  :root[data-style="midnight"] .form-main [data-slot="button"],
+  :root[data-style="midnight"] .form-sidebar [data-slot="button"],
+  :root[data-style="midnight"] .form-main [data-slot="input"],
+  :root[data-style="midnight"] .form-main [data-slot="textarea"],
+  :root[data-style="midnight"] .form-main .notice,
+  :root[data-style="midnight"] .grade-option,
+  :root[data-style="midnight"] .remark-editor,
+  :root[data-style="midnight"] .action-link {
+    border-radius: 6px;
+  }
+  :root[data-style="midnight"] .form-main .assessment-group {
+    padding: 0;
+  }
+  :root[data-style="midnight"] .assessment-group summary {
+    padding-inline: 20px;
+  }
+  :root[data-style="midnight"] .assessment-group > div {
+    padding-inline: 20px;
+  }
+  @media (max-width: 680px) {
+    :root[data-style="midnight"] .form-main .panel {
+      padding: 18px 14px;
+    }
+    :root[data-style="midnight"] .form-main .assessment-group {
+      padding: 0;
+    }
+    :root[data-style="midnight"] .assessment-group summary,
+    :root[data-style="midnight"] .assessment-group > div {
+      padding-inline: 12px;
+    }
+  }
+}
+@layer utilities {
+  :root[data-style="midnight"] .form-main [data-slot="input"],
+  :root[data-style="midnight"] .form-main [data-slot="textarea"] {
+    background-color: var(--card);
+  }
+}

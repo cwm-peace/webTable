@@ -263,9 +263,11 @@ test("字体缺字的 emoji 自动用占位符代替并明确提示", async ({ p
   expect(await download.getAttribute("href")).toMatch(/^blob:/);
 });
 
-test("原型日间和夜间在四种宽度无溢出，显示偏好恢复且跟随系统", async ({
+test("两种风格日间和夜间在四种宽度无溢出，偏好恢复、系统跟随和填写数据保留", async ({
   page,
 }, testInfo) => {
+  // 五次刷新会等待旧页租约自然到期，给状态驱动的等待保留足够时间。
+  test.setTimeout(150_000);
   // 旧风格偏好不应改变原型；只初始化一次，刷新仍能检验新选择的持久化。
   await page.addInitScript(() => {
     if (!sessionStorage.getItem("display-mode-regression")) {
@@ -276,7 +278,18 @@ test("原型日间和夜间在四种宽度无溢出，显示偏好恢复且跟�
   });
   await seedDraft(page);
   await expect(page.getByRole("combobox", { name: "界面风格" })).toHaveCount(0);
+  const root = page.locator("html");
+  const styleSwitch = page.getByRole("button", { name: "切换界面风格" });
   const displayMode = page.getByRole("combobox", { name: "显示模式" });
+  const steps = page
+    .getByRole("navigation", { name: "填写步骤" })
+    .getByRole("button");
+  const savedStatus = page
+    .getByRole("status")
+    .filter({ hasText: "已保存在此浏览器" });
+  await expect(root).toHaveAttribute("data-style", "submission");
+  await expect(styleSwitch).toHaveText("风格：臣服");
+  await expect(styleSwitch).toHaveAttribute("aria-pressed", "false");
   await expect(displayMode).toHaveValue("light");
   await expect(displayMode.locator("option")).toHaveText([
     "跟随系统",
@@ -290,56 +303,163 @@ test("原型日间和夜间在四种宽度无溢出，显示偏好恢复且跟�
         .trim(),
     ),
   ).toBe("#7f1f3d");
+  // 用真实输入与评级修改草稿，避免仅验证准备数据而漏掉切换时重置编辑状态。
+  const name = "风格切换后保留的合成姓名";
+  await page.locator("#basic-name").fill(name);
+  await steps.nth(1).click();
+  await page.locator('label[for="grade-1-B"]').click();
+  await expect(page.locator("#grade-1-B")).toBeChecked();
   const measurements = [];
-  for (const mode of ["light", "dark"]) {
-    await displayMode.selectOption(mode);
-    for (const width of [375, 768, 1024, 1440]) {
-      await page.setViewportSize({ width, height: 900 });
-      for (let step = 1; step <= 3; step += 1) {
-        await page
-          .getByRole("navigation", { name: "填写步骤" })
-          .getByRole("button")
-          .nth(step - 1)
-          .click();
-        const overflow = await page.evaluate(
-          () => document.documentElement.scrollWidth - window.innerWidth,
-        );
-        expect(overflow, `${mode}/${width}/step${step}`).toBeLessThanOrEqual(1);
-        measurements.push({ mode, width, step, overflow });
-      }
-    }
-    await page.setViewportSize({ width: 375, height: 900 });
-    await page
-      .getByRole("navigation", { name: "填写步骤" })
-      .getByRole("button")
-      .nth(1)
-      .click();
-    await expect(page.locator("#grade-1-A")).toBeVisible();
-    const result = await new AxeBuilder({ page })
-      .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
-      .analyze();
-    const severe = result.violations.filter((item) =>
-      ["serious", "critical"].includes(item.impact),
+  const appearances = [
+    {
+      style: "submission",
+      label: "臣服",
+      backgrounds: { light: "rgb(241, 232, 219)", dark: "rgb(13, 11, 14)" },
+    },
+    {
+      style: "midnight",
+      label: "午夜",
+      backgrounds: { light: "rgb(226, 229, 234)", dark: "rgb(10, 15, 22)" },
+    },
+  ];
+  for (const { style, label, backgrounds } of appearances) {
+    if (style === "midnight") await styleSwitch.click();
+    await expect(root).toHaveAttribute("data-style", style);
+    await expect(styleSwitch).toHaveText(`风格：${label}`);
+    await expect(styleSwitch).toHaveAttribute(
+      "aria-pressed",
+      String(style === "midnight"),
     );
-    expect(
-      severe.map((item) => ({
-        id: item.id,
-        targets: item.nodes.map((node) => node.target),
-      })),
-    ).toEqual([]);
-    await page.screenshot({
-      path: testInfo.outputPath(`prototype-${mode}-375.png`),
-    });
+    for (const mode of ["light", "dark"]) {
+      await displayMode.selectOption(mode);
+      // 检查实际绘制颜色，确保 data-style 的变化确实应用了第二套色板。
+      await expect(page.locator("body")).toHaveCSS(
+        "background-color",
+        backgrounds[mode],
+      );
+      for (const width of [375, 768, 1024, 1440]) {
+        await page.setViewportSize({ width, height: 900 });
+        for (let step = 1; step <= 3; step += 1) {
+          await steps.nth(step - 1).click();
+          await expect(page.locator("#step-heading")).toHaveText(
+            ["基础信息", "喜好自评", "照片及导出"][step - 1],
+          );
+          if (step === 1) {
+            await expect(page.locator("#basic-name")).toHaveValue(name);
+            if (style === "midnight")
+              await expect(page.locator("#basic-name")).toHaveCSS(
+                "background-color",
+                mode === "light" ? "rgb(233, 237, 242)" : "rgb(16, 23, 34)",
+              );
+          }
+          if (step === 2)
+            await expect(page.locator("#grade-1-B")).toBeChecked();
+          const overflow = await page.evaluate(
+            () => document.documentElement.scrollWidth - window.innerWidth,
+          );
+          expect(
+            overflow,
+            `${style}/${mode}/${width}/step${step}`,
+          ).toBeLessThanOrEqual(1);
+          measurements.push({ style, mode, width, step, overflow });
+          if (style === "midnight" && width === 1440 && step === 1)
+            await page.screenshot({
+              path: testInfo.outputPath(`midnight-${mode}-1440.png`),
+            });
+        }
+      }
+      await page.setViewportSize({ width: 375, height: 900 });
+      await steps.nth(1).click();
+      await expect(page.locator("#grade-1-B")).toBeChecked();
+      const result = await new AxeBuilder({ page })
+        .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
+        .analyze();
+      const severe = result.violations.filter((item) =>
+        ["serious", "critical"].includes(item.impact),
+      );
+      expect(
+        severe.map((item) => ({
+          id: item.id,
+          targets: item.nodes.map((node) => node.target),
+        })),
+        `${style}/${mode}/375 accessibility`,
+      ).toEqual([]);
+      await page.screenshot({
+        path: testInfo.outputPath(`${style}-${mode}-375.png`),
+      });
+    }
+
+    await displayMode.selectOption("light");
+    // 阶段也通过防抖保存，等成功后刷新才能断言恢复到第二步。
+    await expect(savedStatus).toBeVisible();
+    await page.reload();
+    // 刷新保留旧页租约；等编辑权恢复后再导航，避免把只读状态误测为外观回归。
+    await expect(page.locator("#grade-1-B")).toBeEnabled({ timeout: 16_000 });
+    await expect(root).toHaveAttribute("data-style", style);
+    await expect(styleSwitch).toHaveText(`风格：${label}`);
+    await expect(styleSwitch).toHaveAttribute(
+      "aria-pressed",
+      String(style === "midnight"),
+    );
+    await expect(displayMode).toHaveValue("light");
+    await expect(root).not.toHaveClass(/dark/);
+    await expect(page.locator("body")).toHaveCSS(
+      "background-color",
+      backgrounds.light,
+    );
+    await steps.first().click();
+    await expect(page.locator("#basic-name")).toHaveValue(name);
+    await steps.nth(1).click();
+    await expect(page.locator("#grade-1-B")).toBeChecked();
+
+    await displayMode.selectOption("system");
+    await page.emulateMedia({ colorScheme: "dark" });
+    await expect(root).toHaveClass(/dark/);
+    await expect(page.locator("body")).toHaveCSS(
+      "background-color",
+      backgrounds.dark,
+    );
+    await expect(savedStatus).toBeVisible();
+    await page.reload();
+    await expect(page.locator("#grade-1-B")).toBeEnabled({ timeout: 16_000 });
+    await expect(displayMode).toHaveValue("system");
+    await expect(root).toHaveAttribute("data-style", style);
+    await expect(root).toHaveClass(/dark/);
+    await page.emulateMedia({ colorScheme: "light" });
+    await expect(root).not.toHaveClass(/dark/);
+    await expect(page.locator("body")).toHaveCSS(
+      "background-color",
+      backgrounds.light,
+    );
   }
-  await displayMode.selectOption("light");
+
+  await expect(page.locator(".theme-atmosphere")).toBeVisible();
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  const atmosphereOrbs = page.locator(".theme-atmosphere span");
+  expect(await atmosphereOrbs.count()).toBeGreaterThan(0);
+  for (const orb of await atmosphereOrbs.all())
+    await expect(orb).toHaveCSS("animation-name", "none");
+  await styleSwitch.click();
+  await expect(root).toHaveAttribute("data-style", "submission");
+  await expect(styleSwitch).toHaveAttribute("aria-pressed", "false");
+  await expect(page.locator(".theme-atmosphere")).toHaveCSS("display", "block");
+  await expect(page.locator("body")).toHaveCSS(
+    "background-color",
+    appearances[0].backgrounds.light,
+  );
+  // 切回后的刷新需覆盖旧午夜偏好，不能仅以初始默认值证明臣服风格可恢复。
+  await expect(savedStatus).toBeVisible();
   await page.reload();
-  await expect(displayMode).toHaveValue("light");
-  await expect(page.locator("html")).not.toHaveClass(/dark/);
-  await displayMode.selectOption("system");
-  await page.emulateMedia({ colorScheme: "dark" });
-  await expect(page.locator("html")).toHaveClass(/dark/);
-  await page.emulateMedia({ colorScheme: "light" });
-  await expect(page.locator("html")).not.toHaveClass(/dark/);
+  await expect(page.locator("#grade-1-B")).toBeEnabled({ timeout: 16_000 });
+  await expect(root).toHaveAttribute("data-style", "submission");
+  await expect(styleSwitch).toHaveText("风格：臣服");
+  await expect(styleSwitch).toHaveAttribute("aria-pressed", "false");
+  await expect(displayMode).toHaveValue("system");
+  await expect(page.locator(".theme-atmosphere")).toHaveCSS("display", "block");
+  await steps.first().click();
+  await expect(page.locator("#basic-name")).toHaveValue(name);
+  await steps.nth(1).click();
+  await expect(page.locator("#grade-1-B")).toBeChecked();
   await testInfo.attach("layout-matrix", {
     body: JSON.stringify(measurements),
     contentType: "application/json",
