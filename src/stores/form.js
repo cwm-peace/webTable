@@ -4,6 +4,7 @@ import { computed, nextTick, ref, toRaw, watch } from "vue";
 import { createAutosave } from "../lib/autosave";
 import {
   basicPayload,
+  grades,
   newDraft,
   questions as fixedQuestions,
   validateRevision,
@@ -39,8 +40,9 @@ export const useFormStore = defineStore("form", () => {
   const pdfReady = computed(() => Boolean(pdfUrl.value));
   const answered = computed(
     () =>
-      (revision.value?.answers || []).filter((a) => /^[A-E]$/.test(a.grade))
-        .length,
+      (revision.value?.answers || []).filter((a) =>
+        Object.hasOwn(grades, a.grade),
+      ).length,
   );
   const dirty = computed(() =>
     ["pending", "saving", "error", "conflict"].includes(saveStatus.value),
@@ -85,7 +87,14 @@ export const useFormStore = defineStore("form", () => {
       throw new Error(
         "本机草稿结构无法读取，请先在浏览器设置中清理该网站数据后再使用",
       );
-    return { ...value, basicInfo: basicPayload(value.basicInfo) };
+    return {
+      ...value,
+      basicInfo: basicPayload(value.basicInfo),
+      // 旧草稿没有阶段字段，异常值也回到第一页，不升级数据库或草稿版本。
+      currentStep: [1, 2, 3].includes(value.currentStep)
+        ? value.currentStep
+        : 1,
+    };
   }
 
   /** 串行执行所有数据库操作，续租不会与保存争用同一个版本。
@@ -108,6 +117,7 @@ export const useFormStore = defineStore("form", () => {
       id: value.id,
       ageConfirmedAt: value.ageConfirmedAt,
       updatedAt: new Date().toISOString(),
+      currentStep: value.currentStep,
       basicInfo: basicPayload(value.basicInfo),
       answers: value.answers.map((a) => ({
         questionId: a.questionId,
@@ -181,12 +191,55 @@ export const useFormStore = defineStore("form", () => {
     });
   }
   watch(
-    () => revision.value && [revision.value.basicInfo, revision.value.answers],
+    () =>
+      revision.value && [
+        revision.value.basicInfo,
+        revision.value.answers,
+        revision.value.currentStep,
+      ],
     () => {
       if (!suppress && ageAccepted.value && !readOnly.value && !pdfReady.value)
         queue?.changed();
     },
     { deep: true, flush: "sync" },
+  );
+
+  watch(
+    step,
+    (value) => {
+      if (
+        !suppress &&
+        ageAccepted.value &&
+        !readOnly.value &&
+        !pdfReady.value &&
+        [1, 2, 3].includes(value) &&
+        revision.value.currentStep !== value
+      )
+        revision.value.currentStep = value;
+    },
+    { flush: "sync" },
+  );
+  watch(
+    () =>
+      revision.value && [
+        revision.value.basicInfo,
+        revision.value.answers,
+        revision.value.photos,
+      ],
+    () => {
+      if (suppress || !issues.value.length) return;
+      const remaining = new Map(
+        validateRevision(revision.value).map((issue) => [issue.id, issue]),
+      );
+      // 只修正已显示的错误，并保持数组引用；输入不应触发摘要的导航聚焦。
+      for (let index = issues.value.length - 1; index >= 0; index--) {
+        const current = issues.value[index];
+        const updated = remaining.get(current.id);
+        if (!updated) issues.value.splice(index, 1);
+        else Object.assign(current, updated);
+      }
+    },
+    { deep: true },
   );
 
   /** 撤销本页生成文件的URL，不影响用户已下载的文件。
@@ -247,6 +300,7 @@ export const useFormStore = defineStore("form", () => {
             control = loaded.control;
             suppress = true;
             revision.value = readableDraft(loaded.draft);
+            step.value = revision.value?.currentStep || 1;
             suppress = false;
             readOnly.value = false;
             canResumeReadOnly = false;
@@ -369,6 +423,7 @@ export const useFormStore = defineStore("form", () => {
         const value = readableDraft(loaded.draft);
         suppress = true;
         revision.value = value;
+        step.value = value.currentStep;
         suppress = false;
         configureQueue();
       }
@@ -556,8 +611,8 @@ export const useFormStore = defineStore("form", () => {
       progressText.value = "正在保存图片到本机";
       await persist(value, true, epoch);
       if (epoch === generation) {
+        // 统一校验 watcher 会原地更新错误，避免替换摘要数组后抢走照片控件焦点。
         revision.value.photos = value.photos;
-        issues.value = issues.value.filter((issue) => issue.id !== id);
       }
     } catch (failure) {
       if (epoch === generation) {

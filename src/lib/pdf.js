@@ -68,7 +68,7 @@ export async function exportPdf(draft, { signal, onProgress = () => {} } = {}) {
   if (signal?.aborted)
     throw new DOMException("已取消 PDF 生成，草稿仍保留。", "AbortError");
   const fixed = snapshot(draft);
-  const filename = `填写记录-${new Date().toISOString().slice(0, 10)}.pdf`;
+  const filename = `奴测档案-${new Date().toISOString().slice(0, 10)}.pdf`;
   // 字体缺字替换由内核回调上报，Worker 与本机回退都要带回页面。
   const fallback = async () => {
     let substitutions = null;

@@ -31,6 +31,7 @@ test('metadata and fresh drafts keep the fixed 32-field, 125-question and 16-slo
   const second = newDraft()
   assert.notEqual(first.id, second.id)
   assert.equal(first.ageConfirmedAt, null)
+  assert.equal(first.currentStep, 1)
   assert.equal(first.answers.length, 125)
   assert.equal(first.photos.length, 0)
   assert.deepEqual(validateRevision(completeDraft()), [])
@@ -131,7 +132,7 @@ test('all sixteen photo slots reject missing, duplicated or misplaced entries', 
   ]) {
     const value = completeDraft()
     change(value.photos)
-    assert.ok(validateRevision(value).some((issue) => issue.step === 2))
+    assert.ok(validateRevision(value).some((issue) => issue.step === 3))
   }
 })
 
@@ -139,12 +140,12 @@ test('duplicate input or final hashes are rejected across photo categories', () 
   for (const hash of ['sha256', 'sourceSha256']) {
     const value = completeDraft()
     value.photos[15][hash] = value.photos[0][hash]
-    assert.ok(validateRevision(value).some((issue) => issue.step === 2 && issue.message.includes('重复')))
+    assert.ok(validateRevision(value).some((issue) => issue.step === 3 && issue.message.includes('重复')))
   }
   for (const hash of ['sha256', 'sourceSha256']) {
     const value = completeDraft()
     value.photos[0][hash] = 'not-a-hash'
-    assert.ok(validateRevision(value).some((issue) => issue.step === 2 && issue.message.includes('摘要')))
+    assert.ok(validateRevision(value).some((issue) => issue.step === 3 && issue.message.includes('摘要')))
   }
 })
 
@@ -155,8 +156,47 @@ test('missing and over-limit attachment or preview bytes block export', () => {
   ]) {
     const data = completeDraft()
     data.photos[0][key] = value
-    assert.ok(validateRevision(data).some((issue) => issue.step === 2 && issue.message.includes('文件')))
+    assert.ok(validateRevision(data).some((issue) => issue.step === 3 && issue.message.includes('文件')))
   }
+})
+
+test('阶段错误按基础信息、自评、照片排序，前进不会提前要求照片', () => {
+  const value = newDraft()
+  const errors = validateRevision(value)
+  assert.equal(errors.filter((issue) => issue.step === 1).length, 32)
+  assert.equal(errors.filter((issue) => issue.step === 2).length, 250)
+  assert.equal(errors.filter((issue) => issue.step === 3).length, 16)
+  assert.deepEqual(errors.map((issue) => issue.step), [...errors.map((issue) => issue.step)].sort())
+  assert.equal(errors.find((issue) => issue.id === 'grade-1').step, 2)
+  assert.equal(errors.find((issue) => issue.id === 'remark-1').step, 2)
+  assert.equal(errors.find((issue) => issue.id === 'photo-selfie-1').step, 3)
+  value.basicInfo = completeDraft().basicInfo
+  assert.deepEqual(validateRevision(value).filter((issue) => issue.step < 2), [])
+  assert.equal(validateRevision(value).filter((issue) => issue.step < 3).length, 250)
+  value.answers = completeDraft().answers
+  assert.deepEqual(validateRevision(value).filter((issue) => issue.step < 3), [])
+  assert.equal(validateRevision(value)[0].step, 3)
+})
+
+test('自评结构错误也定位第二步，校验不会静默补写空备注', () => {
+  const value = completeDraft()
+  value.answers.pop()
+  assert.equal(validateRevision(value).find((issue) => issue.id === 'assessment-heading').step, 2)
+  value.answers[0].remark = ''
+  assert.equal(validateRevision(value).find((issue) => issue.id === 'remark-1').step, 2)
+  assert.equal(value.answers[0].remark, '')
+  value.answers[0].remark = '原有合成说明'
+  validateRevision(value)
+  assert.equal(value.answers[0].remark, '原有合成说明')
+})
+
+test('照片结构错误定位第三步，自评问题始终先于照片', () => {
+  const value = completeDraft()
+  value.photos.push(null)
+  value.answers[0].grade = ''
+  const errors = validateRevision(value)
+  assert.equal(errors[0].id, 'grade-1')
+  assert.ok(errors.filter((issue) => issue.id === 'photos-heading').every((issue) => issue.step === 3))
 })
 
 test('malformed local arrays return actionable errors instead of throwing', () => {

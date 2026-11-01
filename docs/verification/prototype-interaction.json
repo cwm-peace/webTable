@@ -1,0 +1,127 @@
+{
+  "date": "2026-10-26",
+  "scope": "prototype-interaction",
+  "status": "passed-selected-scope",
+  "environment": {
+    "platform": "darwin",
+    "arch": "x64",
+    "node": "v26.0.0",
+    "playwright": "1.64.0"
+  },
+  "setup": {
+    "command": "npm ci",
+    "status": "passed"
+  },
+  "developmentServer": {
+    "command": "npm run dev",
+    "status": "started",
+    "localPort": 5174
+  },
+  "build": {
+    "command": "npm run build",
+    "status": "passed",
+    "warning": "Existing large PDF module chunk warning remains"
+  },
+  "modules": {
+    "command": "npm test",
+    "passed": 62,
+    "failed": 0
+  },
+  "browsers": [
+    {
+      "name": "system-chrome",
+      "version": "156.0.8078.48",
+      "fixedPlaywrightBinary": false,
+      "command": "npm run test:e2e -- --config=artifacts/playwright-system-chrome.config.mjs --workers=2",
+      "reportPath": "artifacts/prototype-system-chrome-results.json",
+      "stats": {
+        "startTime": "2026-10-26T09:55:27.560Z",
+        "duration": 116631.266,
+        "expected": 23,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      }
+    },
+    {
+      "name": "firefox",
+      "version": "157.0",
+      "revision": "1555",
+      "fixedPlaywrightBinary": true,
+      "command": "npm run test:e2e -- --project=firefox --workers=2 --max-failures=1",
+      "reportPath": "artifacts/prototype-firefox-results.json",
+      "stats": {
+        "startTime": "2026-10-26T09:59:38.631Z",
+        "duration": 194636.18,
+        "expected": 23,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      }
+    },
+    {
+      "name": "webkit",
+      "version": "27.2",
+      "revision": "2370",
+      "fixedPlaywrightBinary": true,
+      "command": "npm run test:e2e -- --project=webkit --workers=2 --max-failures=1",
+      "reportPath": "artifacts/prototype-webkit-results.json",
+      "stats": {
+        "startTime": "2026-10-26T10:05:22.494Z",
+        "duration": 208789.97100000002,
+        "expected": 23,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      }
+    }
+  ],
+  "browserTestExecutions": 69,
+  "layout": {
+    "steps": 3,
+    "widths": [
+      375,
+      768,
+      1024,
+      1440
+    ],
+    "themes": [
+      "minimal",
+      "tech",
+      "flat"
+    ],
+    "modes": [
+      "light",
+      "dark"
+    ],
+    "combinationsPerEngine": 72,
+    "horizontalOverflow": false
+  },
+  "accessibility": {
+    "scope": "Assessment page at 375px across six theme/mode combinations, plus full grade accessible names at 660px",
+    "seriousOrCriticalViolations": 0,
+    "certification": false
+  },
+  "screenshots": [
+    "artifacts/prototype-desktop-dark.png",
+    "artifacts/prototype-desktop-light.png",
+    "artifacts/prototype-mobile-dark.png"
+  ],
+  "pdf": {
+    "modified": false,
+    "coreHashesMatchBefore": true,
+    "hashes": {
+      "src/lib/pdf.js": "18dc2b74ed902a45f8641ed2f2bb45d916fc9b562b80a64282ffbba5922dd331",
+      "src/lib/pdfCore.js": "d9e33b33a09beb368e7045478d5231dd7a30fa91e53ef4feab14a67f0fc8dbd7",
+      "src/lib/pdfLayout.js": "b29dcd27f64c8969a9f6349f3299300d1a890b8c306155d899edd83e221bd816",
+      "src/workers/pdf.worker.js": "98e8ca3ba810883b20298643777e45e079fd29a2eb3e8767e0404d3ce3f5023e",
+      "tests/pdf.test.js": "fc5d4d626280c493a08f95a849d41e06fe530b534357998a27f2825cfe426a60"
+    }
+  },
+  "limitations": [
+    "Fixed Playwright Chromium installation blocked by automatic approval review; system Chrome used instead",
+    "npm run verify:rounds not rerun",
+    "Physical devices and release Safari not verified",
+    "No public deployment or remote CI run"
+  ]
+}

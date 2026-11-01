@@ -1,0 +1,62 @@
+{
+  "date": "2026-10-30",
+  "runtime": "v26.0.0",
+  "scope": "Restore prototype visual effects and seal; business scripts unchanged",
+  "build": "passed",
+  "modules": {
+    "passed": 70,
+    "failed": 0
+  },
+  "effects": {
+    "stats": {
+      "startTime": "2026-10-30T03:14:29.720Z",
+      "duration": 33328.092,
+      "expected": 9,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "command": "npm run test:e2e -- --config=artifacts/playwright-midnight.config.mjs --grep 原型动效 --workers=2",
+    "checks": [
+      "1000ms/2100ms computed animation changes",
+      "light/dark",
+      "responsive seal",
+      "real progress and form navigation",
+      "reduced motion",
+      "keyboard outline"
+    ]
+  },
+  "layout": {
+    "stats": {
+      "startTime": "2026-10-30T03:09:03.542Z",
+      "duration": 157247.88900000002,
+      "expected": 3,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "combinationsPerEngine": 48,
+    "mobileAxeSevereViolations": 0
+  },
+  "browsers": [
+    "installed Chrome",
+    "Firefox Playwright v1555",
+    "WebKit Playwright v2370"
+  ],
+  "notRun": [
+    "full browser suite",
+    "pinned Chromium",
+    "11 rounds",
+    "physical devices",
+    "independent all-phase geometry check"
+  ],
+  "businessChecksums": [
+    "18dc2b74ed902a45f8641ed2f2bb45d916fc9b562b80a64282ffbba5922dd331  src/lib/pdf.js",
+    "d9e33b33a09beb368e7045478d5231dd7a30fa91e53ef4feab14a67f0fc8dbd7  src/lib/pdfCore.js",
+    "b29dcd27f64c8969a9f6349f3299300d1a890b8c306155d899edd83e221bd816  src/lib/pdfLayout.js",
+    "98e8ca3ba810883b20298643777e45e079fd29a2eb3e8767e0404d3ce3f5023e  src/workers/pdf.worker.js",
+    "f58ba276d8d92665b57a8e29e97d3666863f2d13639717fae5c42739599f10c7  src/stores/form.js",
+    "70e73a44d8a1dcefe7279c9d324a1f57591ff857a92098aa9afefe43894dc137  src/lib/storage.js",
+    "3f915115dca3a5621a10d91ce1406f39d11d33d177d970db9e2a889649dba3ca  src/lib/autosave.js"
+  ]
+}

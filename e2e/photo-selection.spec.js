@@ -1,6 +1,11 @@
 /** 移动照片选择能力与生命周期回归；仅模拟浏览器条件，不替代 Android、鸿蒙或 iOS 真机验收。 */
 import { test, expect } from "@playwright/test";
-import { seedDraft, storageSummary, syntheticImages } from "./helpers.js";
+import {
+  goToExport,
+  seedDraft,
+  storageSummary,
+  syntheticImages,
+} from "./helpers.js";
 import { png, exifOrientation } from "../tests/fixtures/png.mjs";
 
 test.use({ viewport: { width: 390, height: 844 }, hasTouch: true });
@@ -12,7 +17,7 @@ test.use({ viewport: { width: 390, height: 844 }, hasTouch: true });
  */
 async function openPhotos(page) {
   await seedDraft(page, { images: [], name: "移动相册合成测试" });
-  await page.getByRole("button", { name: "检查并继续", exact: true }).click();
+  await goToExport(page);
   await expect(page.locator("#photo-selfie-1")).toBeEnabled();
 }
 
@@ -155,6 +160,12 @@ async function takeoverPage(context) {
     Date.now = () => now() + 11_000;
   });
   await other.goto("/");
+  await expect(other.locator("#photo-selfie-1")).toBeEnabled();
+  await other
+    .getByRole("navigation", { name: "填写步骤" })
+    .getByRole("button")
+    .first()
+    .click();
   await expect(other.locator("#basic-name")).toBeEnabled();
   return other;
 }

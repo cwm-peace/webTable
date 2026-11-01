@@ -1,0 +1,217 @@
+{
+  "date": "2026-10-30",
+  "scope": "Full prototype effects shared by submission and midnight in light and dark modes",
+  "build": "passed after shared CSS extraction",
+  "modules": {
+    "passed": 70,
+    "failed": 0,
+    "note": "Earlier run in this session; subsequent edits are presentation-only"
+  },
+  "effects": {
+    "passed": 12,
+    "failed": 0,
+    "checks": [
+      "actual 1000ms/2100ms animation changes",
+      "both styles in both color modes",
+      "375/768px seal",
+      "keyboard focus",
+      "real form input and 124/125 progress"
+    ]
+  },
+  "reducedMotion": {
+    "passed": 3,
+    "failed": 0,
+    "stats": {
+      "startTime": "2026-10-30T03:25:16.966Z",
+      "duration": 10791.466,
+      "expected": 3,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    }
+  },
+  "layout": {
+    "passed": 3,
+    "failed": 0,
+    "combinationsPerEngine": 48,
+    "mobileAxeSeriousOrCriticalViolations": 0
+  },
+  "initialRun": {
+    "stats": {
+      "startTime": "2026-10-30T03:20:55.483Z",
+      "duration": 213049.864,
+      "expected": 15,
+      "skipped": 0,
+      "unexpected": 3,
+      "flaky": 0
+    },
+    "note": "Three reduced-motion cases used visibility on a zero-height particle wrapper. Assertions now check wrapper display and actual particles; all three passed on rerun. No production change was needed."
+  },
+  "finalCases": [
+    {
+      "title": "原型动效在submission/light实际变化，徽记响应布局且填写可继续",
+      "browser": "system-chrome",
+      "status": "expected",
+      "results": [
+        "passed"
+      ]
+    },
+    {
+      "title": "原型动效在submission/dark实际变化，徽记响应布局且填写可继续",
+      "browser": "system-chrome",
+      "status": "expected",
+      "results": [
+        "passed"
+      ]
+    },
+    {
+      "title": "原型动效在midnight/light实际变化，徽记响应布局且填写可继续",
+      "browser": "system-chrome",
+      "status": "expected",
+      "results": [
+        "passed"
+      ]
+    },
+    {
+      "title": "原型动效在midnight/dark实际变化，徽记响应布局且填写可继续",
+      "browser": "system-chrome",
+      "status": "expected",
+      "results": [
+        "passed"
+      ]
+    },
+    {
+      "title": "原型动效在submission/light实际变化，徽记响应布局且填写可继续",
+      "browser": "firefox",
+      "status": "expected",
+      "results": [
+        "passed"
+      ]
+    },
+    {
+      "title": "原型动效在submission/dark实际变化，徽记响应布局且填写可继续",
+      "browser": "firefox",
+      "status": "expected",
+      "results": [
+        "passed"
+      ]
+    },
+    {
+      "title": "原型动效在midnight/light实际变化，徽记响应布局且填写可继续",
+      "browser": "firefox",
+      "status": "expected",
+      "results": [
+        "passed"
+      ]
+    },
+    {
+      "title": "原型动效在midnight/dark实际变化，徽记响应布局且填写可继续",
+      "browser": "firefox",
+      "status": "expected",
+      "results": [
+        "passed"
+      ]
+    },
+    {
+      "title": "原型动效在submission/light实际变化，徽记响应布局且填写可继续",
+      "browser": "webkit",
+      "status": "expected",
+      "results": [
+        "passed"
+      ]
+    },
+    {
+      "title": "原型动效在submission/dark实际变化，徽记响应布局且填写可继续",
+      "browser": "webkit",
+      "status": "expected",
+      "results": [
+        "passed"
+      ]
+    },
+    {
+      "title": "原型动效在midnight/light实际变化，徽记响应布局且填写可继续",
+      "browser": "webkit",
+      "status": "expected",
+      "results": [
+        "passed"
+      ]
+    },
+    {
+      "title": "原型动效在midnight/dark实际变化，徽记响应布局且填写可继续",
+      "browser": "webkit",
+      "status": "expected",
+      "results": [
+        "passed"
+      ]
+    },
+    {
+      "title": "两种风格日间和夜间在四种宽度无溢出，偏好恢复、系统跟随和填写数据保留",
+      "browser": "system-chrome",
+      "status": "expected",
+      "results": [
+        "passed"
+      ]
+    },
+    {
+      "title": "两种风格日间和夜间在四种宽度无溢出，偏好恢复、系统跟随和填写数据保留",
+      "browser": "firefox",
+      "status": "expected",
+      "results": [
+        "passed"
+      ]
+    },
+    {
+      "title": "两种风格日间和夜间在四种宽度无溢出，偏好恢复、系统跟随和填写数据保留",
+      "browser": "webkit",
+      "status": "expected",
+      "results": [
+        "passed"
+      ]
+    },
+    {
+      "title": "原型动效在两套风格遵循减少动态效果，取消设置与切回臣服后恢复",
+      "browser": "system-chrome",
+      "status": "expected",
+      "results": [
+        "passed"
+      ]
+    },
+    {
+      "title": "原型动效在两套风格遵循减少动态效果，取消设置与切回臣服后恢复",
+      "browser": "firefox",
+      "status": "expected",
+      "results": [
+        "passed"
+      ]
+    },
+    {
+      "title": "原型动效在两套风格遵循减少动态效果，取消设置与切回臣服后恢复",
+      "browser": "webkit",
+      "status": "expected",
+      "results": [
+        "passed"
+      ]
+    }
+  ],
+  "browsers": [
+    "installed Chrome",
+    "Firefox Playwright v1555",
+    "WebKit Playwright v2370"
+  ],
+  "notRun": [
+    "full browser suite in this correction",
+    "pinned Chromium",
+    "11 rounds",
+    "physical devices"
+  ],
+  "businessScript": "FormWizard identical after removing pure-presentational component import",
+  "businessChecksums": [
+    "18dc2b74ed902a45f8641ed2f2bb45d916fc9b562b80a64282ffbba5922dd331  src/lib/pdf.js",
+    "d9e33b33a09beb368e7045478d5231dd7a30fa91e53ef4feab14a67f0fc8dbd7  src/lib/pdfCore.js",
+    "b29dcd27f64c8969a9f6349f3299300d1a890b8c306155d899edd83e221bd816  src/lib/pdfLayout.js",
+    "98e8ca3ba810883b20298643777e45e079fd29a2eb3e8767e0404d3ce3f5023e  src/workers/pdf.worker.js",
+    "f58ba276d8d92665b57a8e29e97d3666863f2d13639717fae5c42739599f10c7  src/stores/form.js",
+    "70e73a44d8a1dcefe7279c9d324a1f57591ff857a92098aa9afefe43894dc137  src/lib/storage.js",
+    "3f915115dca3a5621a10d91ce1406f39d11d33d177d970db9e2a889649dba3ca  src/lib/autosave.js"
+  ]
+}

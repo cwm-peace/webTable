@@ -1,0 +1,77 @@
+{
+  "date": "2026-10-26",
+  "scope": "prototype-display-mode",
+  "status": "passed-selected-scope",
+  "changes": [
+    "Fixed prototype palette; removed tech/flat controls and CSS",
+    "显示模式 with 日间, 夜间, 跟随系统",
+    "Existing color mode persisted; legacy theme ignored"
+  ],
+  "build": {
+    "command": "npm run build",
+    "status": "passed"
+  },
+  "modules": {
+    "command": "npm test",
+    "passed": 62,
+    "failed": 0
+  },
+  "browsers": [
+    {
+      "name": "system-chrome",
+      "scope": "full-suite",
+      "command": "npm run test:e2e -- --config=artifacts/playwright-system-chrome.config.mjs --workers=2",
+      "report": "artifacts/display-mode-system-chrome-results.json",
+      "stats": {
+        "startTime": "2026-10-26T10:34:46.408Z",
+        "duration": 93467.778,
+        "expected": 23,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      }
+    },
+    {
+      "name": "firefox-and-webkit",
+      "scope": "display-mode-layout-accessibility",
+      "command": "npm run test:e2e -- --project=firefox --project=webkit --grep '原型日间' --workers=2",
+      "report": "artifacts/display-mode-firefox-webkit-results.json",
+      "stats": {
+        "startTime": "2026-10-26T10:36:39.593Z",
+        "duration": 35821.148,
+        "expected": 2,
+        "skipped": 0,
+        "unexpected": 0,
+        "flaky": 0
+      }
+    }
+  ],
+  "layout": {
+    "steps": 3,
+    "widths": [
+      375,
+      768,
+      1024,
+      1440
+    ],
+    "modes": [
+      "light",
+      "dark"
+    ],
+    "combinationsPerEngine": 24,
+    "engines": 3
+  },
+  "accessibility": {
+    "scope": "375px assessment page in day and night modes",
+    "seriousOrCriticalViolations": 0
+  },
+  "pdf": {
+    "modified": false,
+    "coreChecksumsMatchBefore": true
+  },
+  "limitations": [
+    "System Chrome used instead of fixed Playwright Chromium",
+    "Firefox/WebKit full suites not rerun for this follow-up; focused regression only",
+    "11-round regression and physical-device verification not run"
+  ]
+}
