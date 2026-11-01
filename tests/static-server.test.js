@@ -1,11 +1,23 @@
 /** 静态服务隔离测试：真实HTTP请求验证只读边界、路径安全和压缩缓存语义。 */
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdtemp, mkdir, writeFile, symlink, rm } from "node:fs/promises";
+import {
+  mkdtemp,
+  mkdir,
+  writeFile,
+  symlink,
+  rm,
+  utimes,
+} from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { request } from "node:http";
-import { brotliDecompressSync, gunzipSync } from "node:zlib";
+import {
+  brotliDecompressSync,
+  gunzipSync,
+  gzipSync,
+  brotliCompressSync,
+} from "node:zlib";
 import {
   createStaticServer,
   selectEncoding,
@@ -115,4 +127,65 @@ test("真实HTTP静态服务安全、压缩和缓存", async (t) => {
     "/%zz",
   ])
     assert.equal((await get(port, path)).status, 400);
+});
+
+test("预压缩字库按编码协商、304和HEAD读取，旧旁文件或外部符号链接不会覆盖正文", async (t) => {
+  const root = await mkdtemp(join(tmpdir(), "webtable-compression-"));
+  await mkdir(join(root, "fonts"));
+  const name = "fonts/TestFont-a1b2c3d4e5f6.otf";
+  const input = Buffer.from("SYNTHETIC_FONT_BYTES".repeat(1000));
+  const compressed = {
+    gzip: gzipSync(input, { level: 9 }),
+    br: brotliCompressSync(input),
+  };
+  await writeFile(join(root, name), input);
+  await writeFile(join(root, `${name}.gz`), compressed.gzip);
+  await writeFile(join(root, `${name}.br`), compressed.br);
+  const server = createStaticServer({ root });
+  await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
+  t.after(async () => {
+    await new Promise((resolve) => server.close(resolve));
+    await rm(root, { recursive: true, force: true });
+  });
+  const port = server.address().port;
+  for (const coding of ["gzip", "br"]) {
+    const response = await get(port, `/${name}`, {
+      headers: { "Accept-Encoding": coding },
+    });
+    assert.equal(response.status, 200);
+    assert.equal(response.headers["content-type"], "font/otf");
+    assert.match(response.headers["cache-control"], /immutable/);
+    assert.deepEqual(response.body, compressed[coding]);
+    const head = await get(port, `/${name}`, {
+      method: "HEAD",
+      headers: { "Accept-Encoding": coding },
+    });
+    assert.equal(head.body.length, 0);
+    assert.equal(
+      Number(head.headers["content-length"]),
+      compressed[coding].length,
+    );
+    const repeat = await get(port, `/${name}`, {
+      headers: {
+        "Accept-Encoding": coding,
+        "If-None-Match": response.headers.etag,
+      },
+    });
+    assert.equal(repeat.status, 304);
+    assert.equal(repeat.body.length, 0);
+  }
+  // 过期的旧压缩文件必须退出缓存键，避免源文件更新后仍返回旧字节。
+  for (const suffix of [".gz", ".br"])
+    await utimes(join(root, name + suffix), 1, 1);
+  const fresh = await get(port, `/${name}`, {
+    headers: { "Accept-Encoding": "gzip" },
+  });
+  assert.deepEqual(gunzipSync(fresh.body), input);
+  assert.deepEqual(fresh.body, gzipSync(input));
+  await writeFile(join(root, "ordinary.js"), "safe");
+  await symlink(join(root, name), join(root, "ordinary.js.gz"));
+  const ignoredLink = await get(port, "/ordinary.js", {
+    headers: { "Accept-Encoding": "gzip" },
+  });
+  assert.equal(gunzipSync(ignoredLink.body).toString(), "safe");
 });

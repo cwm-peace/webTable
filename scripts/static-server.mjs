@@ -1,6 +1,6 @@
 /** 生产静态文件服务：仅GET/HEAD、同源安全头、压缩协商和缓存，不记录请求内容。 */
 import { createServer } from "node:http";
-import { readFile, realpath, stat } from "node:fs/promises";
+import { readFile, realpath, stat, lstat } from "node:fs/promises";
 import { resolve, relative, extname, sep } from "node:path";
 import { pathToFileURL, fileURLToPath } from "node:url";
 import { createHash } from "node:crypto";
@@ -30,6 +30,27 @@ const mimeTypes = {
   ".wasm": "application/wasm",
   ".txt": "text/plain; charset=utf-8",
 };
+
+/**
+ * 查找构建生成且未过期的压缩旁文件；不跟随旁文件符号链接。
+ * @param {string} candidate 已确认位于发布目录内的源文件绝对路径
+ * @param {string} encoding br、gzip 或 identity
+ * @param {import('node:fs').Stats} sourceInfo 源文件状态
+ * @returns {Promise<{path:string,mtimeMs:number,size:number}|null>} 可用旁文件，否则返回空值
+ */
+export async function precompressedVariant(candidate, encoding, sourceInfo) {
+  const suffix = { br: ".br", gzip: ".gz" }[encoding];
+  if (!suffix) return null;
+  const path = `${candidate}${suffix}`;
+  try {
+    const info = await lstat(path);
+    if (!info.isFile() || info.mtimeMs < sourceInfo.mtimeMs) return null;
+    return { path, mtimeMs: info.mtimeMs, size: info.size };
+  } catch (error) {
+    if (["ENOENT", "ENOTDIR", "EACCES"].includes(error.code)) return null;
+    throw error;
+  }
+}
 
 /**
  * 根据客户端质量权重选择压缩，显式q=0禁止该编码。
@@ -155,15 +176,21 @@ export function createStaticServer({
         fail(406, "No acceptable encoding");
         return;
       }
-      const cacheKey = `${candidate}:${info.mtimeMs}:${info.size}:${encoding}`;
+      const precompressed = await precompressedVariant(
+        candidate,
+        encoding,
+        info,
+      );
+      const cacheKey = `${candidate}:${info.mtimeMs}:${info.size}:${encoding}:${precompressed?.mtimeMs}:${precompressed?.size}`;
       let representation = cached.get(cacheKey);
       if (!representation) {
         let building = pending.get(cacheKey);
         if (!building) {
           building = (async () => {
-            const bytes = await readFile(candidate);
-            const body =
-              encoding === "br"
+            const bytes = await readFile(precompressed?.path || candidate);
+            const body = precompressed
+              ? bytes
+              : encoding === "br"
                 ? await compressBr(bytes, {
                     params: { [constants.BROTLI_PARAM_QUALITY]: 4 },
                   })
@@ -200,7 +227,8 @@ export function createStaticServer({
       response.setHeader("Last-Modified", info.mtime.toUTCString());
       response.setHeader(
         "Cache-Control",
-        /^\/assets\/[^/]+-[A-Za-z0-9_-]{8,}\.[^/]+$/.test(pathname)
+        /^\/assets\/[^/]+-[A-Za-z0-9_-]{8,}\.[^/]+$/.test(pathname) ||
+          /^\/fonts\/[^/]+-[a-f0-9]{12}\.otf$/.test(pathname)
           ? "public, max-age=31536000, immutable"
           : "no-cache",
       );

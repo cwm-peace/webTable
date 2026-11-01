@@ -147,6 +147,42 @@ function crc32(bytes, start, end) {
 }
 
 /**
+ * 读取 PNG eXIf 的 TIFF 目录，方向字段的字节序与偏移由 TIFF 头决定。
+ * @param {Uint8Array} bytes 完整图片字节。
+ * @param {number} start eXIf 内容起点，不包含 JPEG 的 Exif 标识。
+ * @param {number} end eXIf 内容终点，不包含 CRC。
+ * @returns {number} EXIF 方向；没有方向条目时为 1。
+ */
+function pngExifOrientation(bytes, start, end) {
+  requireValid(end - start >= 8);
+  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  const littleEndian = bytes[start] === 0x49 && bytes[start + 1] === 0x49;
+  const bigEndian = bytes[start] === 0x4d && bytes[start + 1] === 0x4d;
+  requireValid(
+    (littleEndian || bigEndian) &&
+      view.getUint16(start + 2, littleEndian) === 42,
+  );
+  const offset = view.getUint32(start + 4, littleEndian);
+  const directory = start + offset;
+  requireValid(offset >= 8 && directory + 2 <= end);
+  const count = view.getUint16(directory, littleEndian);
+  // 每个目录条目占 12 字节，目录尾部还有 4 字节的下一目录偏移。
+  requireValid(directory + 2 + count * 12 + 4 <= end);
+  for (let index = 0; index < count; index++) {
+    const entry = directory + 2 + index * 12;
+    if (view.getUint16(entry, littleEndian) !== 0x0112) continue;
+    requireValid(
+      view.getUint16(entry + 2, littleEndian) === 3 &&
+        view.getUint32(entry + 4, littleEndian) === 1,
+    );
+    const orientation = view.getUint16(entry + 8, littleEndian);
+    requireValid(orientation >= 1 && orientation <= 8);
+    return orientation;
+  }
+  return 1;
+}
+
+/**
  * 校验 PNG 块、静态标志和声明尺寸；多帧 APNG 只记录为动图。
  * @param {Uint8Array} bytes PNG 文件字节。
  * @returns {{mime:string,width:number,height:number,orientation:number,animated:boolean}} 图片元数据。
@@ -187,19 +223,12 @@ function parsePng(bytes) {
           validDepths[color].includes(depth) &&
           bytes[offset + 18] === 0 &&
           bytes[offset + 19] === 0 &&
-          bytes[offset + 20] === 0,
+          // PNG 同时允许普通扫描和 Adam7 交错，后者不是文件损坏。
+          [0, 1].includes(bytes[offset + 20]),
       );
     }
-    if (kind === "eXIf") {
-      for (let i = offset + 8; i + 12 <= end; i += 12) {
-        const ifdTag = view.getUint16(i, false);
-        const ifdType = view.getUint16(i + 2, false);
-        if (ifdTag === 0x0112 && ifdType === 3) {
-          orientation = view.getUint16(i + 8, false);
-          break;
-        }
-      }
-    }
+    if (kind === "eXIf")
+      orientation = pngExifOrientation(bytes, offset + 8, end);
     if (kind === "IEND") {
       requireValid(length === 0 && end + 4 === bytes.length);
       foundIEND = true;
@@ -213,7 +242,7 @@ function parsePng(bytes) {
 }
 
 /**
- * 校验 JPEG 标记、Huffman 表与声明尺寸。
+ * 校验 JPEG 标记段、顺序或渐进扫描边界与声明尺寸；像素解码由浏览器完成。
  * @param {Uint8Array} bytes JPEG 文件字节。
  * @returns {{mime:string,width:number,height:number,orientation:number,animated:boolean}} 图片元数据。
  */
@@ -224,63 +253,54 @@ function parseJpeg(bytes) {
   let height = 0;
   let orientation = 1;
   let scanned = false;
+  let ended = false;
 
   while (offset + 2 <= bytes.length) {
-    requireValid(
-      bytes[offset] === 0xff &&
-        bytes[offset + 1] !== 0x00 &&
-        bytes[offset + 1] !== 0xff,
-    );
+    requireValid(bytes[offset] === 0xff);
+    // T.81 允许标记前有连续 FF 填充；最后一个 FF 才是标记前缀。
+    while (bytes[offset + 1] === 0xff) offset++;
+    requireValid(offset + 1 < bytes.length && bytes[offset + 1] !== 0x00);
     const marker = bytes[offset + 1];
 
-    // EOI - End of Image
     if (marker === 0xd9) {
-      scanned = true;
-      offset += 2;
+      ended = true;
       break;
     }
-
-    // RST0-RST7 和 SOI - 独立标记，无长度字段
-    if (
-      [0xd0, 0xd1, 0xd2, 0xd3, 0xd4, 0xd5, 0xd6, 0xd7, 0xd8].includes(marker)
-    ) {
+    // TEM 是不带长度的独立标记；SOI 不能重复，RST 仅能出现在扫描数据内。
+    if (marker === 0x01) {
       offset += 2;
       continue;
     }
+    requireValid(marker !== 0xd8 && !(marker >= 0xd0 && marker <= 0xd7));
 
-    // SOS - Start of Scan，之后是压缩数据流
     if (marker === 0xda) {
-      requireValid(offset + 4 <= bytes.length);
+      requireValid(offset + 5 <= bytes.length && width > 0 && height > 0);
       const length = view.getUint16(offset + 2);
-      requireValid(length >= 2 && offset + 2 + length <= bytes.length);
+      const components = bytes[offset + 4];
+      requireValid(components > 0 && length === 6 + components * 2);
+      requireValid(offset + 2 + length <= bytes.length);
+      scanned = true;
       offset += 2 + length;
 
-      // 扫描压缩数据流直到找到 EOI
-      while (offset + 1 < bytes.length) {
-        if (bytes[offset] === 0xff) {
-          const next = bytes[offset + 1];
-          // 0xff 0x00 是转义的 0xff 数据
-          if (next === 0x00) {
-            offset += 2;
-            continue;
-          }
-          // 0xff 0xd9 是 EOI
-          if (next === 0xd9) {
-            scanned = true;
-            offset += 2;
-            break;
-          }
-          // RST 标记在压缩流中也是合法的
-          if (next >= 0xd0 && next <= 0xd7) {
-            offset += 2;
-            continue;
-          }
-          // 其他标记不应该出现在压缩流中
-          requireValid(false);
+      // 渐进 JPEG 每次扫描后可以重新定义表并开始下一次扫描，不能要求直接遇到 EOI。
+      while (offset < bytes.length) {
+        if (bytes[offset] !== 0xff) {
+          offset++;
+          continue;
         }
-        offset++;
+        const markerStart = offset;
+        while (bytes[offset + 1] === 0xff) offset++;
+        requireValid(offset + 1 < bytes.length);
+        const next = bytes[offset + 1];
+        if (next === 0x00 || (next >= 0xd0 && next <= 0xd7)) {
+          offset += 2;
+          continue;
+        }
+        // 新标记交回外层处理，继续校验长度与结构，不能跳过后续数据。
+        offset = markerStart;
+        break;
       }
-      break;
+      continue;
     }
 
     // 其他带长度字段的标记
@@ -331,7 +351,7 @@ function parseJpeg(bytes) {
     offset = end;
   }
 
-  requireValid(scanned && width > 0); // EOI 后允许有额外元数据（缩略图、厂商私有数据等）
+  requireValid(scanned && ended && width > 0); // EOI 后允许有额外元数据（缩略图、厂商私有数据等）
   requireValid(orientation >= 1 && orientation <= 8); // EXIF 方向值必须在 1-8 范围内
   return { mime: "image/jpeg", width, height, orientation, animated: false };
 }
@@ -455,7 +475,9 @@ function skipGifSubBlocks(bytes, offset) {
 function parseGif(bytes) {
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
   const version = String.fromCharCode(bytes[3], bytes[4], bytes[5]);
-  requireValid(tag(bytes, 0) === "GIF8" && (version === "87a" || version === "89a"));
+  requireValid(
+    tag(bytes, 0) === "GIF8" && (version === "87a" || version === "89a"),
+  );
   requireValid(bytes.length >= 14);
   const width = view.getUint16(6, true);
   const height = view.getUint16(8, true);
@@ -506,7 +528,13 @@ function parseGif(bytes) {
  * @returns {string} 判别组名，未知格式返回空串。
  */
 export function mimeGroup(mime) {
-  return MIME_GROUPS[String(mime || "").trim().toLowerCase()] || "";
+  return (
+    MIME_GROUPS[
+      String(mime || "")
+        .trim()
+        .toLowerCase()
+    ] || ""
+  );
 }
 
 /**
@@ -528,11 +556,14 @@ export function sameMimeGroup(declared, actual) {
  */
 export function sniffMime(input) {
   // 调用方可能传入 file.arrayBuffer() 的结果，这里统一成字节视图。
-  if (!(input instanceof Uint8Array) && !(input instanceof ArrayBuffer)) return "";
+  if (!(input instanceof Uint8Array) && !(input instanceof ArrayBuffer))
+    return "";
   const bytes = input instanceof Uint8Array ? input : new Uint8Array(input);
   if (bytes.length < 4) return "";
   if (
-    [137, 80, 78, 71, 13, 10, 26, 10].every((byte, index) => bytes[index] === byte)
+    [137, 80, 78, 71, 13, 10, 26, 10].every(
+      (byte, index) => bytes[index] === byte,
+    )
   )
     return "image/png";
   if (bytes[0] === 0xff && bytes[1] === 0xd8) return "image/jpeg";
@@ -540,8 +571,14 @@ export function sniffMime(input) {
   if (tag(bytes, 0) === "GIF8") return "image/gif";
   if (bytes[0] === 0x42 && bytes[1] === 0x4d) return "image/bmp";
   if (
-    (bytes[0] === 0x49 && bytes[1] === 0x49 && bytes[2] === 0x2a && bytes[3] === 0) ||
-    (bytes[0] === 0x4d && bytes[1] === 0x4d && bytes[2] === 0 && bytes[3] === 0x2a)
+    (bytes[0] === 0x49 &&
+      bytes[1] === 0x49 &&
+      bytes[2] === 0x2a &&
+      bytes[3] === 0) ||
+    (bytes[0] === 0x4d &&
+      bytes[1] === 0x4d &&
+      bytes[2] === 0 &&
+      bytes[3] === 0x2a)
   )
     return "image/tiff";
   if (bytes[0] === 0 && bytes[1] === 0 && bytes[2] === 1 && bytes[3] === 0)
@@ -549,7 +586,11 @@ export function sniffMime(input) {
   if (bytes.length >= 12 && tag(bytes, 4) === "ftyp") {
     const brand = tag(bytes, 8);
     if (["avif", "avis"].includes(brand)) return "image/avif";
-    if (["heic", "heix", "hevc", "hevx", "heim", "heis", "hevm", "hevs"].includes(brand))
+    if (
+      ["heic", "heix", "hevc", "hevx", "heim", "heis", "hevm", "hevs"].includes(
+        brand,
+      )
+    )
       return "image/heic";
     if (["mif1", "msf1"].includes(brand)) return "image/heif";
     return "";

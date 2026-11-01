@@ -10,9 +10,14 @@ const props = defineProps({
   slot: { type: Number, required: true },
   disabled: { type: Boolean, default: false },
   error: { type: String, default: "" },
+  processing: { type: Boolean, default: false },
+  progress: { type: Number, default: 0 },
+  progressText: { type: String, default: "" },
+  cancellable: { type: Boolean, default: false },
 });
-const emit = defineEmits(["change"]);
+const emit = defineEmits(["change", "cancel"]);
 const preview = ref("");
+const previewError = ref("");
 /**
  * 说明这张图片在本机被如何处理：动图取首帧、超限自动缩小或已压缩附件。
  * @returns {string} 没有需要说明的处理时为空串
@@ -42,7 +47,25 @@ function release() {
  */
 function setPreview(blob) {
   release();
-  if (blob instanceof Blob) preview.value = URL.createObjectURL(blob);
+  previewError.value = "";
+  if (blob instanceof Blob) {
+    try {
+      preview.value = URL.createObjectURL(blob);
+    } catch {
+      previewFailed();
+    }
+  }
+}
+/**
+ * 单独提示预览故障，避免将已加入的附件误认为丢失。
+ * @param {Event|undefined} event 图片加载事件；创建URL失败时不传
+ * @returns {void} 无返回值
+ */
+function previewFailed(event) {
+  // 替换后的旧图片事件不可撤销新预览的URL。
+  if (event && event.target?.src !== preview.value) return;
+  release();
+  previewError.value = "图片已加入，但预览无法显示。可重新选择图片后再试。";
 }
 /**
  * 将文件交给表单状态处理，重置控件以允许再次选择同一文件。
@@ -64,9 +87,11 @@ onBeforeUnmount(release);
     <div class="photo-preview">
       <img
         v-if="preview"
+        :key="preview"
         :src="preview"
         :alt="`${label}第${slot}张预览`"
         loading="lazy"
+        @error="previewFailed"
       />
       <div v-else class="text-center text-muted-foreground p-4">
         <ImagePlus class="size-7 mx-auto mb-2" aria-hidden="true" />
@@ -83,7 +108,7 @@ onBeforeUnmount(release);
       <input
         :id="`photo-${category}-${slot}`"
         type="file"
-        accept="image/jpeg,image/png,image/webp,image/gif,image/bmp,image/avif,image/heic,image/heif,image/tiff,image/svg+xml,.jpg,.jpeg,.png,.webp,.gif,.bmp,.avif,.heic,.heif,.tif,.tiff,.svg"
+        accept="image/*"
         :disabled="disabled"
         :aria-invalid="Boolean(error)"
         :aria-describedby="
@@ -92,10 +117,31 @@ onBeforeUnmount(release);
         class="photo-file"
         @change="choose"
       />
+      <div v-if="processing" class="space-y-2">
+        <p role="status" class="text-sm" aria-atomic="true">
+          {{ progressText || "正在处理图片" }}… {{ Math.round(progress) }}%
+        </p>
+        <progress
+          class="w-full h-2"
+          :value="progress"
+          max="100"
+          :aria-label="`${label}第${slot}张处理进度`"
+        />
+        <Button
+          v-if="cancellable"
+          variant="outline"
+          class="w-full"
+          @click="emit('cancel')"
+          >取消图片处理</Button
+        >
+      </div>
       <p v-if="photo" class="text-xs text-muted-foreground break-all">
         {{ photo.name || photo.filename || "已选择本地图片" }}
       </p>
       <p v-if="notice" class="notice text-xs">{{ notice }}</p>
+      <p v-if="previewError" class="text-sm text-destructive" role="alert">
+        {{ previewError }}
+      </p>
       <Button
         v-if="photo"
         variant="outline"
@@ -109,6 +155,7 @@ onBeforeUnmount(release);
         v-if="error"
         :id="`photo-${category}-${slot}-error`"
         class="text-sm text-destructive"
+        role="alert"
       >
         {{ error }}
       </p>

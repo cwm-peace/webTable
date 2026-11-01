@@ -2,7 +2,13 @@
 import { test, expect } from "@playwright/test";
 import { createCanvas } from "@napi-rs/canvas";
 import { createHash } from "node:crypto";
-import { closeSync, ftruncateSync, mkdirSync, openSync } from "node:fs";
+import {
+  closeSync,
+  ftruncateSync,
+  mkdirSync,
+  openSync,
+  readFileSync,
+} from "node:fs";
 import { fileURLToPath } from "node:url";
 import { seedDraft } from "./helpers.js";
 
@@ -278,7 +284,9 @@ test("4928×6560超大照片自动缩小而不是报错", async ({ page }) => {
     sourceHeight: 6560,
   });
   expect(stored.height).toBe(2560);
-  expect(Math.abs(stored.width / stored.height - 4928 / 6560)).toBeLessThan(0.01);
+  expect(Math.abs(stored.width / stored.height - 4928 / 6560)).toBeLessThan(
+    0.01,
+  );
   expect(stored.size).toBeLessThanOrEqual(2 * 1024 * 1024);
   await expect(
     page.getByText(/原图 4928×6560 超过限制，已自动缩小为 \d+×2560/),
@@ -350,13 +358,16 @@ test("GIF动图取第一帧并转换为静态附件", async ({ page }) => {
   });
   expect(stored.sourceSha256).toBe(image.sha256);
   await expect(
-    page.getByText("动图已取用第一帧。此图片已生成压缩附件，PDF 将使用压缩版本。", {
-      exact: true,
-    }),
+    page.getByText(
+      "动图已取用第一帧。此图片已生成压缩附件，PDF 将使用压缩版本。",
+      {
+        exact: true,
+      },
+    ),
   ).toBeVisible();
 });
 
-test("假MIME、损坏图和64MiB超限均明确报错且保留原槽位", async ({ page }) => {
+test("错标MIME的损坏图和64MiB超限均明确报错且保留原槽位", async ({ page }) => {
   await openPhotos(page);
   const valid = fixture("image/png");
   await chooseAndWait(page, 1, valid);
@@ -365,8 +376,8 @@ test("假MIME、损坏图和64MiB超限均明确报错且保留原槽位", async
     {
       name: "false-mime.jpg",
       mimeType: "image/jpeg",
-      buffer: valid.buffer,
-      message: /格式与图片内容不一致/,
+      buffer: valid.buffer.subarray(0, 24),
+      message: /不完整|损坏/,
     },
     {
       name: "truncated.png",
@@ -400,3 +411,53 @@ test("假MIME、损坏图和64MiB超限均明确报错且保留原槽位", async
     ).toBeVisible();
   }
 });
+
+for (const fallback of [false, true]) {
+  test(`渐进 JPG 多扫描、方向和填充标记可导入，截断文件不覆盖原图${fallback ? "（普通canvas）" : "（Worker）"}`, async ({
+    page,
+  }) => {
+    if (fallback) await disableAdvancedImageApis(page);
+    await openPhotos(page);
+    const progressive = readFileSync(
+      new URL("../tests/fixtures/progressive.jpg", import.meta.url),
+    );
+    const rotated = withExifOrientation(progressive, 6);
+    const padded = Buffer.concat([
+      progressive.subarray(0, 2),
+      Buffer.from([0xff, 0xff]),
+      progressive.subarray(2),
+      Buffer.from("SYNTHETIC_CAMERA_METADATA"),
+    ]);
+    for (const [index, bytes] of [progressive, rotated, padded].entries()) {
+      await chooseAndWait(page, index + 1, {
+        name: `synthetic-progressive-${index + 1}.jpg`,
+        mimeType: index === 2 ? "application/octet-stream" : "image/jpeg",
+        buffer: bytes,
+      });
+      const saved = (await savedPhotos(page)).find(
+        (photo) => photo.slot === index + 1,
+      );
+      expect(saved).toMatchObject({
+        mime: "image/jpeg",
+        width: index === 1 ? 60 : 80,
+        height: index === 1 ? 80 : 60,
+        compressed: false,
+        sha256: createHash("sha256").update(bytes).digest("hex"),
+      });
+    }
+    const baseline = await savedPhotos(page);
+    await page.locator("#photo-selfie-1").setInputFiles({
+      name: "truncated.jpg",
+      mimeType: "application/octet-stream",
+      buffer: progressive.subarray(0, -2),
+    });
+    await expect(
+      page.getByRole("alert").filter({ hasText: "图片文件不完整或已损坏" }),
+    ).toBeVisible();
+    await expect(page.locator("#photo-selfie-1")).toBeEnabled();
+    expect(await savedPhotos(page)).toEqual(baseline);
+    await expect(
+      page.getByRole("img", { name: "自拍第1张预览", exact: true }),
+    ).toBeVisible();
+  });
+}

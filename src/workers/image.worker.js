@@ -6,6 +6,7 @@ import {
   imageError,
   isPreservableFormat,
 } from "../lib/imageHeader.js";
+import { imageOperation } from "../lib/imageOperation.js";
 
 /** 解码目标长边：附件和预览都不会超过该值，超限图片在解码阶段先降采样。 */
 const DECODE_SIDE = Math.max(
@@ -33,6 +34,38 @@ function sameSize(actual, expected) {
 }
 
 /**
+ * 接受原尺寸或浏览器因内存限制进行的等比降采样，拒绝放大、横竖反转和拉伸。
+ * @param {{width:number,height:number}} actual 浏览器交付的实际尺寸。
+ * @param {{width:number,height:number}} source 按文件方向修正后的原始尺寸。
+ * @returns {boolean} 尺寸一致或降采样取整误差不超过一个像素。
+ */
+function matchesDecodedSize(actual, source) {
+  if (sameSize(actual, source)) return true;
+  if (
+    !Number.isInteger(actual.width) ||
+    !Number.isInteger(actual.height) ||
+    actual.width <= 0 ||
+    actual.height <= 0 ||
+    actual.width > source.width ||
+    actual.height > source.height ||
+    Math.max(actual.width, actual.height) >=
+      Math.max(source.width, source.height) ||
+    (actual.width - actual.height) * (source.width - source.height) < 0
+  )
+    return false;
+  const expected = fitWithin(
+    source.width,
+    source.height,
+    Math.max(actual.width, actual.height),
+  );
+  // 原生解码器的整数舍入可能与 Math.round 相差一个像素。
+  return (
+    Math.abs(actual.width - expected.width) <= 1 &&
+    Math.abs(actual.height - expected.height) <= 1
+  );
+}
+
+/**
  * 用 Image 元素解码，供不支持 createImageBitmap 的浏览器回退。
  * @param {Blob} blob 图片字节。
  * @param {AbortSignal|undefined} signal 取消信号。
@@ -44,51 +77,55 @@ function decodeWithElement(blob, signal) {
       "IMAGE_DECODE",
       "浏览器未能解码这张图片，请换一张图片重试。",
     );
-  return new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(blob);
-    const element = new Image();
-    let finished = false;
-    const cleanup = () => {
-      signal?.removeEventListener("abort", abort);
-      element.onload = null;
-      element.onerror = null;
-      URL.revokeObjectURL(url);
-    };
-    const abort = () => {
-      if (finished) return;
-      finished = true;
-      cleanup();
-      element.src = "";
-      reject(new DOMException("图片处理已取消。", "AbortError"));
-    };
-    signal?.addEventListener("abort", abort, { once: true });
-    element.onload = () => {
-      if (finished) return;
-      finished = true;
-      cleanup();
-      resolve({
-        source: element,
-        width: element.naturalWidth,
-        height: element.naturalHeight,
-        close: () => {
+  return imageOperation(
+    (decodeSignal) =>
+      new Promise((resolve, reject) => {
+        const url = URL.createObjectURL(blob);
+        const element = new Image();
+        let finished = false;
+        const cleanup = () => {
+          decodeSignal.removeEventListener("abort", abort);
+          element.onload = null;
+          element.onerror = null;
+          URL.revokeObjectURL(url);
+        };
+        const abort = () => {
+          if (finished) return;
+          finished = true;
+          cleanup();
           element.src = "";
-        },
-      });
-    };
-    element.onerror = () => {
-      if (finished) return;
-      finished = true;
-      cleanup();
-      reject(
-        imageError(
-          "IMAGE_DECODE",
-          "浏览器未能解码这张图片，请换一张图片重试。",
-        ),
-      );
-    };
-    element.src = url;
-    if (signal?.aborted) abort();
-  });
+          reject(new DOMException("图片处理已取消。", "AbortError"));
+        };
+        decodeSignal.addEventListener("abort", abort, { once: true });
+        element.onload = () => {
+          if (finished) return;
+          finished = true;
+          cleanup();
+          resolve({
+            source: element,
+            width: element.naturalWidth,
+            height: element.naturalHeight,
+            close: () => {
+              element.src = "";
+            },
+          });
+        };
+        element.onerror = () => {
+          if (finished) return;
+          finished = true;
+          cleanup();
+          reject(
+            imageError(
+              "IMAGE_DECODE",
+              "浏览器未能解码这张图片，请换一张图片重试。",
+            ),
+          );
+        };
+        element.src = url;
+        if (decodeSignal.aborted) abort();
+      }),
+    { signal, onLateResult: (result) => result.close() },
+  );
 }
 
 /**
@@ -117,7 +154,10 @@ async function decode(blob, metadata, signal) {
   if (typeof createImageBitmap === "function") {
     let bitmap = null;
     try {
-      bitmap = await createImageBitmap(blob, options);
+      bitmap = await imageOperation(() => createImageBitmap(blob, options), {
+        signal,
+        onLateResult: (result) => result.close(),
+      });
     } catch (error) {
       if (error?.name === "AbortError") throw error;
       // 部分系统浏览器支持 createImageBitmap，但没有实现所有图片解码器。
@@ -129,24 +169,21 @@ async function decode(blob, metadata, signal) {
         checkAbort(signal);
       }
       const actual = { width: bitmap.width, height: bitmap.height };
-      // 浏览器可能忽略 resize 选项，两种结果都接受，其他尺寸视为方向或内容不一致。
-      if (!sameSize(actual, requested) && !sameSize(actual, source)) {
+      // 部分系统的位图解码器方向/缩放行为不完整；尺寸不符时再试图片元素。
+      if (!sameSize(actual, requested) && !matchesDecodedSize(actual, source)) {
         bitmap.close();
-        throw imageError(
-          "IMAGE_DECODE",
-          "浏览器解码的图片尺寸或方向与文件记录不一致，请在相册重新保存后再选择。",
-        );
+      } else {
+        return {
+          source: bitmap,
+          width: actual.width,
+          height: actual.height,
+          close: () => bitmap.close(),
+        };
       }
-      return {
-        source: bitmap,
-        width: actual.width,
-        height: actual.height,
-        close: () => bitmap.close(),
-      };
     }
   }
   const decoded = await decodeWithElement(blob, signal);
-  if (!sameSize(decoded, source)) {
+  if (!matchesDecodedSize(decoded, source)) {
     decoded.close();
     throw imageError(
       "IMAGE_DECODE",
@@ -175,33 +212,58 @@ function makeCanvas(width, height) {
       "IMAGE_UNSUPPORTED",
       "浏览器不支持本地图片处理，请使用当前版本的系统浏览器。",
     );
-  const context = canvas.getContext("2d", { alpha: false });
-  if (!context)
+  try {
+    const context = canvas.getContext("2d", { alpha: false });
+    if (!context)
+      throw imageError(
+        "IMAGE_UNSUPPORTED",
+        "浏览器无法创建图片画布，请关闭其他页面后重试。",
+      );
+    context.fillStyle = "#ffffff";
+    context.fillRect(0, 0, width, height);
+    context.imageSmoothingEnabled = true;
+    context.imageSmoothingQuality = "high";
+    return { canvas, context };
+  } catch (error) {
+    // 获取上下文也可能在低内存设备上失败，此时尚未进入外层画布 finally。
+    canvas.width = 1;
+    canvas.height = 1;
+    if (error.code === "IMAGE_UNSUPPORTED") throw error;
     throw imageError(
       "IMAGE_UNSUPPORTED",
       "浏览器无法创建图片画布，请关闭其他页面后重试。",
     );
-  context.fillStyle = "#ffffff";
-  context.fillRect(0, 0, width, height);
-  context.imageSmoothingEnabled = true;
-  context.imageSmoothingQuality = "high";
-  return { canvas, context };
+  }
 }
 
 /**
  * 编码 JPEG，兼容 OffscreenCanvas 和普通 canvas。
  * @param {OffscreenCanvas|HTMLCanvasElement} canvas 已绘制的画布。
  * @param {number} quality JPEG 编码质量，范围为 0 至 1。
+ * @param {AbortSignal|undefined} signal 取消信号。
  * @returns {Promise<Blob>} JPEG 字节。
  */
-async function encode(canvas, quality) {
+async function encode(canvas, quality, signal) {
   let blob;
-  if (typeof canvas.convertToBlob === "function")
-    blob = await canvas.convertToBlob({ type: "image/jpeg", quality });
-  else
-    blob = await new Promise((resolve) =>
-      canvas.toBlob(resolve, "image/jpeg", quality),
+  try {
+    blob = await imageOperation(
+      () => {
+        if (typeof canvas.convertToBlob === "function")
+          return canvas.convertToBlob({ type: "image/jpeg", quality });
+        return new Promise((resolve) =>
+          canvas.toBlob(resolve, "image/jpeg", quality),
+        );
+      },
+      { signal },
     );
+  } catch (error) {
+    if (error.name === "AbortError" || error.code === "IMAGE_TIMEOUT")
+      throw error;
+    throw imageError(
+      "IMAGE_ENCODING",
+      "浏览器无法生成图片，请关闭其他页面后重试，或先在设备上缩小照片。",
+    );
+  }
   if (!blob || blob.type !== "image/jpeg")
     throw imageError(
       "IMAGE_ENCODING",
@@ -230,7 +292,7 @@ async function boundedJpeg(decoded, sides, qualities, maxBytes, signal) {
       context.drawImage(decoded.source, 0, 0, width, height);
       for (const quality of qualities) {
         checkAbort(signal);
-        const blob = await encode(canvas, quality);
+        const blob = await encode(canvas, quality, signal);
         checkAbort(signal);
         if (blob.size <= maxBytes) return { blob, width, height };
       }

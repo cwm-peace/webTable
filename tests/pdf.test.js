@@ -8,10 +8,11 @@ import { getDocument, OPS } from 'pdfjs-dist/legacy/build/pdf.mjs';
 import { generatePdf, exportPdf } from '../src/lib/pdf.js';
 import { attachmentName } from '../src/lib/pdfCore.js';
 import { wrapText } from '../src/lib/pdfLayout.js';
+import { PDF_FONT_FILE } from '../src/lib/pdfFont.js';
 import fields from '../src/data/fields.json' with { type: 'json' };
 import questions from '../src/data/questions.json' with { type: 'json' };
 
-const fontBytes = new Uint8Array(await readFile(new URL('../public/fonts/NotoSansSC-Regular.otf', import.meta.url)));
+const fontBytes = new Uint8Array(await readFile(new URL(`../public/fonts/${PDF_FONT_FILE}`, import.meta.url)));
 
 /**
  * 计算 PNG 数据块校验码。

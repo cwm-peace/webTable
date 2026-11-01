@@ -260,12 +260,11 @@ test('SHA-256 is byte-based and stable across renamed files', async () => {
   assert.equal(await sha256(first), await sha256(second))
 })
 
-test('processImage rejects oversized files, forged MIME and cancellation before decode', async () => {
+test('processImage rejects oversized files, invalid content and cancellation before decode', async () => {
   const controller = new AbortController()
   controller.abort()
   await assert.rejects(processImage(new File([png()], 'a.png'), { signal: controller.signal }), { name: 'AbortError' })
   await assert.rejects(processImage({ size: IMAGE_LIMITS.inputBytes + 1, arrayBuffer() { throw new Error('Must not allocate') } }), { code: 'IMAGE_TOO_LARGE' })
-  await assert.rejects(processImage(new File([png()], 'a.jpg', { type: 'image/jpeg' })), { code: 'IMAGE_TYPE' })
   await assert.rejects(processImage(new File(['<html>invalid data</html>'], 'a.png', { type: 'image/png' })), { code: 'IMAGE_TYPE' })
   await assert.rejects(processImage(new File([png().subarray(0, 20)], 'a.png', { type: 'image/png' })), { code: 'IMAGE_CORRUPT' })
 })

@@ -1,0 +1,324 @@
+{
+  "date": "2026-10-17",
+  "release": "webtable-20261017-160826",
+  "basePath": "/bdsm/",
+  "server": {
+    "os": "CentOS Stream 9",
+    "nginxVersion": "1.31.6",
+    "gzipStaticCompiled": false,
+    "brotliCompiled": false,
+    "compression": "gzip dynamic level 6",
+    "reload": "graceful; nginx -t passed before activation"
+  },
+  "font": {
+    "beforeBytes": 8331336,
+    "beforeContentType": "application/octet-stream",
+    "beforeEncoding": "identity",
+    "afterRawBytes": 6935324,
+    "afterGzipBytes": 5879355,
+    "afterContentType": "font/otf",
+    "reductionPercent": 29.43,
+    "sha256": "c5b729f69005f2cf0da1790c93b11ff565ed8308caa4734698b24c4ea7c589d6",
+    "conditionalStatus": 304,
+    "gzipQ0Honored": true
+  },
+  "httpChecks": [
+    {
+      "path": "/bdsm/",
+      "status": 200,
+      "cacheControl": "no-cache"
+    },
+    {
+      "path": "/bdsm",
+      "status": 308,
+      "cacheControl": "no-cache"
+    },
+    {
+      "path": "/",
+      "status": 301,
+      "cacheControl": "no-cache"
+    },
+    {
+      "path": "/bdsm/assets/index-B5NPlrz2.js",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable"
+    },
+    {
+      "path": "/bdsm/assets/index-CpCNpAmx.js",
+      "status": 200,
+      "cacheControl": "public, max-age=31536000, immutable"
+    },
+    {
+      "path": "/bdsm/fonts/NotoSansSC-Regular.otf",
+      "status": 200,
+      "cacheControl": "no-cache"
+    },
+    {
+      "path": "/bdsm/assets/missing-deploy-check.js",
+      "status": 404,
+      "cacheControl": null
+    },
+    {
+      "path": "/bdsm/api",
+      "status": 404,
+      "cacheControl": null
+    },
+    {
+      "path": "/bdsm/.git/config",
+      "status": 404,
+      "cacheControl": null
+    }
+  ],
+  "localSubpathSmoke": [
+    {
+      "engine": "chromium",
+      "status": "passed",
+      "secureContext": true,
+      "progressiveJpeg": true,
+      "truncatedPreservesPhoto": true,
+      "pdfPages": 24,
+      "attachments": 16,
+      "downloadPreservesDraft": true,
+      "subpath": true,
+      "requests": [
+        {
+          "path": "/bdsm/",
+          "method": "GET"
+        },
+        {
+          "path": "/bdsm/assets/index-B5NPlrz2.js",
+          "method": "GET"
+        },
+        {
+          "path": "/bdsm/assets/index-31grR1SB.css",
+          "method": "GET"
+        },
+        {
+          "path": "/__e2e_seed",
+          "method": "GET"
+        },
+        {
+          "path": "/bdsm/",
+          "method": "GET"
+        },
+        {
+          "path": "/bdsm/assets/index-B5NPlrz2.js",
+          "method": "GET"
+        },
+        {
+          "path": "/bdsm/assets/index-31grR1SB.css",
+          "method": "GET"
+        },
+        {
+          "path": "/bdsm/assets/image.worker-BdiK_PDg.js",
+          "method": "GET"
+        },
+        {
+          "path": "/bdsm/assets/pdf-BjfHUTRR.js",
+          "method": "GET"
+        },
+        {
+          "path": "/bdsm/assets/pdf.worker-CHGeCsOU.js",
+          "method": "GET"
+        },
+        {
+          "path": "/bdsm/fonts/WebTableSansSC-Regular-c5b729f69005.otf",
+          "method": "GET"
+        }
+      ],
+      "badResponses": [],
+      "errors": []
+    },
+    {
+      "engine": "webkit",
+      "status": "passed",
+      "secureContext": true,
+      "progressiveJpeg": true,
+      "truncatedPreservesPhoto": true,
+      "pdfPages": 24,
+      "attachments": 16,
+      "downloadPreservesDraft": true,
+      "subpath": true,
+      "requests": [
+        {
+          "path": "/bdsm/",
+          "method": "GET"
+        },
+        {
+          "path": "/bdsm/assets/index-B5NPlrz2.js",
+          "method": "GET"
+        },
+        {
+          "path": "/bdsm/assets/index-31grR1SB.css",
+          "method": "GET"
+        },
+        {
+          "path": "/__e2e_seed",
+          "method": "GET"
+        },
+        {
+          "path": "/bdsm/",
+          "method": "GET"
+        },
+        {
+          "path": "/bdsm/assets/index-B5NPlrz2.js",
+          "method": "GET"
+        },
+        {
+          "path": "/bdsm/assets/index-31grR1SB.css",
+          "method": "GET"
+        },
+        {
+          "path": "/bdsm/assets/image.worker-BdiK_PDg.js",
+          "method": "GET"
+        },
+        {
+          "path": "/bdsm/assets/pdf-BjfHUTRR.js",
+          "method": "GET"
+        },
+        {
+          "path": "/bdsm/assets/pdf.worker-CHGeCsOU.js",
+          "method": "GET"
+        },
+        {
+          "path": "/bdsm/fonts/WebTableSansSC-Regular-c5b729f69005.otf",
+          "method": "GET"
+        }
+      ],
+      "badResponses": [],
+      "errors": []
+    }
+  ],
+  "publicHttpsSmoke": [
+    {
+      "engine": "chromium",
+      "status": "passed",
+      "secureContext": true,
+      "progressiveJpeg": true,
+      "truncatedPreservesPhoto": true,
+      "pdfPages": 24,
+      "attachments": 16,
+      "downloadPreservesDraft": true,
+      "subpath": true,
+      "requests": [
+        {
+          "path": "/bdsm/",
+          "method": "GET"
+        },
+        {
+          "path": "/bdsm/assets/index-B5NPlrz2.js",
+          "method": "GET"
+        },
+        {
+          "path": "/bdsm/assets/index-31grR1SB.css",
+          "method": "GET"
+        },
+        {
+          "path": "/__e2e_seed",
+          "method": "GET"
+        },
+        {
+          "path": "/bdsm/",
+          "method": "GET"
+        },
+        {
+          "path": "/bdsm/assets/index-B5NPlrz2.js",
+          "method": "GET"
+        },
+        {
+          "path": "/bdsm/assets/index-31grR1SB.css",
+          "method": "GET"
+        },
+        {
+          "path": "/bdsm/assets/image.worker-BdiK_PDg.js",
+          "method": "GET"
+        },
+        {
+          "path": "/bdsm/assets/pdf-BjfHUTRR.js",
+          "method": "GET"
+        },
+        {
+          "path": "/bdsm/assets/pdf.worker-CHGeCsOU.js",
+          "method": "GET"
+        },
+        {
+          "path": "/bdsm/fonts/WebTableSansSC-Regular-c5b729f69005.otf",
+          "method": "GET"
+        }
+      ],
+      "badResponses": [],
+      "errors": []
+    },
+    {
+      "engine": "webkit",
+      "status": "passed",
+      "secureContext": true,
+      "progressiveJpeg": true,
+      "truncatedPreservesPhoto": true,
+      "pdfPages": 24,
+      "attachments": 16,
+      "downloadPreservesDraft": true,
+      "subpath": true,
+      "requests": [
+        {
+          "path": "/bdsm/",
+          "method": "GET"
+        },
+        {
+          "path": "/bdsm/assets/index-B5NPlrz2.js",
+          "method": "GET"
+        },
+        {
+          "path": "/bdsm/assets/index-31grR1SB.css",
+          "method": "GET"
+        },
+        {
+          "path": "/__e2e_seed",
+          "method": "GET"
+        },
+        {
+          "path": "/bdsm/",
+          "method": "GET"
+        },
+        {
+          "path": "/bdsm/assets/index-B5NPlrz2.js",
+          "method": "GET"
+        },
+        {
+          "path": "/bdsm/assets/index-31grR1SB.css",
+          "method": "GET"
+        },
+        {
+          "path": "/bdsm/assets/image.worker-BdiK_PDg.js",
+          "method": "GET"
+        },
+        {
+          "path": "/bdsm/assets/pdf-BjfHUTRR.js",
+          "method": "GET"
+        },
+        {
+          "path": "/bdsm/assets/pdf.worker-CHGeCsOU.js",
+          "method": "GET"
+        },
+        {
+          "path": "/bdsm/fonts/WebTableSansSC-Regular-c5b729f69005.otf",
+          "method": "GET"
+        }
+      ],
+      "badResponses": [],
+      "errors": []
+    }
+  ],
+  "rollback": {
+    "originalSitePreserved": true,
+    "configurationAndSiteBackedUp": true,
+    "legacyHashedResourcesRetained": true,
+    "details": "Private deployment record under artifacts/webtable-20261017-160826/"
+  },
+  "validationLimits": [
+    "No phone/tablet physical-device verification",
+    "No Firefox browser verification",
+    "No 11-round regression rerun",
+    "Brotli and gzip_static were not installed or enabled on the live server"
+  ]
+}

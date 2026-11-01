@@ -1,0 +1,411 @@
+{
+  "schemaVersion": 1,
+  "measuredAt": "2026-10-17T07:54:17.861Z",
+  "node": "v26.7.0",
+  "build": {
+    "sha256": "626986b55e8c19744107d25a8773aa11c10f613e2cba53bffaf65a7451b11bf4",
+    "files": 29
+  },
+  "buildUnchanged": true,
+  "compression": {
+    "gzip": "Prebuilt gzip level 9 when present; otherwise Node zlib level 6",
+    "br": "Prebuilt Brotli quality 11 when present; otherwise quality 4",
+    "measurement": "Compressed response-body bytes; excludes HTTP/TLS headers, retransmission and CDN billing rules."
+  },
+  "files": [
+    {
+      "path": "assets/image.worker-BdiK_PDg.js",
+      "raw": 5301,
+      "gzip": 2343,
+      "br": 1958
+    },
+    {
+      "path": "assets/index-21xkYT8z.js",
+      "raw": 263208,
+      "gzip": 90660,
+      "br": 78515
+    },
+    {
+      "path": "assets/index-31grR1SB.css",
+      "raw": 66635,
+      "gzip": 12616,
+      "br": 10790
+    },
+    {
+      "path": "assets/pdf-CQCCj4pZ.js",
+      "raw": 2268,
+      "gzip": 1186,
+      "br": 1033
+    },
+    {
+      "path": "assets/pdf.worker-D_g5PW_R.js",
+      "raw": 1172534,
+      "gzip": 514226,
+      "br": 424185
+    },
+    {
+      "path": "assets/pdfCore-CMglxlHO.js",
+      "raw": 1144095,
+      "gzip": 506899,
+      "br": 418134
+    },
+    {
+      "path": "favicon.svg",
+      "raw": 2910,
+      "gzip": 1481,
+      "br": 1203
+    },
+    {
+      "path": "fonts/OFL.txt",
+      "raw": 4301,
+      "gzip": 1914,
+      "br": 1814
+    },
+    {
+      "path": "fonts/SOURCE.md",
+      "raw": 2030,
+      "gzip": 1383,
+      "br": 1484
+    },
+    {
+      "path": "fonts/WebTableSansSC-Regular-c5b729f69005.otf",
+      "raw": 6935324,
+      "gzip": 5876648,
+      "br": 4804883
+    },
+    {
+      "path": "index.html",
+      "raw": 1255,
+      "gzip": 791,
+      "br": 521
+    }
+  ],
+  "totals": {
+    "raw": 9599861,
+    "gzip": 7010147,
+    "br": 5744520
+  },
+  "budgets": {
+    "entry": {
+      "paths": [
+        "assets/index-21xkYT8z.js",
+        "assets/index-31grR1SB.css",
+        "favicon.svg",
+        "index.html"
+      ],
+      "bytes": {
+        "raw": 334008,
+        "gzip": 105548,
+        "br": 91029
+      },
+      "method": "index.html plus statically imported JS, CSS URL assets and HTML references; excludes dynamic imports and workers"
+    },
+    "normalFirstExportAdditional": {
+      "paths": [
+        "assets/pdf-CQCCj4pZ.js",
+        "assets/pdf.worker-D_g5PW_R.js",
+        "fonts/WebTableSansSC-Regular-c5b729f69005.otf"
+      ],
+      "bytes": {
+        "raw": 8110126,
+        "gzip": 6392060,
+        "br": 5230101
+      },
+      "method": "Lazy PDF module, PDF worker and font; worker includes its bundled libraries"
+    },
+    "imageProcessingAdditional": {
+      "paths": [
+        "assets/image.worker-BdiK_PDg.js"
+      ],
+      "bytes": {
+        "raw": 5301,
+        "gzip": 2343,
+        "br": 1958
+      },
+      "method": "Worker loaded on the first local image processing task"
+    },
+    "normalCompleteUse": {
+      "paths": [
+        "index.html",
+        "assets/index-31grR1SB.css",
+        "assets/index-21xkYT8z.js",
+        "favicon.svg",
+        "assets/image.worker-BdiK_PDg.js",
+        "assets/pdf-CQCCj4pZ.js",
+        "assets/pdf.worker-D_g5PW_R.js",
+        "fonts/WebTableSansSC-Regular-c5b729f69005.otf"
+      ],
+      "bytes": {
+        "raw": 8449435,
+        "gzip": 6499951,
+        "br": 5323088
+      },
+      "method": "Union of entry resources, image worker, lazy PDF module, PDF worker and font; excludes the main-thread PDF fallback bundle"
+    },
+    "fallbackFirstExportAdditional": {
+      "paths": [
+        "assets/pdf-CQCCj4pZ.js",
+        "assets/pdfCore-CMglxlHO.js",
+        "fonts/WebTableSansSC-Regular-c5b729f69005.otf"
+      ],
+      "bytes": {
+        "raw": 8081687,
+        "gzip": 6384733,
+        "br": 5224050
+      },
+      "method": "Conservative sum of non-entry non-worker JS chunks plus font; fallback path may load only a subset"
+    },
+    "allRuntimeResources": {
+      "paths": [
+        "assets/image.worker-BdiK_PDg.js",
+        "assets/index-21xkYT8z.js",
+        "assets/index-31grR1SB.css",
+        "assets/pdf-CQCCj4pZ.js",
+        "assets/pdf.worker-D_g5PW_R.js",
+        "assets/pdfCore-CMglxlHO.js",
+        "favicon.svg",
+        "fonts/WebTableSansSC-Regular-c5b729f69005.otf",
+        "index.html"
+      ],
+      "bytes": {
+        "raw": 9593530,
+        "gzip": 7006850,
+        "br": 5741222
+      },
+      "method": "Upper bound if every runtime branch is loaded once; ordinary use does not necessarily request every chunk"
+    }
+  },
+  "realHttpCacheChecks": [
+    {
+      "path": "index.html",
+      "encoding": "br",
+      "status": 200,
+      "encodedBodyBytes": 521,
+      "expectedBodyBytes": 521,
+      "cacheControl": "no-cache",
+      "etag": "\"fJulJLsgcZQIt6BlecQiHZkj8ATPn5avIgiVJDwczzQ\"",
+      "repeatedStatus": 304,
+      "repeatedBodyBytes": 0,
+      "passed": true
+    },
+    {
+      "path": "index.html",
+      "encoding": "gzip",
+      "status": 200,
+      "encodedBodyBytes": 791,
+      "expectedBodyBytes": 791,
+      "cacheControl": "no-cache",
+      "etag": "\"syz4NWGvLVGrlJrFL0D0p_jHKVBF67FxYCfRj4qiKwA\"",
+      "repeatedStatus": 304,
+      "repeatedBodyBytes": 0,
+      "passed": true
+    },
+    {
+      "path": "index.html",
+      "encoding": "identity",
+      "status": 200,
+      "encodedBodyBytes": 1255,
+      "expectedBodyBytes": 1255,
+      "cacheControl": "no-cache",
+      "etag": "\"ixNy_3UX6CdoZWWHNn58OWKf8oNidfAYwkOn8eDfdfY\"",
+      "repeatedStatus": 304,
+      "repeatedBodyBytes": 0,
+      "passed": true
+    },
+    {
+      "path": "assets/index-21xkYT8z.js",
+      "encoding": "br",
+      "status": 200,
+      "encodedBodyBytes": 78515,
+      "expectedBodyBytes": 78515,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "etag": "\"ajSZ4OjOcVeKJQBdkFf6csvQMZIeV-7_cUH7FdlXrMM\"",
+      "repeatedStatus": 304,
+      "repeatedBodyBytes": 0,
+      "passed": true
+    },
+    {
+      "path": "assets/index-21xkYT8z.js",
+      "encoding": "gzip",
+      "status": 200,
+      "encodedBodyBytes": 90660,
+      "expectedBodyBytes": 90660,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "etag": "\"eyZCd1wGPBGn1RHNGHNSPe9CrAlgvV2itgEznE4YqDA\"",
+      "repeatedStatus": 304,
+      "repeatedBodyBytes": 0,
+      "passed": true
+    },
+    {
+      "path": "assets/index-21xkYT8z.js",
+      "encoding": "identity",
+      "status": 200,
+      "encodedBodyBytes": 263208,
+      "expectedBodyBytes": 263208,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "etag": "\"e70ZQhp0D89Fqn3yevVX2i00lFgetUMxSIYz7hu6u9U\"",
+      "repeatedStatus": 304,
+      "repeatedBodyBytes": 0,
+      "passed": true
+    },
+    {
+      "path": "fonts/WebTableSansSC-Regular-c5b729f69005.otf",
+      "encoding": "br",
+      "status": 200,
+      "encodedBodyBytes": 4804883,
+      "expectedBodyBytes": 4804883,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "etag": "\"BYOIKxFZMWi5TTMkqXj13ioeTDauspcwq-CgPwMOYeE\"",
+      "repeatedStatus": 304,
+      "repeatedBodyBytes": 0,
+      "passed": true
+    },
+    {
+      "path": "fonts/WebTableSansSC-Regular-c5b729f69005.otf",
+      "encoding": "gzip",
+      "status": 200,
+      "encodedBodyBytes": 5876648,
+      "expectedBodyBytes": 5876648,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "etag": "\"JvZTrFAfWU3boNx6L3tI4e39cvB6sMMzqGi8YOwdhRU\"",
+      "repeatedStatus": 304,
+      "repeatedBodyBytes": 0,
+      "passed": true
+    },
+    {
+      "path": "fonts/WebTableSansSC-Regular-c5b729f69005.otf",
+      "encoding": "identity",
+      "status": 200,
+      "encodedBodyBytes": 6935324,
+      "expectedBodyBytes": 6935324,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "etag": "\"xbcp9pAF8s8NoXkMk7Ef9WXtgwjKpHNGmLJMTqfFidY\"",
+      "repeatedStatus": 304,
+      "repeatedBodyBytes": 0,
+      "passed": true
+    },
+    {
+      "path": "assets/pdf.worker-D_g5PW_R.js",
+      "encoding": "br",
+      "status": 200,
+      "encodedBodyBytes": 424185,
+      "expectedBodyBytes": 424185,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "etag": "\"eZ7EsZ1MmnfHItc7TaPos6fpZ5g9OkTcc_okAgEK31g\"",
+      "repeatedStatus": 304,
+      "repeatedBodyBytes": 0,
+      "passed": true
+    },
+    {
+      "path": "assets/pdf.worker-D_g5PW_R.js",
+      "encoding": "gzip",
+      "status": 200,
+      "encodedBodyBytes": 514226,
+      "expectedBodyBytes": 514226,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "etag": "\"x1mYSVYcGDQ2KEYRZvScAR9WCyaGmwzuk2oAfbKCNDg\"",
+      "repeatedStatus": 304,
+      "repeatedBodyBytes": 0,
+      "passed": true
+    },
+    {
+      "path": "assets/pdf.worker-D_g5PW_R.js",
+      "encoding": "identity",
+      "status": 200,
+      "encodedBodyBytes": 1172534,
+      "expectedBodyBytes": 1172534,
+      "cacheControl": "public, max-age=31536000, immutable",
+      "etag": "\"How5l44UKzpfOPHYMNdcQUwsKqhO7EdzXTwU4YHuVPU\"",
+      "repeatedStatus": 304,
+      "repeatedBodyBytes": 0,
+      "passed": true
+    }
+  ],
+  "browserHomepageNetwork": {
+    "status": "measured",
+    "browser": "Chromium 156.0.8078.4",
+    "note": "CDP encodedDataLength includes response transport/header accounting; body-only budgets are reported separately. Same-page reload still revalidates index.html.",
+    "cold": {
+      "encodedBytes": 92388,
+      "requests": [
+        {
+          "url": "http://127.0.0.1:58784/",
+          "method": "GET",
+          "encodedBytes": 1354,
+          "status": 200,
+          "diskCache": false,
+          "serviceWorker": false,
+          "mime": "text/html"
+        },
+        {
+          "url": "http://127.0.0.1:58784/assets/index-21xkYT8z.js",
+          "method": "GET",
+          "encodedBytes": 79383,
+          "status": 200,
+          "diskCache": false,
+          "serviceWorker": false,
+          "mime": "text/javascript"
+        },
+        {
+          "url": "http://127.0.0.1:58784/assets/index-31grR1SB.css",
+          "method": "GET",
+          "encodedBytes": 11651,
+          "status": 200,
+          "diskCache": false,
+          "serviceWorker": false,
+          "mime": "text/css"
+        }
+      ]
+    },
+    "warm": {
+      "encodedBytes": 822,
+      "requests": [
+        {
+          "url": "http://127.0.0.1:58784/",
+          "method": "GET",
+          "encodedBytes": 822,
+          "status": 200,
+          "diskCache": false,
+          "serviceWorker": false,
+          "mime": "text/html"
+        },
+        {
+          "url": "http://127.0.0.1:58784/assets/index-21xkYT8z.js",
+          "method": "GET",
+          "encodedBytes": 0,
+          "memoryCache": true,
+          "status": 200,
+          "diskCache": false,
+          "serviceWorker": false,
+          "mime": "text/javascript"
+        },
+        {
+          "url": "http://127.0.0.1:58784/assets/index-31grR1SB.css",
+          "method": "GET",
+          "encodedBytes": 0,
+          "memoryCache": true,
+          "status": 200,
+          "diskCache": false,
+          "serviceWorker": false,
+          "mime": "text/css"
+        }
+      ]
+    },
+    "failed": []
+  },
+  "planning": {
+    "assumptions": {
+      "peakUsers": 100,
+      "desiredLoadSeconds": 10,
+      "overheadFactor": 1.3,
+      "monthlyColdFullUses": 10000
+    },
+    "coldFullMonthlyGB": 57.41222,
+    "entryPeakMbps": 9.467016000000001,
+    "normalFullUseMonthlyGB": 53.23088,
+    "normalFullUsePeakMbps": 553.601152,
+    "fullPeakMbps": 597.087088,
+    "note": "Photos, IndexedDB drafts and generated PDFs remain local and do not add server payload traffic. Content-versioned assets and fonts use immutable caching; unversioned resources revalidate using ETag. Precompressed sidecars are storage alternatives, not additional browser downloads."
+  },
+  "passed": true
+}

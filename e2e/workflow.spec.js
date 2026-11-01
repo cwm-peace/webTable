@@ -1,4 +1,5 @@
 /** 生产构建的填写、导出与清理回归；只使用虚构文字及合成图片。 */
+import { PDF_FONT_FILE } from "../src/lib/pdfFont.js";
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { readFile } from "node:fs/promises";
@@ -212,7 +213,7 @@ test("取消、字体加载失败和重试都保留草稿，返回修改使旧 P
   ).toBeVisible();
   expect(await storageSummary(page)).toMatchObject({ draft: true, photos: 16 });
   const failFont = (route) => route.abort();
-  await context.route("**/fonts/NotoSansSC-Regular.otf", failFont);
+  await context.route(`**/fonts/${PDF_FONT_FILE}`, failFont);
   await page.getByRole("button", { name: "检查并生成 PDF" }).click();
   await expect(
     page.getByRole("button", { name: "检查并生成 PDF" }),
@@ -222,7 +223,7 @@ test("取消、字体加载失败和重试都保留草稿，返回修改使旧 P
     0,
   );
   expect(await storageSummary(page)).toMatchObject({ draft: true, photos: 16 });
-  await context.unroute("**/fonts/NotoSansSC-Regular.otf", failFont);
+  await context.unroute(`**/fonts/${PDF_FONT_FILE}`, failFont);
   await page.getByRole("button", { name: "检查并生成 PDF" }).click();
   await expect(page.getByRole("heading", { name: "PDF 已生成" })).toBeVisible();
   const previousUrl = await page
@@ -259,12 +260,12 @@ test("字体缺字的 emoji 自动用占位符代替并明确提示", async ({ p
   expect(await download.getAttribute("href")).toMatch(/^blob:/);
 });
 
-test("三步骤在四个宽度和六种外观下无横向溢出，严重可访问性问题为零", async ({
+test("三步骤在四个宽度和四种外观下无横向溢出，严重可访问性问题为零", async ({
   page,
 }, testInfo) => {
   await seedDraft(page);
   const measurements = [];
-  for (const theme of ["minimal", "tech", "flat"])
+  for (const theme of ["minimal", "flat"])
     for (const mode of ["light", "dark"]) {
       await page
         .getByRole("combobox", { name: "界面风格" })

@@ -4,10 +4,10 @@ import {
   imageError,
   inspectImage,
   mimeGroup,
-  sameMimeGroup,
   sniffMime,
 } from "./imageHeader.js";
 import { renderImage } from "../workers/image.worker.js";
+import { imageOperation, IMAGE_WORKER_TIMEOUT_MS } from "./imageOperation.js";
 
 export { IMAGE_LIMITS };
 
@@ -23,24 +23,32 @@ function checkAbort(signal) {
 /**
  * 对文件原字节计算 SHA-256，文件名不会影响摘要。
  * @param {Blob} blob 需要计算摘要的图片文件。
+ * @param {AbortSignal|undefined} signal 取消信号。
  * @returns {Promise<string>} 64 位十六进制摘要。
  */
-export async function sha256(blob) {
-  return digestBytes(await blob.arrayBuffer());
+export async function sha256(blob, signal) {
+  return digestBytes(
+    await imageOperation(() => blob.arrayBuffer(), { signal }),
+    signal,
+  );
 }
 
 /**
  * 复用已经读取的文件缓冲区计算摘要，减少大文件的临时副本。
  * @param {ArrayBuffer} bytes 图片原字节。
+ * @param {AbortSignal|undefined} signal 取消信号。
  * @returns {Promise<string>} 64 位十六进制 SHA-256。
  */
-async function digestBytes(bytes) {
+async function digestBytes(bytes, signal) {
   if (!globalThis.crypto?.subtle)
     throw imageError(
       "IMAGE_CRYPTO",
       "浏览器不支持安全摘要，请通过 HTTPS 或 localhost 打开网站。",
     );
-  const digest = await globalThis.crypto.subtle.digest("SHA-256", bytes);
+  const digest = await imageOperation(
+    () => globalThis.crypto.subtle.digest("SHA-256", bytes),
+    { signal },
+  );
   return Array.from(new Uint8Array(digest), (byte) =>
     byte.toString(16).padStart(2, "0"),
   ).join("");
@@ -56,6 +64,8 @@ async function digestBytes(bytes) {
 function renderInWorker(blob, metadata, { signal, onProgress }) {
   return new Promise((resolve, reject) => {
     let worker;
+    let timer;
+    let finished = false;
     try {
       worker = new Worker(
         new URL("../workers/image.worker.js", import.meta.url),
@@ -66,15 +76,36 @@ function renderInWorker(blob, metadata, { signal, onProgress }) {
       return;
     }
     const cleanup = () => {
+      finished = true;
+      clearTimeout(timer);
       signal?.removeEventListener("abort", abort);
+      worker.onmessage = null;
+      worker.onerror = null;
+      worker.onmessageerror = null;
       worker.terminate();
     };
     const abort = () => {
+      if (finished) return;
       cleanup();
       reject(new DOMException("图片处理已取消。", "AbortError"));
     };
+    const restartTimer = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        if (finished) return;
+        cleanup();
+        reject(
+          imageError(
+            "WORKER_UNAVAILABLE",
+            "图片处理线程等待过久，正在改用页面处理。",
+          ),
+        );
+      }, IMAGE_WORKER_TIMEOUT_MS);
+    };
     worker.onmessage = ({ data }) => {
+      if (finished) return;
       if (data.progress) {
+        restartTimer();
         onProgress?.(data.progress);
         return;
       }
@@ -89,10 +120,12 @@ function renderInWorker(blob, metadata, { signal, onProgress }) {
       else resolve(data.result);
     };
     worker.onerror = () => {
+      if (finished) return;
       cleanup();
       reject(imageError("WORKER_UNAVAILABLE", "图片处理线程不可用。"));
     };
     worker.onmessageerror = () => {
+      if (finished) return;
       cleanup();
       reject(imageError("WORKER_UNAVAILABLE", "图片无法传递给处理线程。"));
     };
@@ -102,6 +135,7 @@ function renderInWorker(blob, metadata, { signal, onProgress }) {
       return;
     }
     try {
+      restartTimer();
       worker.postMessage({ blob, metadata });
     } catch {
       cleanup();
@@ -120,12 +154,13 @@ function renderInWorker(blob, metadata, { signal, onProgress }) {
 async function probeImageByDecoding(blob, signal) {
   checkAbort(signal);
 
-  // 优先使用 createImageBitmap，它支持浏览器内置解码器的全部格式。
+  // 位图与图片元素可能支持不同格式，按能力尝试而不按设备名称判断。
   if (typeof createImageBitmap === "function") {
     try {
-      const bitmap = await createImageBitmap(blob, {
-        imageOrientation: "from-image",
-      });
+      const bitmap = await imageOperation(
+        () => createImageBitmap(blob, { imageOrientation: "from-image" }),
+        { signal, onLateResult: (result) => result.close() },
+      );
       if (signal?.aborted) {
         bitmap.close();
         checkAbort(signal);
@@ -147,48 +182,54 @@ async function probeImageByDecoding(blob, signal) {
       "浏览器无法解码这张图片，请确认文件完整且格式正确。",
     );
 
-  return new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(blob);
-    const element = new Image();
-    let finished = false;
-    const cleanup = () => {
-      signal?.removeEventListener("abort", abort);
-      element.onload = null;
-      element.onerror = null;
-      URL.revokeObjectURL(url);
-    };
-    const abort = () => {
-      if (finished) return;
-      finished = true;
-      cleanup();
-      element.src = "";
-      reject(new DOMException("图片处理已取消。", "AbortError"));
-    };
-    signal?.addEventListener("abort", abort, { once: true });
-    element.onload = () => {
-      if (finished) return;
-      finished = true;
-      cleanup();
-      resolve({
-        width: element.naturalWidth,
-        height: element.naturalHeight,
-        mime: String(blob.type || ""),
-      });
-    };
-    element.onerror = () => {
-      if (finished) return;
-      finished = true;
-      cleanup();
-      reject(
-        imageError(
-          "IMAGE_DECODE",
-          "浏览器无法解码这张图片，请确认文件完整且格式正确。",
-        ),
-      );
-    };
-    element.src = url;
-    if (signal?.aborted) abort();
-  });
+  return imageOperation(
+    (decodeSignal) =>
+      new Promise((resolve, reject) => {
+        const url = URL.createObjectURL(blob);
+        const element = new Image();
+        let finished = false;
+        const cleanup = () => {
+          decodeSignal.removeEventListener("abort", abort);
+          element.onload = null;
+          element.onerror = null;
+          URL.revokeObjectURL(url);
+        };
+        const abort = () => {
+          if (finished) return;
+          finished = true;
+          cleanup();
+          element.src = "";
+          reject(new DOMException("图片处理已取消。", "AbortError"));
+        };
+        decodeSignal.addEventListener("abort", abort, { once: true });
+        element.onload = () => {
+          if (finished) return;
+          finished = true;
+          cleanup();
+          const dimensions = {
+            width: element.naturalWidth,
+            height: element.naturalHeight,
+            mime: String(blob.type || ""),
+          };
+          element.src = "";
+          resolve(dimensions);
+        };
+        element.onerror = () => {
+          if (finished) return;
+          finished = true;
+          cleanup();
+          reject(
+            imageError(
+              "IMAGE_DECODE",
+              "浏览器无法解码这张图片，请确认文件完整且格式正确。",
+            ),
+          );
+        };
+        element.src = url;
+        if (decodeSignal.aborted) abort();
+      }),
+    { signal },
+  );
 }
 
 /**
@@ -199,6 +240,7 @@ async function probeImageByDecoding(blob, signal) {
  * @returns {Error} 带 code 的错误。
  */
 function describeDecodeFailure(error, declaredType, sniffed) {
+  if (error.code === "IMAGE_TIMEOUT") return error;
   const group = mimeGroup(sniffed) || mimeGroup(declaredType);
   if (group === "heif")
     return imageError(
@@ -231,8 +273,23 @@ export async function processImage(file, { signal, onProgress } = {}) {
     );
 
   onProgress?.({ stage: "validate", progress: 0.05 });
-  let bytes = await file.arrayBuffer();
+  let bytes;
+  try {
+    bytes = await imageOperation(() => file.arrayBuffer(), { signal });
+  } catch (error) {
+    if (error.name === "AbortError" || error.code === "IMAGE_TIMEOUT")
+      throw error;
+    throw imageError(
+      "IMAGE_READ",
+      "无法读取所选照片，请先将照片下载或保存到设备，再重新选择。",
+    );
+  }
   checkAbort(signal);
+  if (!bytes.byteLength)
+    throw imageError(
+      "IMAGE_READ",
+      "所选照片没有可读取的内容，请先将照片下载或保存到设备，再重新选择。",
+    );
 
   const declaredType = String(file.type || "")
     .trim()
@@ -247,9 +304,10 @@ export async function processImage(file, { signal, onProgress } = {}) {
     metadata = inspectImage(bytes);
   } catch (error) {
     if (error.name === "AbortError") throw error;
-    // 声明为 JPEG／PNG／WebP 却解析失败，说明内容与声明不符，直接拒绝。
+    // 已识别的容器必须通过结构校验，不能因相册未提供 MIME 而绕过检查。
     if (
-      ["jpeg", "png", "webp"].includes(declaredGroup) &&
+      (["jpeg", "png", "webp", "gif"].includes(mimeGroup(sniffed)) ||
+        (!sniffed && ["jpeg", "png", "webp", "gif"].includes(declaredGroup))) &&
       (error.code === "IMAGE_TYPE" || error.code === "IMAGE_CORRUPT")
     )
       throw error;
@@ -259,10 +317,13 @@ export async function processImage(file, { signal, onProgress } = {}) {
   }
 
   if (!metadata) {
-    const typed =
-      file.type && String(file.type).startsWith("image/")
-        ? file
-        : new Blob([bytes], { type: sniffed || "application/octet-stream" });
+    const typed = new Blob([bytes], {
+      type:
+        sniffed ||
+        (declaredType.startsWith("image/")
+          ? declaredType
+          : "application/octet-stream"),
+    });
     let probed;
     try {
       probed = await probeImageByDecoding(typed, signal);
@@ -287,19 +348,18 @@ export async function processImage(file, { signal, onProgress } = {}) {
     };
   }
 
-  // 文件声明的格式必须与内容格式同组，防止改扩展名绕过判重与格式说明。
-  if (declaredGroup && !sameMimeGroup(declaredType, metadata.mime))
+  if (
+    Math.max(metadata.width, metadata.height) > IMAGE_LIMITS.decodeSide ||
+    metadata.width * metadata.height > IMAGE_LIMITS.decodePixels
+  )
     throw imageError(
-      "IMAGE_TYPE",
-      "文件声明的格式与图片内容不一致，请从相册重新保存后再选择。",
+      "IMAGE_DIMENSIONS",
+      `图片尺寸 ${metadata.width}×${metadata.height} 过大，本机无法处理，请先在设备上裁剪或缩小。`,
     );
 
-  // 重建 Blob，确保 MIME 类型与内容一致。
-  const blob =
-    file.type === metadata.mime
-      ? file
-      : new Blob([bytes], { type: metadata.mime });
-  const sourceSha256 = await digestBytes(bytes);
+  // 相册可能转码但保留旧 MIME；以已校验内容为准，并脱离可能失效的系统文件句柄。
+  const blob = new Blob([bytes], { type: metadata.mime });
+  const sourceSha256 = await digestBytes(bytes, signal);
   bytes = null;
   checkAbort(signal);
   onProgress?.({ stage: "hash", progress: 0.2 });
@@ -321,6 +381,7 @@ export async function processImage(file, { signal, onProgress } = {}) {
           "IMAGE_UNSUPPORTED",
           "IMAGE_ENCODING",
           "IMAGE_PROCESS",
+          "IMAGE_TIMEOUT",
         ].includes(error.code)
       )
         throw error;
@@ -331,7 +392,7 @@ export async function processImage(file, { signal, onProgress } = {}) {
   checkAbort(signal);
 
   const finalSha256 = result.compressed
-    ? await sha256(result.blob)
+    ? await sha256(result.blob, signal)
     : sourceSha256;
   checkAbort(signal);
 

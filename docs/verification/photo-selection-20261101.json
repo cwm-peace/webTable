@@ -1,0 +1,268 @@
+{
+  "date": "2026-11-01",
+  "scope": "Local production build; synthetic text and images; browser capability simulation, not real mobile devices",
+  "commands": [
+    "npm ci",
+    "npm run dev -- --host 127.0.0.1",
+    "npm run build",
+    "npm test",
+    "npm run test:e2e -- --project=chromium --project=webkit"
+  ],
+  "unit": {
+    "total": 88,
+    "passed": 88,
+    "failed": 0,
+    "skipped": 0
+  },
+  "e2e": {
+    "total": 70,
+    "passed": 67,
+    "failed": 0,
+    "skipped": 3,
+    "timedOut": 0,
+    "interrupted": 0,
+    "byProject": {
+      "chromium": {
+        "passed": 34,
+        "failed": 0,
+        "skipped": 1,
+        "timedOut": 0,
+        "interrupted": 0
+      },
+      "webkit": {
+        "passed": 33,
+        "failed": 0,
+        "skipped": 2,
+        "timedOut": 0,
+        "interrupted": 0
+      }
+    }
+  },
+  "photoSelection": {
+    "total": 34,
+    "passed": 31,
+    "failed": 0,
+    "skipped": 3,
+    "timedOut": 0,
+    "interrupted": 0,
+    "cases": [
+      {
+        "file": "photo-selection.spec.js",
+        "title": "Android Chromium 常见能力模拟：无 MIME、通用 MIME 与相册别名 JPEG 均可选择",
+        "project": "chromium",
+        "status": "passed"
+      },
+      {
+        "file": "photo-selection.spec.js",
+        "title": "iOS WebKit 无 OffscreenCanvas模拟：无 MIME、通用 MIME 与相册别名 JPEG 均可选择",
+        "project": "chromium",
+        "status": "skipped"
+      },
+      {
+        "file": "photo-selection.spec.js",
+        "title": "鸿蒙浏览器能力降级模拟：无 MIME、通用 MIME 与相册别名 JPEG 均可选择",
+        "project": "chromium",
+        "status": "passed"
+      },
+      {
+        "file": "photo-selection.spec.js",
+        "title": "最后一格的相册读取失败在原处提示，重选同一文件可以成功",
+        "project": "chromium",
+        "status": "passed"
+      },
+      {
+        "file": "photo-selection.spec.js",
+        "title": "取消系统文件选择和再次选择同一照片均保留已有槽位",
+        "project": "chromium",
+        "status": "passed"
+      },
+      {
+        "file": "photo-selection.spec.js",
+        "title": "零字节云端占位图和错标 MIME 的截断图均明确报错并保留旧照片",
+        "project": "chromium",
+        "status": "passed"
+      },
+      {
+        "file": "photo-selection.spec.js",
+        "title": "相册读取挂起可取消，迟到的读取结果不会替换旧照片",
+        "project": "chromium",
+        "status": "passed"
+      },
+      {
+        "file": "photo-selection.spec.js",
+        "title": "打开相册超过九秒后返回，同一页面仍能保存照片",
+        "project": "chromium",
+        "status": "passed"
+      },
+      {
+        "file": "photo-selection.spec.js",
+        "title": "后台读取期间第二页接管，旧页恢复不会覆盖新文字或保存迟到照片",
+        "project": "chromium",
+        "status": "passed"
+      },
+      {
+        "file": "photo-selection.spec.js",
+        "title": "后台读取期间第二页明确清除，迟到照片不会使草稿复活",
+        "project": "chromium",
+        "status": "passed"
+      },
+      {
+        "file": "photo-selection.spec.js",
+        "title": "相册把合法 PNG 标成 JPEG 时按真实内容保存",
+        "project": "chromium",
+        "status": "passed"
+      },
+      {
+        "file": "photo-selection.spec.js",
+        "title": "相册读取超时后解锁控件，重新选择仍能保存",
+        "project": "chromium",
+        "status": "passed"
+      },
+      {
+        "file": "photo-selection.spec.js",
+        "title": "Worker 没有任何回调时超时退出并在页面中完成图片",
+        "project": "chromium",
+        "status": "passed"
+      },
+      {
+        "file": "photo-selection.spec.js",
+        "title": "Adam7 与带方向的 PNG 能生成实际预览（默认处理）",
+        "project": "chromium",
+        "status": "passed"
+      },
+      {
+        "file": "photo-selection.spec.js",
+        "title": "Adam7 与带方向的 PNG 能生成实际预览（普通 canvas）",
+        "project": "chromium",
+        "status": "passed"
+      },
+      {
+        "file": "photo-selection.spec.js",
+        "title": "预览地址创建失败仍保留已存照片，重选后旧预览错误不移除新预览",
+        "project": "chromium",
+        "status": "passed"
+      },
+      {
+        "file": "photo-selection.spec.js",
+        "title": "本机图片写入失败保留原槽位，恢复存储后同文件可重试",
+        "project": "chromium",
+        "status": "passed"
+      },
+      {
+        "file": "photo-selection.spec.js",
+        "title": "Android Chromium 常见能力模拟：无 MIME、通用 MIME 与相册别名 JPEG 均可选择",
+        "project": "webkit",
+        "status": "skipped"
+      },
+      {
+        "file": "photo-selection.spec.js",
+        "title": "iOS WebKit 无 OffscreenCanvas模拟：无 MIME、通用 MIME 与相册别名 JPEG 均可选择",
+        "project": "webkit",
+        "status": "passed"
+      },
+      {
+        "file": "photo-selection.spec.js",
+        "title": "鸿蒙浏览器能力降级模拟：无 MIME、通用 MIME 与相册别名 JPEG 均可选择",
+        "project": "webkit",
+        "status": "skipped"
+      },
+      {
+        "file": "photo-selection.spec.js",
+        "title": "最后一格的相册读取失败在原处提示，重选同一文件可以成功",
+        "project": "webkit",
+        "status": "passed"
+      },
+      {
+        "file": "photo-selection.spec.js",
+        "title": "取消系统文件选择和再次选择同一照片均保留已有槽位",
+        "project": "webkit",
+        "status": "passed"
+      },
+      {
+        "file": "photo-selection.spec.js",
+        "title": "零字节云端占位图和错标 MIME 的截断图均明确报错并保留旧照片",
+        "project": "webkit",
+        "status": "passed"
+      },
+      {
+        "file": "photo-selection.spec.js",
+        "title": "相册读取挂起可取消，迟到的读取结果不会替换旧照片",
+        "project": "webkit",
+        "status": "passed"
+      },
+      {
+        "file": "photo-selection.spec.js",
+        "title": "打开相册超过九秒后返回，同一页面仍能保存照片",
+        "project": "webkit",
+        "status": "passed"
+      },
+      {
+        "file": "photo-selection.spec.js",
+        "title": "后台读取期间第二页接管，旧页恢复不会覆盖新文字或保存迟到照片",
+        "project": "webkit",
+        "status": "passed"
+      },
+      {
+        "file": "photo-selection.spec.js",
+        "title": "后台读取期间第二页明确清除，迟到照片不会使草稿复活",
+        "project": "webkit",
+        "status": "passed"
+      },
+      {
+        "file": "photo-selection.spec.js",
+        "title": "相册把合法 PNG 标成 JPEG 时按真实内容保存",
+        "project": "webkit",
+        "status": "passed"
+      },
+      {
+        "file": "photo-selection.spec.js",
+        "title": "相册读取超时后解锁控件，重新选择仍能保存",
+        "project": "webkit",
+        "status": "passed"
+      },
+      {
+        "file": "photo-selection.spec.js",
+        "title": "Worker 没有任何回调时超时退出并在页面中完成图片",
+        "project": "webkit",
+        "status": "passed"
+      },
+      {
+        "file": "photo-selection.spec.js",
+        "title": "Adam7 与带方向的 PNG 能生成实际预览（默认处理）",
+        "project": "webkit",
+        "status": "passed"
+      },
+      {
+        "file": "photo-selection.spec.js",
+        "title": "Adam7 与带方向的 PNG 能生成实际预览（普通 canvas）",
+        "project": "webkit",
+        "status": "passed"
+      },
+      {
+        "file": "photo-selection.spec.js",
+        "title": "预览地址创建失败仍保留已存照片，重选后旧预览错误不移除新预览",
+        "project": "webkit",
+        "status": "passed"
+      },
+      {
+        "file": "photo-selection.spec.js",
+        "title": "本机图片写入失败保留原槽位，恢复存储后同文件可重试",
+        "project": "webkit",
+        "status": "passed"
+      }
+    ]
+  },
+  "firefox": {
+    "status": "environment-blocked",
+    "probe": "npm run test:e2e -- --project=firefox e2e/images.spec.js -g 无Worker或位图API",
+    "reason": "Browser process exits before page launch: Could not find profile folder."
+  },
+  "limitations": [
+    "No Android, iOS, HarmonyOS or HarmonyOS NEXT real-device validation.",
+    "No native photo picker, cloud provider, physical low-memory or HEIC device validation.",
+    "Three browser-profile combinations are intentionally inapplicable and skipped.",
+    "Eleven fixed-version rounds not run.",
+    "Not deployed to production."
+  ],
+  "buildIndexSha256": "27e1202110c008724b019254ca277e0f452a6d2cf051e56eddf35ee26ae73f59"
+}

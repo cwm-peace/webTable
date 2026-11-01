@@ -4,6 +4,7 @@
  */
 import { PDFDocument } from "pdf-lib";
 import fontkit from "@pdf-lib/fontkit";
+import { PDF_FONT_FILE } from "./pdfFont.js";
 import {
   allBasicFields as fields,
   fieldGroups,
@@ -221,13 +222,11 @@ function buildSubstitutionReport(sanitizer, placeholder) {
   const total = sanitizer.count();
   if (!total) return null;
   const character = String.fromCodePoint(placeholder);
-  const items = [...sanitizer.entries]
-    .slice(0, 8)
-    .map(([code, times]) => ({
-      code: `U+${code.toString(16).toUpperCase()}`,
-      character: isVisibleCode(code) ? String.fromCodePoint(code) : "",
-      count: times,
-    }));
+  const items = [...sanitizer.entries].slice(0, 8).map(([code, times]) => ({
+    code: `U+${code.toString(16).toUpperCase()}`,
+    character: isVisibleCode(code) ? String.fromCodePoint(code) : "",
+    count: times,
+  }));
   return {
     total,
     placeholder: character,
@@ -261,7 +260,7 @@ function assertDrawable(supported, values) {
  */
 async function loadFont(signal) {
   const base = import.meta.env?.BASE_URL || "/";
-  const response = await fetch(`${base}fonts/NotoSansSC-Regular.otf`, {
+  const response = await fetch(`${base}fonts/${PDF_FONT_FILE}`, {
     signal,
     credentials: "omit",
     referrerPolicy: "no-referrer",
@@ -374,7 +373,9 @@ export async function generatePdf(
       layout.ensureSpace(190);
       layout.subheading(
         `${question.section === "left" ? "左侧分组" : "右侧分组"} · ${question.itemType}`,
-        { note: `${questions.filter((item) => `${item.section}:${item.itemType}` === group).length} 项` },
+        {
+          note: `${questions.filter((item) => `${item.section}:${item.itemType}` === group).length} 项`,
+        },
       );
       layout.tableHead(ASSESSMENT_COLUMNS);
       previousGroup = group;

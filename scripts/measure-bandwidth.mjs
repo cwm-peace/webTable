@@ -1,10 +1,10 @@
 /** 测量静态包实际压缩体积、延迟加载预算及本机HTTP缓存行为。 */
-import { readFile } from "node:fs/promises";
+import { readFile, stat } from "node:fs/promises";
 import { resolve, relative, posix, extname } from "node:path";
 import { pathToFileURL } from "node:url";
 import { promisify } from "node:util";
 import { gzip, brotliCompress, constants } from "node:zlib";
-import { createStaticServer } from "./static-server.mjs";
+import { createStaticServer, precompressedVariant } from "./static-server.mjs";
 import {
   filesUnder,
   fingerprint,
@@ -135,11 +135,18 @@ export async function measureBandwidth({
   const sourceFiles = await filesUnder(root);
   const build = await fingerprint(sourceFiles, root);
   const measured = new Map();
-  for (const file of sourceFiles) {
+  for (const file of sourceFiles.filter((file) => !/\.(gz|br)$/.test(file))) {
+    const info = await stat(file);
+    const gzFile = await precompressedVariant(file, "gzip", info);
+    const brFile = await precompressedVariant(file, "br", info);
     const bytes = await readFile(file);
     const [gz, br] = await Promise.all([
-      compressGzip(bytes),
-      compressBr(bytes, { params: { [constants.BROTLI_PARAM_QUALITY]: 4 } }),
+      gzFile ? readFile(gzFile.path) : compressGzip(bytes),
+      brFile
+        ? readFile(brFile.path)
+        : compressBr(bytes, {
+            params: { [constants.BROTLI_PARAM_QUALITY]: 4 },
+          }),
     ]);
     measured.set(relative(root, file).split("\\").join("/"), {
       raw: bytes.length,
@@ -276,8 +283,8 @@ export async function measureBandwidth({
     build,
     buildUnchanged: after.sha256 === build.sha256,
     compression: {
-      gzip: "Node zlib default level 6",
-      br: "Node Brotli quality 4, matching static-server.mjs",
+      gzip: "Prebuilt gzip level 9 when present; otherwise Node zlib level 6",
+      br: "Prebuilt Brotli quality 11 when present; otherwise quality 4",
       measurement:
         "Compressed response-body bytes; excludes HTTP/TLS headers, retransmission and CDN billing rules.",
     },
@@ -343,7 +350,7 @@ export async function measureBandwidth({
           assumptions.desiredLoadSeconds /
           1e6) *
         assumptions.overheadFactor,
-      note: "Photos, IndexedDB drafts and generated PDFs remain local and do not add server payload traffic. Cached immutable resources need no body transfer until changed; unhashed fonts currently revalidate using ETag.",
+      note: "Photos, IndexedDB drafts and generated PDFs remain local and do not add server payload traffic. Content-versioned assets and fonts use immutable caching; unversioned resources revalidate using ETag. Precompressed sidecars are storage alternatives, not additional browser downloads.",
     },
     passed:
       after.sha256 === build.sha256 &&

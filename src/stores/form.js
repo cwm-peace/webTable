@@ -25,6 +25,9 @@ export const useFormStore = defineStore("form", () => {
   const issues = ref([]),
     readOnly = ref(false),
     storageFailed = ref(false);
+  const photoErrors = ref({}),
+    activePhoto = ref(""),
+    photoCancellable = ref(false);
   const storageMode = ref("persistent"),
     complete = ref(false);
   const pdfUrl = ref(""),
@@ -208,6 +211,9 @@ export const useFormStore = defineStore("form", () => {
     revision.value = null;
     suppress = false;
     issues.value = [];
+    photoErrors.value = {};
+    activePhoto.value = "";
+    photoCancellable.value = false;
     error.value = "";
     saveError.value = null;
     saveStatus.value = "saved";
@@ -341,6 +347,9 @@ export const useFormStore = defineStore("form", () => {
     readOnly.value = false;
     step.value = 1;
     issues.value = [];
+    photoErrors.value = {};
+    activePhoto.value = "";
+    photoCancellable.value = false;
     saveStatus.value = "saved";
     saveError.value = null;
     storageMode.value = "persistent";
@@ -474,24 +483,56 @@ export const useFormStore = defineStore("form", () => {
    * @returns {Promise<void>} 图片操作结束
    */
   async function changePhoto(category, slot, file) {
-    if (busy.value || readOnly.value || pdfReady.value || !ageAccepted.value)
+    const id = `photo-${category}-${slot}`;
+    if (pdfReady.value || !ageAccepted.value) return;
+    // 系统选择器打开期间可能发生失权，返回的 change 事件仍应在原处说明原因。
+    if (readOnly.value) {
+      photoErrors.value[id] =
+        "本页暂不可编辑，请先重新读取本机草稿，再选择图片。";
       return;
+    }
+    if (busy.value) {
+      photoErrors.value[id] = "正在处理其他操作，请等待完成后重新选择图片。";
+      return;
+    }
     busy.value = true;
     error.value = "";
+    delete photoErrors.value[id];
+    activePhoto.value = id;
+    photoCancellable.value = false;
     progress.value = 0;
-    progressText.value = "正在检查图片";
+    progressText.value = "正在准备图片";
     const epoch = generation;
-    abortController = new AbortController();
+    const controller = new AbortController();
+    abortController = controller;
     try {
-      if (!(await flush())) return;
+      if (!(await flush()))
+        throw new Error(
+          saveError.value?.message ||
+            "本机草稿尚未保存，请先重试本机保存，再选择图片。",
+        );
+      if (epoch !== generation || controller.signal.aborted) return;
       let photo;
       if (file) {
+        photoCancellable.value = true;
         photo = await processImage(file, {
-          signal: abortController.signal,
+          signal: controller.signal,
           onProgress: (p) => {
+            if (epoch !== generation || controller.signal.aborted) return;
             progress.value = p.progress * 100;
+            progressText.value =
+              {
+                validate: "正在读取并检查图片",
+                hash: "正在检查图片摘要",
+                decode: "正在解码图片",
+                render: "正在生成图片预览",
+                encode: "正在压缩图片",
+                attachment: "正在生成图片附件",
+                complete: "正在准备保存图片",
+              }[p.stage] || "正在处理图片";
           },
         });
+        if (epoch !== generation || controller.signal.aborted) return;
         const others = revision.value.photos.filter(
           (p) => p.category !== category || p.slot !== slot,
         );
@@ -504,22 +545,50 @@ export const useFormStore = defineStore("form", () => {
         )
           throw new Error("这张图片已在其他槽位使用，请选择不同的图片");
       }
-      if (epoch !== generation || abortController.signal.aborted) return;
+      if (epoch !== generation || controller.signal.aborted) return;
       const value = snapshot();
       value.photos = value.photos.filter(
         (p) => p.category !== category || p.slot !== slot,
       );
       if (photo) value.photos.push({ ...photo, category, slot });
+      // 事务一旦提交就不能当作已取消，保存期间关闭取消入口。
+      photoCancellable.value = false;
+      progressText.value = "正在保存图片到本机";
       await persist(value, true, epoch);
-      if (epoch === generation) revision.value.photos = value.photos;
+      if (epoch === generation) {
+        revision.value.photos = value.photos;
+        issues.value = issues.value.filter((issue) => issue.id !== id);
+      }
     } catch (failure) {
-      if (epoch === generation) failed(failure);
+      if (epoch === generation) {
+        // 失权引发的中止应保留冲突提示，不能被普通取消信息覆盖。
+        if (failure.status === 409) failed(failure);
+        photoErrors.value[id] =
+          readOnly.value && error.value
+            ? error.value
+            : failure.name === "AbortError"
+              ? "图片处理已取消，原有图片仍保留。"
+              : failure.name === "QuotaExceededError"
+                ? "本机存储空间不足，图片尚未加入。请释放空间后重新选择，原有图片仍保留。"
+                : failure.message ||
+                  "图片未能加入，请重新选择，原有图片仍保留。";
+      }
     } finally {
       if (epoch === generation) {
         busy.value = false;
         abortController = null;
+        activePhoto.value = "";
+        photoCancellable.value = false;
       }
     }
+  }
+  /** 取消尚未进入保存事务的图片处理；现有槽位内容保持不变。
+   * @returns {void} 无返回值
+   */
+  function cancelPhoto() {
+    if (!activePhoto.value || !photoCancellable.value) return;
+    abortController?.abort();
+    photoErrors.value[activePhoto.value] = "图片处理已取消，原有图片仍保留。";
   }
   /** 校验并生成完整PDF快照；下载和清理均由页面上的明确操作触发。
    * @returns {Promise<void>} 生成结束，失败保留草稿
@@ -671,6 +740,9 @@ export const useFormStore = defineStore("form", () => {
     progress,
     progressText,
     issues,
+    photoErrors,
+    activePhoto,
+    photoCancellable,
     readOnly,
     storageFailed,
     storageMode,
@@ -691,6 +763,7 @@ export const useFormStore = defineStore("form", () => {
     navigate,
     focusIssue,
     changePhoto,
+    cancelPhoto,
     generateExport,
     cancelExport,
     returnToEdit,

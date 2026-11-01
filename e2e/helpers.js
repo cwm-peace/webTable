@@ -69,7 +69,7 @@ export async function fillBasic(page, name = "回归测试资料") {
 /**
  * 在空白的同源测试页面读写已有数据库，避免应用保存队列与准备数据互相覆盖。
  * @param {import('@playwright/test').Page} page 当前测试页面
- * @param {object} options answersOnly仅补齐答案；images用于创建完整图片草稿
+ * @param {object} options answersOnly仅补齐答案；images用于创建完整图片草稿；entryPath指定子路径入口
  * @returns {Promise<void>} 准备完成并回到正式页面
  */
 export async function seedDraft(
@@ -78,6 +78,7 @@ export async function seedDraft(
     answersOnly = false,
     images = syntheticImages(),
     name = "测试本地草稿",
+    entryPath = "/",
   } = {},
 ) {
   await page.route("**/__e2e_seed", (route) =>
@@ -183,7 +184,7 @@ export async function seedDraft(
     { fields, questions, images: payload, answersOnly, name },
   );
   await page.unroute("**/__e2e_seed");
-  await page.goto("/");
+  await page.goto(entryPath);
   await expect(page.locator("#basic-name")).toBeEnabled();
 }
 

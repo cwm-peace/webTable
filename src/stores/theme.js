@@ -1,4 +1,4 @@
-/** 本机外观偏好：三种视觉主题和独立明暗模式，不发送网络请求。 */
+/** 本机外观偏好：极简/扁平两种视觉主题和独立明暗模式，不发送网络请求。 */
 import { defineStore } from "pinia";
 import { ref } from "vue";
 
@@ -7,7 +7,6 @@ export const useThemeStore = defineStore("theme", () => {
   const mode = ref("system");
   const themes = [
     { value: "minimal", label: "极简" },
-    { value: "tech", label: "科技" },
     { value: "flat", label: "扁平" },
   ];
   let media;
@@ -30,6 +29,7 @@ export const useThemeStore = defineStore("theme", () => {
     try {
       const savedTheme = localStorage.getItem("webtable-theme");
       const savedMode = localStorage.getItem("webtable-color-mode");
+      // 已移除主题（如旧版科技）无法匹配当前列表，自动回退默认极简。
       if (themes.some((item) => item.value === savedTheme))
         theme.value = savedTheme;
       if (["system", "light", "dark"].includes(savedMode))
@@ -59,7 +59,7 @@ export const useThemeStore = defineStore("theme", () => {
   }
   /**
    * 切换本机视觉主题。
-   * @param {string} value minimal、tech 或 flat
+   * @param {string} value minimal 或 flat
    * @returns {void} 无返回值
    */
   function setTheme(value) {

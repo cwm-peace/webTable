@@ -474,7 +474,7 @@ onBeforeUnmount(() => {
               </ul>
             </section>
             <section
-              v-if="store.busy"
+              v-if="store.busy && !store.activePhoto"
               class="panel space-y-4"
               aria-labelledby="processing-title"
             >
@@ -584,13 +584,17 @@ onBeforeUnmount(() => {
                   支持 JPEG、PNG、WebP、GIF、BMP、AVIF、TIFF、SVG
                   等常见图片，按文件内容识别格式，HEIC／HEIF
                   取决于浏览器是否内置解码器。单张最多 64 MiB；超过 2500
-                  万像素或边长 8192 会自动缩小，动图取第一帧。
-                  不超过 2 MiB、1300 万像素且边长不超过 4096
+                  万像素或边长 8192 会自动缩小，动图取第一帧。 不超过 2
+                  MiB、1300 万像素且边长不超过 4096
                   的图片保留原始字节；其余生成压缩 JPEG 附件并标记。
                   原文件可能保留拍摄位置等元数据。
                 </p>
               </div>
-              <fieldset :disabled="inputDisabled" class="min-w-0 space-y-5">
+              <!-- 图片控件逐项禁用，使当前槽位的取消按钮仍可操作。 -->
+              <fieldset
+                :disabled="store.step !== 2 && inputDisabled"
+                class="min-w-0 space-y-5"
+              >
                 <template v-if="store.step === 1"
                   ><section
                     v-for="group in fieldGroups"
@@ -690,8 +694,18 @@ onBeforeUnmount(() => {
                         :label="category.label"
                         :slot="slot"
                         :disabled="inputDisabled"
-                        :error="fieldError(`photo-${category.key}-${slot}`)"
+                        :error="
+                          store.photoErrors[`photo-${category.key}-${slot}`] ||
+                          fieldError(`photo-${category.key}-${slot}`)
+                        "
+                        :processing="
+                          store.activePhoto === `photo-${category.key}-${slot}`
+                        "
+                        :progress="store.progress"
+                        :progress-text="store.progressText"
+                        :cancellable="store.photoCancellable"
                         @change="store.changePhoto(category.key, slot, $event)"
+                        @cancel="store.cancelPhoto"
                       />
                     </div></section
                 ></template>
