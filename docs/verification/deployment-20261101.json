@@ -1,0 +1,369 @@
+{
+  "date": "2026-11-01",
+  "status": "deployed-and-verified",
+  "sourceCommit": "49ae8f43ff0a3aefa21dd4ffae4f542cb2f1d808",
+  "includedProductionCommit": "42071ba",
+  "branch": "feature-2026070-AI",
+  "base": "/bdsm/",
+  "bundle": {
+    "files": 29,
+    "archiveBytes": 19804995,
+    "archiveSha256": "3f3a21b93d6c6d1ea310661ba715f878090c4ac2689893003360abeced52d405",
+    "indexSha256": "1320b0cffbad2f58dcd6a7ef28d4064939e9c71bd9163d7a688ff4bf4ed433b9",
+    "compressedRepresentationsVerified": true
+  },
+  "unit": {
+    "passed": 99,
+    "failed": 0,
+    "skipped": 0
+  },
+  "browserRegression": {
+    "expected": 91,
+    "unexpected": 0,
+    "skipped": 3,
+    "flaky": 0,
+    "duration": 327845.577
+  },
+  "subpathSmoke": {
+    "local": [
+      {
+        "engine": "chromium",
+        "status": "passed",
+        "realDevice": false,
+        "secureContext": true,
+        "imageCases": [
+          {
+            "key": "selfie-1",
+            "name": "synthetic-progressive.jpg",
+            "mime": "image/jpeg",
+            "width": 80,
+            "height": 60,
+            "sha256": "6e36ab4bc5431657788ab831094db44fc9272de7794e38687ed3c5c716ba4ac8",
+            "preserved": true
+          },
+          {
+            "key": "selfie-2",
+            "name": "synthetic-adam7.png",
+            "mime": "image/png",
+            "width": 9,
+            "height": 7,
+            "sha256": "04153efa1930d6bf5b25d81c7242ffd2b5518d3ae4291f9e9f27639c678bf624",
+            "preserved": true
+          },
+          {
+            "key": "selfie-3",
+            "name": "synthetic-orientation6.png",
+            "mime": "image/png",
+            "width": 7,
+            "height": 9,
+            "sha256": "67d314aec9f02d399b4190cd4b072a61bea5ddd5a0e0b07a6db72ee4b268ba0e",
+            "preserved": true
+          },
+          {
+            "key": "selfie-4",
+            "name": "synthetic-mislabeled.jpg",
+            "mime": "image/png",
+            "width": 13,
+            "height": 11,
+            "sha256": "9c64ac72537fe87f918a304ade1ebcdf672e69a1ac81cf3d09c6c7eb7a5f1055",
+            "preserved": true
+          },
+          {
+            "key": "nude-1",
+            "name": "synthetic-orientation8.png",
+            "mime": "image/png",
+            "width": 7,
+            "height": 9,
+            "sha256": "b461db1f6403ee5b99434bf834b84a2f3df81c4535ccdf60f8511e1e43a4b68a",
+            "preserved": true
+          }
+        ],
+        "readFailure": {
+          "inlineErrorVisible": true,
+          "existingPhotosPreserved": true,
+          "previewPreserved": true,
+          "sameFileRetry": true
+        },
+        "truncatedPreservesPhoto": true,
+        "pdf": {
+          "pages": 24,
+          "attachments": 16,
+          "checkedOriginals": 6,
+          "downloaded": true
+        },
+        "downloadPreservesDraft": true,
+        "mobileNoHorizontalOverflow": true,
+        "sameOriginGetOnly": true
+      },
+      {
+        "engine": "webkit",
+        "status": "passed",
+        "realDevice": false,
+        "secureContext": true,
+        "imageCases": [
+          {
+            "key": "selfie-1",
+            "name": "synthetic-progressive.jpg",
+            "mime": "image/jpeg",
+            "width": 80,
+            "height": 60,
+            "sha256": "6e36ab4bc5431657788ab831094db44fc9272de7794e38687ed3c5c716ba4ac8",
+            "preserved": true
+          },
+          {
+            "key": "selfie-2",
+            "name": "synthetic-adam7.png",
+            "mime": "image/png",
+            "width": 9,
+            "height": 7,
+            "sha256": "04153efa1930d6bf5b25d81c7242ffd2b5518d3ae4291f9e9f27639c678bf624",
+            "preserved": true
+          },
+          {
+            "key": "selfie-3",
+            "name": "synthetic-orientation6.png",
+            "mime": "image/png",
+            "width": 7,
+            "height": 9,
+            "sha256": "67d314aec9f02d399b4190cd4b072a61bea5ddd5a0e0b07a6db72ee4b268ba0e",
+            "preserved": true
+          },
+          {
+            "key": "selfie-4",
+            "name": "synthetic-mislabeled.jpg",
+            "mime": "image/png",
+            "width": 13,
+            "height": 11,
+            "sha256": "9c64ac72537fe87f918a304ade1ebcdf672e69a1ac81cf3d09c6c7eb7a5f1055",
+            "preserved": true
+          },
+          {
+            "key": "nude-1",
+            "name": "synthetic-orientation8.png",
+            "mime": "image/png",
+            "width": 7,
+            "height": 9,
+            "sha256": "b461db1f6403ee5b99434bf834b84a2f3df81c4535ccdf60f8511e1e43a4b68a",
+            "preserved": true
+          }
+        ],
+        "readFailure": {
+          "inlineErrorVisible": true,
+          "existingPhotosPreserved": true,
+          "previewPreserved": true,
+          "sameFileRetry": true
+        },
+        "truncatedPreservesPhoto": true,
+        "pdf": {
+          "pages": 24,
+          "attachments": 16,
+          "checkedOriginals": 6,
+          "downloaded": true
+        },
+        "downloadPreservesDraft": true,
+        "mobileNoHorizontalOverflow": true,
+        "sameOriginGetOnly": true
+      }
+    ],
+    "public": [
+      {
+        "engine": "chromium",
+        "status": "passed",
+        "realDevice": false,
+        "secureContext": true,
+        "imageCases": [
+          {
+            "key": "selfie-1",
+            "name": "synthetic-progressive.jpg",
+            "mime": "image/jpeg",
+            "width": 80,
+            "height": 60,
+            "sha256": "6e36ab4bc5431657788ab831094db44fc9272de7794e38687ed3c5c716ba4ac8",
+            "preserved": true
+          },
+          {
+            "key": "selfie-2",
+            "name": "synthetic-adam7.png",
+            "mime": "image/png",
+            "width": 9,
+            "height": 7,
+            "sha256": "04153efa1930d6bf5b25d81c7242ffd2b5518d3ae4291f9e9f27639c678bf624",
+            "preserved": true
+          },
+          {
+            "key": "selfie-3",
+            "name": "synthetic-orientation6.png",
+            "mime": "image/png",
+            "width": 7,
+            "height": 9,
+            "sha256": "67d314aec9f02d399b4190cd4b072a61bea5ddd5a0e0b07a6db72ee4b268ba0e",
+            "preserved": true
+          },
+          {
+            "key": "selfie-4",
+            "name": "synthetic-mislabeled.jpg",
+            "mime": "image/png",
+            "width": 13,
+            "height": 11,
+            "sha256": "9c64ac72537fe87f918a304ade1ebcdf672e69a1ac81cf3d09c6c7eb7a5f1055",
+            "preserved": true
+          },
+          {
+            "key": "nude-1",
+            "name": "synthetic-orientation8.png",
+            "mime": "image/png",
+            "width": 7,
+            "height": 9,
+            "sha256": "b461db1f6403ee5b99434bf834b84a2f3df81c4535ccdf60f8511e1e43a4b68a",
+            "preserved": true
+          }
+        ],
+        "readFailure": {
+          "inlineErrorVisible": true,
+          "existingPhotosPreserved": true,
+          "previewPreserved": true,
+          "sameFileRetry": true
+        },
+        "truncatedPreservesPhoto": true,
+        "pdf": {
+          "pages": 24,
+          "attachments": 16,
+          "checkedOriginals": 6,
+          "downloaded": true
+        },
+        "downloadPreservesDraft": true,
+        "mobileNoHorizontalOverflow": true,
+        "sameOriginGetOnly": true
+      },
+      {
+        "engine": "webkit",
+        "status": "passed",
+        "realDevice": false,
+        "secureContext": true,
+        "imageCases": [
+          {
+            "key": "selfie-1",
+            "name": "synthetic-progressive.jpg",
+            "mime": "image/jpeg",
+            "width": 80,
+            "height": 60,
+            "sha256": "6e36ab4bc5431657788ab831094db44fc9272de7794e38687ed3c5c716ba4ac8",
+            "preserved": true
+          },
+          {
+            "key": "selfie-2",
+            "name": "synthetic-adam7.png",
+            "mime": "image/png",
+            "width": 9,
+            "height": 7,
+            "sha256": "04153efa1930d6bf5b25d81c7242ffd2b5518d3ae4291f9e9f27639c678bf624",
+            "preserved": true
+          },
+          {
+            "key": "selfie-3",
+            "name": "synthetic-orientation6.png",
+            "mime": "image/png",
+            "width": 7,
+            "height": 9,
+            "sha256": "67d314aec9f02d399b4190cd4b072a61bea5ddd5a0e0b07a6db72ee4b268ba0e",
+            "preserved": true
+          },
+          {
+            "key": "selfie-4",
+            "name": "synthetic-mislabeled.jpg",
+            "mime": "image/png",
+            "width": 13,
+            "height": 11,
+            "sha256": "9c64ac72537fe87f918a304ade1ebcdf672e69a1ac81cf3d09c6c7eb7a5f1055",
+            "preserved": true
+          },
+          {
+            "key": "nude-1",
+            "name": "synthetic-orientation8.png",
+            "mime": "image/png",
+            "width": 7,
+            "height": 9,
+            "sha256": "b461db1f6403ee5b99434bf834b84a2f3df81c4535ccdf60f8511e1e43a4b68a",
+            "preserved": true
+          }
+        ],
+        "readFailure": {
+          "inlineErrorVisible": true,
+          "existingPhotosPreserved": true,
+          "previewPreserved": true,
+          "sameFileRetry": true
+        },
+        "truncatedPreservesPhoto": true,
+        "pdf": {
+          "pages": 24,
+          "attachments": 16,
+          "checkedOriginals": 6,
+          "downloaded": true
+        },
+        "downloadPreservesDraft": true,
+        "mobileNoHorizontalOverflow": true,
+        "sameOriginGetOnly": true
+      }
+    ]
+  },
+  "http": {
+    "status": "passed",
+    "tlsVerified": true,
+    "responses": [
+      {
+        "path": "/bdsm/",
+        "status": 200,
+        "encoding": "gzip",
+        "wireBytes": 800,
+        "sha256Verified": true,
+        "cache": "no-cache",
+        "conditionalStatus": 304
+      },
+      {
+        "path": "/bdsm/assets/index-Ct6fiY5f.js",
+        "status": 200,
+        "encoding": "gzip",
+        "wireBytes": 96370,
+        "sha256Verified": true,
+        "cache": "public, max-age=31536000, immutable",
+        "conditionalStatus": 304
+      },
+      {
+        "path": "/bdsm/assets/image.worker-CS832Hav.js",
+        "status": 200,
+        "encoding": "gzip",
+        "wireBytes": 2856,
+        "sha256Verified": true,
+        "cache": "public, max-age=31536000, immutable",
+        "conditionalStatus": 304
+      },
+      {
+        "path": "/bdsm/fonts/WebTableSansSC-Regular-c5b729f69005.otf",
+        "status": 200,
+        "encoding": "gzip",
+        "wireBytes": 5876648,
+        "sha256Verified": true,
+        "cache": "public, max-age=31536000, immutable",
+        "conditionalStatus": 304
+      },
+      {
+        "path": "/bdsm/assets/index-D4BeDUHU.js",
+        "status": 200
+      }
+    ]
+  },
+  "deployment": {
+    "nginxConfigValidated": true,
+    "nginxReloaded": true,
+    "previousReleaseBackedUp": true,
+    "retainedLegacyFiles": 41,
+    "adjacentSiteUnchanged": true,
+    "accessLoggingUnchanged": true,
+    "temporarySshCredentialsInstalled": false
+  },
+  "limitations": [
+    "Android/iOS/HarmonyOS real-device photo pickers not tested.",
+    "Firefox startup blocked by local profile-folder error; not included in passing browser scope.",
+    "Eleven fixed-version rounds not run."
+  ]
+}

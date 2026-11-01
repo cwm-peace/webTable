@@ -33,3 +33,7 @@ PDF 字库仅导出时按同源 URL 加载，内容哈希文件名可缓存一�
 ## 同日加固后的部署方式
 
 实际站点随后迁移到经官方签名验证的Nginx稳定版1.30.6，配置由`/etc/nginx/nginx.conf`和systemd管理；启用`gzip_static`直接发送构建旁文件，TLS使用发行版动态库，ACME重载改为`systemctl reload nginx`。Brotli仍未启用。上文“动态gzip、无gzip_static”的描述保留为迁移前记录。站点静态目录与证书/HTTP验证路径不变，回滚和具体服务器信息见本机忽略目录`artifacts/hardening-20261017/`。
+
+## 2026-11-01 照片修复发布
+
+发布代码 `49ae8f4` 包含此前线上 `42071ba` 的完整界面与流程。本次按 `/bdsm/` 构建，在服务器校验29个新文件并保留41个旧资源；只替换现有配置中的WebTable发布根目录，不覆盖相邻站点、证书、安全头和日志设置。原配置和静态目录已备份，配置校验与平滑重载成功。本机/公网双引擎照片与PDF验收、TLS、内容摘要、gzip及304检查通过。证据见 [deployment-20261101.json](verification/deployment-20261101.json)，私有路径与回滚命令保存在忽略目录 `artifacts/release-20261101/DEPLOYMENT.md`。
